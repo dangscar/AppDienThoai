@@ -1,0 +1,239 @@
+package com.nlhd.user
+
+import android.annotation.SuppressLint
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nlhd.core.theme.AppTheme
+import com.nlhd.core.utils.Font
+import org.koin.androidx.compose.koinViewModel
+import com.nlhd.core.R
+import com.nlhd.core.utils.containerButtonLightGray
+import com.nlhd.core.utils.containerLogin
+import com.nlhd.core.utils.containerTextFieldLogin
+import com.nlhd.core.utils.containerTopBar
+
+@RequiresApi(Build.VERSION_CODES.Q)
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+fun LoginScreen(
+    loginViewModel: LoginViewModel = koinViewModel(),
+    onLoginSuccess: (String) -> Unit
+) {
+    val context = LocalContext.current
+
+    val state = loginViewModel.state.collectAsStateWithLifecycle()
+    val email = loginViewModel.email.collectAsStateWithLifecycle()
+    val password = loginViewModel.password.collectAsStateWithLifecycle()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("ĐĂNG NHẬP", style = AppTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White
+                    ),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = containerLogin
+                )
+            )
+        },
+        containerColor = Color.White
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(AppTheme.dimens.medium)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(AppTheme.dimens.medium3))
+            Text("KTOR STORE", style = AppTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.Black
+                )
+            )
+            Spacer(modifier = Modifier.height(AppTheme.dimens.medium3))
+            OutlinedTextField(
+                value = email.value,
+                onValueChange = { loginViewModel.setEmail(it) },
+                singleLine = true,
+                placeholder = {
+                    Text("Email", style = AppTheme.typography.labelMedium.copy(
+                        fontFamily = Font.fontFamily,
+                        fontWeight = FontWeight.ExtraLight
+                    ),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                },
+                shape = RoundedCornerShape(AppTheme.dimens.small3),
+                colors = TextFieldDefaults.colors(
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = containerLogin,
+                    focusedContainerColor = containerTextFieldLogin,
+                    unfocusedContainerColor = containerTextFieldLogin
+                ),
+                modifier = Modifier.fillMaxWidth()
+
+            )
+
+            Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
+
+            OutlinedTextField(
+                value = password.value,
+                onValueChange = { loginViewModel.setPassword(it) },
+                singleLine = true,
+                placeholder = {
+                    Text("Mật khẩu", style = AppTheme.typography.labelMedium.copy(
+                        fontFamily = Font.fontFamily,
+                        fontWeight = FontWeight.ExtraLight
+                    ),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                },
+                shape = RoundedCornerShape(AppTheme.dimens.small3),
+                colors = TextFieldDefaults.colors(
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = containerLogin,
+                    focusedContainerColor = containerTextFieldLogin,
+                    unfocusedContainerColor = containerTextFieldLogin
+                ),
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+
+            Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
+
+            Button(
+                onClick = {
+                    loginViewModel.login()
+                },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = containerLogin),
+                shape = RoundedCornerShape(AppTheme.dimens.small3)
+            ) {
+                Text("Tiếp tục", style = AppTheme.typography.labelMedium.copy(
+                    fontFamily = Font.fontFamily,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                ),
+                    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
+
+            Row {
+                Text("Bạn chưa có tài khoản?", style = AppTheme.typography.labelMedium.copy(
+                    fontFamily = Font.fontFamily,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                ),
+                )
+                Spacer(modifier = Modifier.width(AppTheme.dimens.small))
+                Text("Đăng ký", style = AppTheme.typography.labelMedium.copy(
+                    fontFamily = Font.fontFamily,
+                    fontWeight = FontWeight.Bold,
+                    color = containerLogin
+                ))
+            }
+
+            Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
+
+            when (state.value) {
+                is LoginState.Error -> {
+                    Text("Đăng nhập bất thường", style = AppTheme.typography.labelMedium.copy(
+                        fontFamily = Font.fontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
+                    ))
+                }
+                LoginState.Loading -> {
+                    Text("Vui lòng đăng nhập", style = AppTheme.typography.labelMedium.copy(
+                        fontFamily = Font.fontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
+                    ))
+                }
+                is LoginState.Success -> {
+                    val token = (state.value as LoginState.Success).data.token
+                    val role = (state.value as LoginState.Success).data.user.role
+                    Text("Đăng nhập thành công", style = AppTheme.typography.labelMedium.copy(
+                        fontFamily = Font.fontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
+                    ))
+                    loginViewModel.saveToken(context, token, role)
+                }
+
+                is LoginState.SaveTokenSuccess -> {
+                    onLoginSuccess((state.value as LoginState.SaveTokenSuccess).role)
+                    loginViewModel.setState(LoginState.Loading)
+                }
+            }
+
+        }
+    }
+
+
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+private fun LoginPre() {
+
+}
