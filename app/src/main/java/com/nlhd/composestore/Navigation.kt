@@ -3,6 +3,8 @@ package com.nlhd.composestore
 import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,9 +49,14 @@ import com.nlhd.admin.AdminProfileScreen
 import com.nlhd.cart.CartScreen
 import com.nlhd.checkout.CheckoutScreen
 import com.nlhd.checkout.CheckoutSuccessScreen
+import com.nlhd.composestore.navigate.AddProduct
+import com.nlhd.composestore.navigate.AddVersionProduct
 import com.nlhd.composestore.navigate.Address
 import com.nlhd.composestore.navigate.EditAddress
-import com.nlhd.composestore.navigate.ProductScreen
+import com.nlhd.composestore.navigate.EditProduct
+import com.nlhd.composestore.navigate.EditProfile
+import com.nlhd.composestore.navigate.LoadProduct
+import com.nlhd.composestore.navigate.LoadVersionProduct
 import com.nlhd.composestore.navigate.Search
 import com.nlhd.composestore.navigate.SearchSuccess
 import com.nlhd.dashboard.Navigate
@@ -67,10 +74,15 @@ import com.nlhd.domain.entity.checkout.CheckoutResponse
 import com.nlhd.domain.entity.checkout.Payment
 import com.nlhd.domain.entity.product.Product
 import com.nlhd.keystore.KeyStoreManager
-import com.nlhd.manage_product.ManageProductScreen
-import com.nlhd.manage_product.ProductScreen
+import com.nlhd.manage_product.EditProductScreen.EditProductScreen
+import com.nlhd.manage_product.AddProductScreen.ManageProductScreen
+import com.nlhd.manage_product.AddVersionProductScreen.AddVersionProductScreen
+import com.nlhd.manage_product.LoadProductScreen.ProductScreen
+import com.nlhd.manage_product.LoadVersionProductScreen.LoadVersionProductScreen
+import com.nlhd.order.OrderScreen
 import com.nlhd.search.SearchScreen
 import com.nlhd.search.SearchSuccessScreen
+import com.nlhd.user.EditProfileScreen
 import com.nlhd.user.UserScreen
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
@@ -91,7 +103,7 @@ sealed class Navigation(
     val icon: Int
 ) {
     object Home : Navigation("home", "Trang chủ", R.drawable.ic_home)
-    object Search: Navigation("seach", "Tìm kiếm", R.drawable.ic_search)
+    object Order: Navigation("seach", "Đơn hàng", R.drawable.ic_notification)
     object User : Navigation("user", "Người dùng", R.drawable.ic_profile)
 }
 
@@ -120,8 +132,7 @@ object Dashboard
 @Serializable
 object Admin
 
-@Serializable
-object ManageProduct
+
 
 @Composable
 fun BottomBar(
@@ -141,7 +152,7 @@ fun BottomBar(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val route = listOf(Navigation.Home, Navigation.Search, Navigation.User)
+            val route = listOf(Navigation.Home, Navigation.Order, Navigation.User)
             route.forEach { navigation ->
                 BottomBarItem(
                     navigation = navigation,
@@ -230,7 +241,6 @@ fun Navigation(
                     CircularProgressIndicator(
                         color = contentPrice,
                     )
-                    Text("Loading...")
                 }
 
             }
@@ -271,7 +281,7 @@ fun AdminScreen(
                 onClickNavigate = {
                     when (it) {
                         Navigate.Product -> {
-                            navController.navigate(ProductScreen)
+                            navController.navigate(LoadProduct)
                         }
                         Navigate.Order -> {
 
@@ -299,11 +309,73 @@ fun AdminScreen(
                 }
             )
         }
-        composable<ManageProduct> {
-            ManageProductScreen()
+        composable<AddProduct> {
+            ManageProductScreen(
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
         }
-        composable<ProductScreen> {
-            ProductScreen()
+        composable<LoadProduct> {
+            ProductScreen(
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                },
+                onClickAddProduct = {
+                    navController.navigate(AddProduct)
+                },
+                onClickEditProduct = {
+                    navController.navigate(EditProduct(it))
+                },
+                onClick = { id, name ->
+                    navController.navigate(LoadVersionProduct(id, name))
+                }
+            )
+        }
+        composable<EditProduct> {
+            val id = it.toRoute<EditProduct>().id
+            EditProductScreen(
+                id = id,
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
+        composable<LoadVersionProduct> {
+            val productId = it.toRoute<LoadVersionProduct>().productId
+            val name = it.toRoute<LoadVersionProduct>().productName
+            LoadVersionProductScreen(
+                productId = productId,
+                productName = name,
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                },
+                onClick = {
+
+                },
+                onClickAddVersionProduct = {
+                    navController.navigate(AddVersionProduct(productId))
+                }
+            )
+        }
+        composable<AddVersionProduct> {
+            val productId = it.toRoute<AddVersionProduct>().productId
+            AddVersionProductScreen(
+                productId = productId,
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
         }
     }
 }
@@ -319,7 +391,20 @@ fun CustomerScreen(
         startDestination = General,
         navController = navController,
     ) {
-        composable<General> {
+        composable<General>(
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             GeneralScreen(onClick = { product->
                 navController.navigate(Detail(productId = product.id, version = product.versions[0].id, color = product.colors[0].id))
             },
@@ -329,10 +414,38 @@ fun CustomerScreen(
                 onClickSearch = {
                     navController.navigate(Search)
                 },
-                onNavigateAdmin = onNavigateAdmin
+                onNavigateAdmin = onNavigateAdmin,
+                onClickEditProfile = {
+                    navController.navigate(EditProfile)
+                }
             )
         }
-        composable<Detail> {
+        composable<Detail>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             val productId = it.toRoute<Detail>().productId
             val version = it.toRoute<Detail>().version
             val color = it.toRoute<Detail>().color
@@ -347,11 +460,43 @@ fun CustomerScreen(
                 },
                 onClickCart = {
                     navController.navigate(Cart)
+                },
+                onNavigateCheckout = {
+                    val selectedProductsJson = Json.encodeToString(it)
+                    navController.navigate(Checkout(selectedProductsJson))
+                },
+                onClickSearch = {
+                    navController.navigate(Search)
                 }
             )
         }
 
-        composable<Search> {
+        composable<Search>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             SearchScreen(
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
@@ -364,7 +509,32 @@ fun CustomerScreen(
             )
         }
 
-        composable<SearchSuccess> {
+        composable<SearchSuccess>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             SearchSuccessScreen(
                 search = it.toRoute<SearchSuccess>().search,
                 onClickBack = {
@@ -378,7 +548,32 @@ fun CustomerScreen(
             )
         }
 
-        composable<Cart> {
+        composable<Cart>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             CartScreen(
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
@@ -398,7 +593,20 @@ fun CustomerScreen(
             )
         }
 
-        composable<Address> {
+        composable<Address>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             AddressScreen(
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
@@ -408,7 +616,20 @@ fun CustomerScreen(
             )
         }
 
-        composable<EditAddress> {
+        composable<EditAddress>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             val id = it.toRoute<EditAddress>().id
             EditAddressScreen(
                 id = id,
@@ -420,7 +641,32 @@ fun CustomerScreen(
             )
         }
 
-        composable<Checkout> {
+        composable<Checkout>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             val checkoutResponseString = it.toRoute<Checkout>().checkoutResponse
             val gson = Gson()
             val checkoutResponse = gson.fromJson(checkoutResponseString, CheckoutResponse::class.java)
@@ -447,13 +693,62 @@ fun CustomerScreen(
             )
         }
 
-        composable<Payment> {
+        composable<Payment>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             val amountPaid = it.toRoute<Payment>().amountPaid
             CheckoutSuccessScreen(
                 onClickBack = {
                     navController.navigate(General) {
                         popUpTo(0) { inclusive = true }
                         launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable<EditProfile>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+
+        ) {
+            EditProfileScreen(
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
                     }
                 }
             )
@@ -469,6 +764,7 @@ fun GeneralScreen(
     onClick: (Product) -> Unit,
     onClickCart: () -> Unit,
     onClickSearch: () -> Unit,
+    onClickEditProfile: () -> Unit,
     onNavigateAdmin: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -500,19 +796,17 @@ fun GeneralScreen(
                 )
             }
 
-            composable(Navigation.Search.route) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Search")
-                }
+            composable(Navigation.Order.route) {
+                OrderScreen()
             }
 
             composable(Navigation.User.route) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     UserScreen(
-                        onNavigateAdmin = onNavigateAdmin
+                        onNavigateAdmin = onNavigateAdmin,
+                        onClickEditProfile = onClickEditProfile
                     )
                 }
-
             }
         }
     }

@@ -73,14 +73,19 @@ import com.nlhd.core.utils.Utils
 import com.nlhd.keystore.KeyStoreManager
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.graphics.toColorInt
+import com.google.gson.Gson
 import com.nlhd.core.R
 import com.nlhd.core.utils.Font
 import com.nlhd.core.utils.containerButtonLightGray
 import com.nlhd.core.utils.containerSearch
 import com.nlhd.core.utils.containerTopBar
 import com.nlhd.core.utils.contentPrice
+import com.nlhd.domain.entity.checkout.CheckoutRequest
+import com.nlhd.domain.entity.checkout.CheckoutResponse
+import com.nlhd.domain.entity.checkout.ProductCheckout
 import java.text.NumberFormat
 
+var currentToast: Toast? = null
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,19 +95,30 @@ fun DetailScreen(
     version: Int,
     color: Int,
     onClickBack: () -> Unit,
-    onClickCart: () -> Unit
+    onClickCart: () -> Unit,
+    onNavigateCheckout: (CheckoutResponse) -> Unit,
+    onClickSearch: () -> Unit
 ) {
+    val gson = Gson()
     val context = LocalContext.current
     val state = detailViewModel.state.collectAsStateWithLifecycle()
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
     val versionState = detailViewModel.version.collectAsStateWithLifecycle()
     val colorState = detailViewModel.color.collectAsStateWithLifecycle()
     val addCartState = detailViewModel.addCartState.collectAsStateWithLifecycle()
+    val getCartState = detailViewModel.stateGetCart.collectAsStateWithLifecycle()
+    val checkoutPreviewState = detailViewModel.stateCheckoutPreview.collectAsStateWithLifecycle()
     LaunchedEffect(
         key1 = Unit
     ) {
         detailViewModel.setVersionAndColor(version, color)
         detailViewModel.getProductDetail(productId, version, color)
+    }
+
+    LaunchedEffect(keyStore.value) {
+        if (keyStore.value != "") {
+            detailViewModel.getCart(keyStore.value)
+        }
     }
 
     Scaffold(
@@ -128,6 +144,13 @@ fun DetailScreen(
                                         RoundedCornerShape(AppTheme.dimens.small3)
                                     )
                                     .padding(AppTheme.dimens.small)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onTap = {
+                                                onClickSearch()
+                                            }
+                                        )
+                                    }
                             ) {
                                 val (search, text) = createRefs()
                                 IconButton(
@@ -228,6 +251,11 @@ fun DetailScreen(
 
                     val colorsSelected = colors.filter { it.id == colorState.value }
                     val statusResponse = if (colorsSelected.isEmpty()) colors[0].status else colorsSelected[0].status
+
+                    val image = if (colorsSelected.isEmpty()) colors[0].image else colorsSelected[0].image
+                    val price = if (colorsSelected.isEmpty()) colors[0].price else colorsSelected[0].price
+                    val colorName = if (colorsSelected.isEmpty()) colors[0].name else colorsSelected[0].name
+
                     if (statusResponse == "in-stock") {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -235,7 +263,6 @@ fun DetailScreen(
                         ) {
                             OutlinedButton(
                                 onClick = {
-                                    val productDetailResponse = (state.value as DetailState.Success).data
                                     val product = productDetailResponse.product
                                     val versions = product.versions
                                     val colors = versions.first { it.id == versionState.value }.colors
@@ -269,7 +296,48 @@ fun DetailScreen(
                             }
                             Spacer(modifier = Modifier.width(AppTheme.dimens.small))
                             OutlinedButton(
-                                onClick = {},
+                                onClick = {
+                                    if (getCartState.value is CartState.Success) {
+                                        val cartResponse = (getCartState.value as CartState.Success).data
+                                        val productsCheckout = mutableListOf<ProductCheckout>()
+                                        productsCheckout.add(
+                                            ProductCheckout(
+                                                color_product_id = product.id.toString(),
+                                                name = product.name,
+                                                image = image,
+                                                price = price.toString(),
+                                                quantity = "1",
+                                                color = colorName,
+                                                ram = versions.first { it.id == versionState.value }.ram.toString(),
+                                                storage = versions.first { it.id == versionState.value }.storage.toString()
+                                            )
+                                        )
+
+                                        if (cartResponse.customerInformation == null) {
+                                            currentToast?.cancel()
+                                            val info = "Vui lòng thêm địa chỉ"
+                                            currentToast = Toast.makeText(context, info, Toast.LENGTH_SHORT)
+                                            currentToast?.show()
+                                            return@OutlinedButton
+                                        }
+
+                                        if (productsCheckout.isNotEmpty()) {
+                                            val jsonList = gson.toJson(productsCheckout) //Phải chuyển đổi thành json
+                                            val checkoutRequest = CheckoutRequest(
+                                                customer_info = cartResponse.customerInformation!!.id.toInt(),
+                                                selected_products = jsonList
+                                            )
+                                            detailViewModel.checkoutPreview(keyStore.value, checkoutRequest)
+                                        } else {
+                                            currentToast?.cancel()
+                                            val info = "Có lỗi xảy ra"
+                                            currentToast = Toast.makeText(context, info, Toast.LENGTH_SHORT)
+                                            currentToast?.show()
+                                        }
+                                    }
+
+
+                                },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = contentPrice,
@@ -604,6 +672,29 @@ fun DetailScreen(
                 } else if (addCart.message.contains("Unauthenticated")) {
                     Toast.makeText(context, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+        when (checkoutPreviewState.value) {
+            is CheckoutPreviewState.Error -> {
+                val error = (checkoutPreviewState.value as CheckoutPreviewState.Error).message
+                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+            }
+            CheckoutPreviewState.Loading -> {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        color = contentPrice
+                    )
+                }
+            }
+            is CheckoutPreviewState.Success -> {
+                detailViewModel.setCheckoutPreviewState(CheckoutPreviewState.Pending)
+                val success = (checkoutPreviewState.value as CheckoutPreviewState.Success).data
+                onNavigateCheckout(success)
+            }
+            CheckoutPreviewState.Pending -> {
+
             }
         }
     }

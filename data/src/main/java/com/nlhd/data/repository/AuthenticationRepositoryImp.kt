@@ -6,9 +6,13 @@ import com.nlhd.data.mapper.toDomain
 import com.nlhd.data.model.login.LoginRequest
 import com.nlhd.data.model.logout.LogoutResponseDto
 import com.nlhd.data.model.profile.ProfileResponseDto
+import com.nlhd.data.model.profile.UpdateProfileRequestDto
+import com.nlhd.data.model.profile.UpdateProfileResponseDto
 import com.nlhd.domain.entity.login.LoginResponse
 import com.nlhd.domain.entity.logout.LogoutResponse
 import com.nlhd.domain.entity.profile.ProfileResponse
+import com.nlhd.domain.entity.profile.UpdateProfileReponse
+import com.nlhd.domain.entity.profile.UpdateProfileRequest
 import com.nlhd.domain.repository.AuthenticationRepository
 import com.nlhd.domain.resultWrapper.ResultWrapper
 import io.ktor.client.HttpClient
@@ -16,6 +20,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -82,5 +87,30 @@ class AuthenticationRepositoryImp(
             ResultWrapper.Failure(e)
         }
     }
+
+    override suspend fun updateProfile(
+        token: String,
+        updateProfileRequest: UpdateProfileRequest
+    ): ResultWrapper<UpdateProfileReponse> {
+        return try {
+            val responseDto = ktor.put(Utils.BASE_URL+"/api/profile") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(
+                    UpdateProfileRequestDto(
+                        address = updateProfileRequest.address,
+                        name = updateProfileRequest.name,
+                        phone = updateProfileRequest.phone
+                    )
+                )
+            }.body<UpdateProfileResponseDto>()
+            val response = responseDto.toDomain(responseDto)
+            return ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+
+    }
+
 
 }

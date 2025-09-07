@@ -1,7 +1,7 @@
 package com.nlhd.domain.usecase.manageProduct
 
-import com.nlhd.domain.entity.manageProduct.ManageProductResponse
-import com.nlhd.domain.entity.manageProduct.UploadProduct
+import com.nlhd.domain.entity.manageProduct.AddProduct.ManageProductResponse
+import com.nlhd.domain.entity.manageProduct.AddProduct.UploadProduct
 import com.nlhd.domain.repository.ManageProductRepository
 import com.nlhd.domain.resultWrapper.ResultWrapper
 

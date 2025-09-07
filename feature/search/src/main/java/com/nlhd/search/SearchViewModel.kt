@@ -51,7 +51,10 @@ class SearchViewModel(
     fun getHistory(context: Context): Flow<List<String>> = HistorySearchManager.getHistory(context)
 
     fun addSearch(context: Context) = viewModelScope.launch {
-        HistorySearchManager.addHistory(context, query.value)
+        if (query.value.isNotEmpty()) {
+            HistorySearchManager.addHistory(context, query.value)
+        }
+
     }
 
     fun removeHistoryItem(context: Context, item: String) = viewModelScope.launch {

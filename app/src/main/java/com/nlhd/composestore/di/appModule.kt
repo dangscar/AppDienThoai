@@ -8,8 +8,14 @@ import com.nlhd.composestore.NavigationViewModel
 import com.nlhd.dashboard.DashboardViewModel
 import com.nlhd.detail.DetailViewModel
 import com.nlhd.home.HomeViewModel
-import com.nlhd.manage_product.ManageProductViewModel
+import com.nlhd.manage_product.EditProductScreen.EditProductViewModel
+import com.nlhd.manage_product.LoadProductScreen.LoadProductViewModel
+import com.nlhd.manage_product.AddProductScreen.ManageProductViewModel
+import com.nlhd.manage_product.AddVersionProductScreen.AddVersionProductViewModel
+import com.nlhd.manage_product.LoadVersionProductScreen.LoadVersionProductViewModel
+import com.nlhd.order.OrderViewModel
 import com.nlhd.search.SearchViewModel
+import com.nlhd.user.EditProfileViewModel
 import com.nlhd.user.LoginViewModel
 import com.nlhd.user.ProfileViewModel
 import com.nlhd.user.UserViewModel
@@ -18,7 +24,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     viewModel { HomeViewModel(get()) }
-    viewModel { DetailViewModel(get()) }
+    viewModel { DetailViewModel(get(), get()) }
     viewModel { LoginViewModel(get()) }
     viewModel { ProfileViewModel(get()) }
     viewModel { UserViewModel(get()) }
@@ -37,5 +43,20 @@ val appModule = module {
         productUseCase = get()
     ) }
 
+    viewModel {
+        OrderViewModel(get())
+    }
+
+    viewModel {
+        EditProfileViewModel(get())
+    }
+
+    viewModel {
+        LoadProductViewModel(get())
+    }
+
+    viewModel { EditProductViewModel(get(), get()) }
+    viewModel { LoadVersionProductViewModel(get()) }
+    viewModel { AddVersionProductViewModel(get()) }
 
 }

@@ -17,3 +17,6 @@ object Search
 data class SearchSuccess(
     val search: String
 )
+
+@Serializable
+object EditProfile

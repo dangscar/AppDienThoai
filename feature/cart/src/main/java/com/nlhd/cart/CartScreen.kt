@@ -50,23 +50,18 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.gson.Gson
-import com.nlhd.cart.components.CardAddress
 import com.nlhd.cart.components.CartItem
-import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Font
 import com.nlhd.core.utils.colorDivide
@@ -79,7 +74,6 @@ import com.nlhd.domain.entity.checkout.CheckoutResponse
 import com.nlhd.domain.entity.checkout.ProductCheckout
 import com.nlhd.keystore.KeyStoreManager
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 import java.text.NumberFormat
 
@@ -240,6 +234,7 @@ fun CartScreen(
                                 fontWeight = FontWeight.Normal
                             )
                         )
+
                         val priceFormat = NumberFormat.getNumberInstance().format(price.value)
                         Text(
                             "${priceFormat}đ",
@@ -360,8 +355,9 @@ fun CartScreen(
                             .padding(horizontal = AppTheme.dimens.small3)
                     ) {
                         item {
+                            val info = if (cartResponse.cartItems.isEmpty()) "Chưa có sản phẩm nào" else "Sản phẩm trong giỏ hàng"
                             Text(
-                                "Thông tin chi tiết giỏ hàng",
+                                info,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(AppTheme.dimens.small3),

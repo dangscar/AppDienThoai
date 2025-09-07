@@ -12,6 +12,7 @@ import com.nlhd.data.model.address.get.AddressResponseDto
 import com.nlhd.data.model.address.get.SelectedAddressResponseDto
 import com.nlhd.data.model.address.update.UpdateAddressRequestDto
 import com.nlhd.data.model.address.update.UpdateAddressResponseDto
+import com.nlhd.data.summary.urlLR
 import com.nlhd.domain.entity.address.add.AddAddressRequest
 import com.nlhd.domain.entity.address.add.AddAddressResponse
 import com.nlhd.domain.entity.address.delete.DeleteAddressResponse
@@ -40,7 +41,7 @@ class AddressRepositoryImp(
 
     override suspend fun getAddress(token: String): ResultWrapper<AddressResponse> {
         return try {
-            val responseDto = ktor.get(Utils.BASE_URL+"/api/dashboard/checkout/checkoutInfoShow") {
+            val responseDto = ktor.get(urlLR("/dashboard/checkout/checkoutInfoShow")) {
                 header("Authorization", "Bearer $token")
                 contentType(ContentType.Application.Json)
             }.body<AddressResponseDto>()

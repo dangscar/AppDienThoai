@@ -7,6 +7,7 @@ import com.nlhd.data.repository.CheckoutRepositoryImp
 import com.nlhd.data.repository.DashboardRepositoryImp
 import com.nlhd.data.repository.ManageCategoryRepositoryImp
 import com.nlhd.data.repository.ManageProductRepositoryImp
+import com.nlhd.data.repository.OrderRepositoryImp
 import com.nlhd.data.repository.ProductRepositoryImp
 import com.nlhd.domain.repository.AddressRepository
 import com.nlhd.domain.repository.AuthenticationRepository
@@ -15,6 +16,7 @@ import com.nlhd.domain.repository.CheckoutRepository
 import com.nlhd.domain.repository.DashboardRepository
 import com.nlhd.domain.repository.ManageCategoryRepository
 import com.nlhd.domain.repository.ManageProductRepository
+import com.nlhd.domain.repository.OrderRepository
 import com.nlhd.domain.repository.ProductRepository
 import org.koin.dsl.module
 
@@ -42,5 +44,8 @@ val dataModule = module {
     }
     single<AddressRepository> {
         AddressRepositoryImp(get())
+    }
+    single<OrderRepository> {
+        OrderRepositoryImp(get())
     }
 }

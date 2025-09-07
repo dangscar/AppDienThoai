@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/feature/detail" />
             <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/manage_product" />
+            <option value="$PROJECT_DIR$/feature/order" />
             <option value="$PROJECT_DIR$/feature/search" />
             <option value="$PROJECT_DIR$/feature/user" />
             <option value="$PROJECT_DIR$/keystore" />

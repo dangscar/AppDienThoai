@@ -198,16 +198,6 @@ fun CartItem(
 
                 }
 
-
-                Text("Tình trạng hàng: ", style = AppTheme.typography.titleSmall.copy(
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Font.fontFamily,
-                    textAlign = TextAlign.Center
-                ), maxLines = 2,
-                    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small),
-                    textAlign = TextAlign.End
-                )
-
             }
         }
     }

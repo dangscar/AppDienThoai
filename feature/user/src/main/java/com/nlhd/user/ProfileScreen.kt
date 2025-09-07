@@ -10,12 +10,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,7 +62,7 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(
     profileViewModel: ProfileViewModel = koinViewModel(),
     onClickBack: () -> Unit,
-    role: String
+    onClickEditProfile: () -> Unit
 ) {
     val context = LocalContext.current
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
@@ -76,11 +80,13 @@ fun ProfileScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Profile", style = AppTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold
+                    Text("My profile", style = AppTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
                     ),
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -109,19 +115,23 @@ fun ProfileScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-                        .padding(horizontal = AppTheme.dimens.medium)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(bottom = innerPadding.calculateBottomPadding(), start = AppTheme.dimens.small, end = AppTheme.dimens.small),
+                    verticalArrangement = Arrangement.SpaceBetween,
+
                 ) {
                     item {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             AsyncImage(
-                                model = com.nlhd.core.R.drawable.ic_profile,
+                                model = "https://i.pinimg.com/1200x/69/78/19/69781905dd57ba144ab71ca4271ab294.jpg",
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(AppTheme.dimens.large2)
                                     .clip(CircleShape)
-                                    .background(color = containerTextFieldLogin)
+                                    .background(color = containerTextFieldLogin),
+                                contentScale = ContentScale.Crop
                             )
                             Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
                             Column (
@@ -143,19 +153,16 @@ fun ProfileScreen(
 
                         }
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                    }
 
-                    item {
-                        ButtonProfile("Chỉnh sửa thông tin cá nhân")
+                        ButtonProfile(
+                            "Chỉnh sửa thông tin cá nhân",
+                            onClick = onClickEditProfile
+                        )
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                    }
 
-                    item {
                         CardInfo()
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                    }
 
-                    item {
                         Text(
                             "Hỗ trợ",
                             style = AppTheme.typography.bodyMedium.copy(
@@ -165,7 +172,12 @@ fun ProfileScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                        ButtonProfile("Đến trung tâm hỗ trợ")
+                        ButtonProfile(
+                            "Đến trung tâm hỗ trợ",
+                            onClick = {
+
+                            }
+                        )
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                     }
 
@@ -182,7 +194,7 @@ fun ProfileScreen(
                             border = _root_ide_package_.androidx.compose.foundation.BorderStroke(
                                 width = AppTheme.dimens.extraSmall,
                                 color = borderTextField
-                            )
+                            ),
                         ) {
                             Text(
                                 "Đăng xuất",

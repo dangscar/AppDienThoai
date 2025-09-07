@@ -76,4 +76,6 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
+
+    implementation ("com.google.code.gson:gson:2.13.1")
 }

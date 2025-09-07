@@ -3,6 +3,8 @@ package com.nlhd.domain.repository
 import com.nlhd.domain.entity.login.LoginResponse
 import com.nlhd.domain.entity.logout.LogoutResponse
 import com.nlhd.domain.entity.profile.ProfileResponse
+import com.nlhd.domain.entity.profile.UpdateProfileReponse
+import com.nlhd.domain.entity.profile.UpdateProfileRequest
 import com.nlhd.domain.resultWrapper.ResultWrapper
 
 interface AuthenticationRepository {
@@ -10,4 +12,6 @@ interface AuthenticationRepository {
     suspend fun profile(token: String): ResultWrapper<ProfileResponse>
     suspend fun profileAdmin(token: String): ResultWrapper<ProfileResponse>
     suspend fun logout(token: String): ResultWrapper<LogoutResponse>
+
+    suspend fun updateProfile(token: String, updateProfileRequest: UpdateProfileRequest): ResultWrapper<UpdateProfileReponse>
 }

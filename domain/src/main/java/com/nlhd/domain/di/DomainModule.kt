@@ -12,6 +12,7 @@ import com.nlhd.domain.usecase.authentication.Login
 import com.nlhd.domain.usecase.authentication.Logout
 import com.nlhd.domain.usecase.authentication.Profile
 import com.nlhd.domain.usecase.authentication.ProfileAdmin
+import com.nlhd.domain.usecase.authentication.UpdateProfile
 import com.nlhd.domain.usecase.cart.AddCart
 import com.nlhd.domain.usecase.cart.CartUseCase
 import com.nlhd.domain.usecase.cart.CheckoutPreview
@@ -23,7 +24,14 @@ import com.nlhd.domain.usecase.dashboard.GetDashboard
 import com.nlhd.domain.usecase.manageCategory.GetCategory
 import com.nlhd.domain.usecase.manageCategory.ManageCategoryUseCase
 import com.nlhd.domain.usecase.manageProduct.AddProduct
+import com.nlhd.domain.usecase.manageProduct.AddVersionProduct
+import com.nlhd.domain.usecase.manageProduct.GetProduct
+import com.nlhd.domain.usecase.manageProduct.GetVersionProducts
+import com.nlhd.domain.usecase.manageProduct.LoadProducts
 import com.nlhd.domain.usecase.manageProduct.ManageProductUseCase
+import com.nlhd.domain.usecase.manageProduct.UpdateProduct
+import com.nlhd.domain.usecase.order.GetOrders
+import com.nlhd.domain.usecase.order.OrderUseCase
 import com.nlhd.domain.usecase.product.GetProductDetail
 import com.nlhd.domain.usecase.product.GetProducts
 import com.nlhd.domain.usecase.product.ProductUseCase
@@ -36,7 +44,7 @@ val domainModule = module {
             getProducts = GetProducts(get()),
             getProductDetail = GetProductDetail(get()),
             addCart = AddCart(get()),
-            searchProducts = SearchProducts(get())
+            searchProducts = SearchProducts(get()),
         )
     }
 
@@ -45,7 +53,8 @@ val domainModule = module {
             login = Login(get()),
             profile = Profile(get()),
             logout = Logout(get()),
-            profileAdmin = ProfileAdmin(get())
+            profileAdmin = ProfileAdmin(get()),
+            updateProfile = UpdateProfile(get())
         )
     }
 
@@ -65,7 +74,12 @@ val domainModule = module {
 
     single {
         ManageProductUseCase(
-            addProduct = AddProduct(get())
+            addProduct = AddProduct(get()),
+            loadProducts = LoadProducts(get()),
+            getProduct = GetProduct(get()),
+            updateProduct = UpdateProduct(get()),
+            getVersionProducts = GetVersionProducts(get()),
+            addVersionProduct = AddVersionProduct(get())
         )
     }
 
@@ -89,6 +103,12 @@ val domainModule = module {
             editAddress = EditAddress(get()),
             updateAddress = UpdateAddress(get()),
             deleteAddress = DeleteAddress(get())
+        )
+    }
+
+    single {
+        OrderUseCase(
+            getOrders = GetOrders(get())
         )
     }
 

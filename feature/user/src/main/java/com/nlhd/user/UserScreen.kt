@@ -28,9 +28,7 @@ import org.koin.androidx.compose.koinViewModel
 object LoginScreen
 
 @Serializable
-data class ProfileScreen(
-    val role: String
-)
+object ProfileScreen
 
 @Serializable
 object Admin
@@ -39,7 +37,8 @@ object Admin
 @Composable
 fun UserScreen(
     userViewModel: UserViewModel = koinViewModel(),
-    onNavigateAdmin: () -> Unit
+    onNavigateAdmin: () -> Unit,
+    onClickEditProfile: () -> Unit
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
@@ -54,7 +53,7 @@ fun UserScreen(
 
     NavHost(
         navController = navController,
-        startDestination = if (state.value is UserState.Success) ProfileScreen("") else LoginScreen
+        startDestination = if (state.value is UserState.Success) ProfileScreen else LoginScreen
     ) {
         composable<LoginScreen> {
             LoginScreen(
@@ -62,7 +61,7 @@ fun UserScreen(
                     if (role == "admin") {
                         onNavigateAdmin()
                     } else {
-                        navController.navigate(ProfileScreen(role))
+                        navController.navigate(ProfileScreen)
                     }
 
                 }
@@ -70,13 +69,11 @@ fun UserScreen(
         }
 
         composable<ProfileScreen> {
-            val role = it.toRoute<ProfileScreen>().role
-
             ProfileScreen(
                 onClickBack = {
                     navController.navigate(LoginScreen)
                 },
-                role = role
+                onClickEditProfile = onClickEditProfile
             )
         }
     }

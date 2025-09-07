@@ -71,7 +71,7 @@ dependencies {
     //Image
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-    implementation ("com.google.code.gson:gson:2.10.1")
+    implementation ("com.google.code.gson:gson:2.13.1")
 
     //Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")

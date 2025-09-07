@@ -72,6 +72,7 @@ dependencies {
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:address"))
     implementation(project(":feature:search"))
+    implementation(project(":feature:order"))
 
     //Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")

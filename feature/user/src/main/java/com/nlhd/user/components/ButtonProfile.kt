@@ -19,10 +19,11 @@ import com.nlhd.core.utils.borderTextField
 
 @Composable
 fun ButtonProfile(
-    title: String
+    title: String,
+    onClick: () -> Unit
 ) {
     OutlinedButton(
-        onClick = {},
+        onClick = onClick,
         shape = RoundedCornerShape(AppTheme.dimens.small3),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White,
@@ -45,10 +46,4 @@ fun ButtonProfile(
             )
     }
 
-}
-
-@Preview
-@Composable
-private fun ButtonPre() {
-    ButtonProfile("AA")
 }
