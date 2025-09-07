@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.nlhd.manage_product"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24

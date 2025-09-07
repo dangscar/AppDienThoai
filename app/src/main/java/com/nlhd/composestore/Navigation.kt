@@ -103,6 +103,7 @@ sealed class Navigation(
     val icon: Int
 ) {
     object Home : Navigation("home", "Trang chủ", R.drawable.ic_home)
+    object Video: Navigation("video", "Short Video", R.drawable.ic_video)
     object Order: Navigation("seach", "Đơn hàng", R.drawable.ic_notification)
     object User : Navigation("user", "Người dùng", R.drawable.ic_profile)
 }
@@ -152,7 +153,7 @@ fun BottomBar(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val route = listOf(Navigation.Home, Navigation.Order, Navigation.User)
+            val route = listOf(Navigation.Home, Navigation.Video ,Navigation.Order, Navigation.User)
             route.forEach { navigation ->
                 BottomBarItem(
                     navigation = navigation,
@@ -794,6 +795,13 @@ fun GeneralScreen(
                     onClickCart = onClickCart,
                     onClickSearch = onClickSearch
                 )
+            }
+
+            composable(Navigation.Video.route) {
+                //ShortVideoScreen()
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text("Short Video")
+                }
             }
 
             composable(Navigation.Order.route) {
