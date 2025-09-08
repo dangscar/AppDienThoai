@@ -161,6 +161,14 @@ val CompactMediumTypography = Typography(
         letterSpacing = 0.5.sp,
         color = Color.Black
     ),
+    headlineSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 11.sp,
+        letterSpacing = 0.5.sp,
+        color = Color.Black,
+        lineHeight = 23.sp
+    ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,

@@ -36,6 +36,8 @@ import com.nlhd.domain.usecase.product.GetProductDetail
 import com.nlhd.domain.usecase.product.GetProducts
 import com.nlhd.domain.usecase.product.ProductUseCase
 import com.nlhd.domain.usecase.product.SearchProducts
+import com.nlhd.domain.usecase.shortvideo.GetVideos
+import com.nlhd.domain.usecase.shortvideo.ShortVideoUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -110,6 +112,16 @@ val domainModule = module {
         OrderUseCase(
             getOrders = GetOrders(get())
         )
+    }
+
+
+
+
+    single {
+        ShortVideoUseCase(
+            getVideos = GetVideos(get())
+        )
+
     }
 
 }

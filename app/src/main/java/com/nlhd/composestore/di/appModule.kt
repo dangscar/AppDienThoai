@@ -2,11 +2,17 @@ package com.nlhd.composestore.di
 
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.media3.database.ExoDatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.HttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.nlhd.address.AddressViewModel
 import com.nlhd.admin.AdminProfileViewModel
 import com.nlhd.cart.CartViewModel
@@ -22,6 +28,9 @@ import com.nlhd.manage_product.AddVersionProductScreen.AddVersionProductViewMode
 import com.nlhd.manage_product.LoadVersionProductScreen.LoadVersionProductViewModel
 import com.nlhd.order.OrderViewModel
 import com.nlhd.search.SearchViewModel
+import com.nlhd.shortvideo.ContentCommonViewModel
+import com.nlhd.shortvideo.ShortVideoViewModel
+import com.nlhd.shortvideo.VideoViewModel
 import com.nlhd.user.EditProfileViewModel
 import com.nlhd.user.LoginViewModel
 import com.nlhd.user.ProfileViewModel
@@ -70,17 +79,46 @@ val appModule = module {
     viewModel { AddVersionProductViewModel(get()) }
 
 
-    /*single {
-        val context: Context = androidContext()
-        val cacheSize: Long = 1000 * 1024 * 1024
-        SimpleCache(
-            File(context.cacheDir, "media"),
-            LeastRecentlyUsedCacheEvictor(cacheSize),
-            StandaloneDatabaseProvider(context)
-        )
-        CacheDataSource.Factory().setCache(get()).setUpstreamDataSourceFactory(DefaultDataSource.Factory(context)).setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-    }*/
 
+    //ExoPlayer
+
+    single {
+        val ctx = androidContext()
+        val cacheSize = 1_000L * 1024 * 1024
+        SimpleCache(
+            File(ctx.cacheDir, "media"),
+            LeastRecentlyUsedCacheEvictor(cacheSize),
+            ExoDatabaseProvider(ctx) // hoặc StandaloneDatabaseProvider(ctx)
+        )
+    }
+
+    single<HttpDataSource.Factory> { DefaultHttpDataSource.Factory() }
+
+    single<DataSource.Factory> {
+        CacheDataSource.Factory()
+            .setCache(get<SimpleCache>())
+            .setUpstreamDataSourceFactory(get<HttpDataSource.Factory>())
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+    }
+
+    single { DefaultMediaSourceFactory(get<DataSource.Factory>()) }
+
+    single {
+        ExoPlayer.Builder(androidContext())
+            .setMediaSourceFactory(get<DefaultMediaSourceFactory>())
+            .build()
+    }
+    viewModel {
+        ContentCommonViewModel(get())
+    }
+
+    viewModel {
+        ShortVideoViewModel(get())
+    }
+
+    viewModel {
+        VideoViewModel()
+    }
 
 
 }

@@ -17,7 +17,12 @@ data class Dimens(
     val large3: Dp = 0.dp,
     val extraLarge: Dp = 0.dp,
     val image: Dp = 0.dp,
-    val iconBottomBar: Dp = 0.dp
+    val iconBottomBar: Dp = 0.dp,
+    val icon: Dp = 0.dp,
+    val iconStory: Dp = 0.dp,
+    val iconAdd: Dp= 0.dp,
+    val iconAction: Dp = 0.dp,
+    val paddingAdd: Dp = 0.dp,
 )
 
 val CompactSmallDimens = Dimens(
@@ -34,7 +39,11 @@ val CompactSmallDimens = Dimens(
     large3 = 84.dp,
     extraLarge = 200.dp,
     image = 200.dp,
-    iconBottomBar = 20.dp
+    iconBottomBar = 20.dp,
+    icon = 40.dp,
+    iconStory = 46.dp,
+    iconAdd = 18.dp,
+    iconAction = 23.dp
 )
 
 val CompactMediumDimens = Dimens(
@@ -51,8 +60,12 @@ val CompactMediumDimens = Dimens(
     large3 = 100.dp,
     extraLarge = 200.dp,
     image = 300.dp,
-    iconBottomBar = 22.dp
-
+    iconBottomBar = 22.dp,
+    icon = 48.dp,
+    iconStory = 57.dp,
+    iconAdd = 24.dp,
+    iconAction = 32.dp,
+    paddingAdd = 7.dp
 )
 
 
@@ -70,7 +83,9 @@ val MediumDimens = Dimens(
     large3 = 100.dp,
     extraLarge = 200.dp,
     image = 300.dp,
-    iconBottomBar = 22.dp
+    iconBottomBar = 22.dp,
+    icon = 48.dp,
+    iconAdd = 24.dp,
 )
 
 val LargeDimens = Dimens(
@@ -86,5 +101,7 @@ val LargeDimens = Dimens(
     large2 = 75.dp,
     large3 = 100.dp,
     extraLarge = 200.dp,
-    iconBottomBar = 29.dp
+    iconBottomBar = 29.dp,
+    icon = 48.dp,
+    iconAdd = 24.dp,
 )

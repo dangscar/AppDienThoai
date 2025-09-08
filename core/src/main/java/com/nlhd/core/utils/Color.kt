@@ -18,3 +18,6 @@ val containerUnConfirm = Color(0xFFFFABBB)
 val containerConfirm = Color(0xFFFD2656)
 
 val borderColor = Color(0xFF7F56D9)
+
+val Blue = Color(0xFF1FA3DA)
+val Green = Color(0xFF2EE8AE)

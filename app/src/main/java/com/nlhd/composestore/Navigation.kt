@@ -82,6 +82,7 @@ import com.nlhd.manage_product.LoadVersionProductScreen.LoadVersionProductScreen
 import com.nlhd.order.OrderScreen
 import com.nlhd.search.SearchScreen
 import com.nlhd.search.SearchSuccessScreen
+import com.nlhd.shortvideo.ShortVideoScreen
 import com.nlhd.user.EditProfileScreen
 import com.nlhd.user.UserScreen
 import kotlinx.serialization.json.Json
@@ -798,10 +799,10 @@ fun GeneralScreen(
             }
 
             composable(Navigation.Video.route) {
-                //ShortVideoScreen()
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Text("Short Video")
-                }
+                ShortVideoScreen(
+                    innerPadding = innerPadding
+                )
+
             }
 
             composable(Navigation.Order.route) {

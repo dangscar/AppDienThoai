@@ -1,22 +1,19 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("kotlinx-serialization")
 }
 
 android {
-    namespace = "com.nlhd.composestore"
-    compileSdk = 35
+    namespace = "com.nlhd.shortvideo"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.nlhd.composestore"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -34,9 +31,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
     }
 }
 
@@ -57,23 +51,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(project(":network"))
     implementation(project(":domain"))
-    implementation(project(":data"))
-    implementation(project(":feature:home"))
-    implementation(project(":feature:detail"))
     implementation(project(":core"))
-    implementation(project(":feature:user"))
-    implementation(project(":feature:cart"))
-    implementation(project(":feature:checkout"))
     implementation(project(":keystore"))
-    implementation(project(":feature:admin"))
-    implementation(project(":feature:manage_product"))
-    implementation(project(":feature:dashboard"))
-    implementation(project(":feature:address"))
-    implementation(project(":feature:search"))
-    implementation(project(":feature:order"))
-    implementation(project(":feature:shortvideo"))
+
+    //Koin
+    implementation("io.insert-koin:koin-android:3.5.0")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.0")
 
     //Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
@@ -84,20 +68,17 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1")
     implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-    //Koin
-    implementation("io.insert-koin:koin-android:3.5.0")
-    implementation("io.insert-koin:koin-androidx-compose:3.5.0")
+    //Image
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
-    //Navigation
-    implementation("androidx.navigation:navigation-compose:2.9.0")
+    implementation ("com.google.code.gson:gson:2.10.1")
 
     //Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
-    implementation ("com.google.code.gson:gson:2.10.1")
-
-    //DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    //Paging
+    implementation("androidx.paging:paging-runtime:3.3.6")
+    implementation("androidx.paging:paging-compose:3.3.6")
 
     //Video
     implementation("androidx.media3:media3-exoplayer:1.8.0")
@@ -106,4 +87,6 @@ dependencies {
     implementation("androidx.media:media:1.7.0")
     implementation("androidx.media3:media3-datasource-okhttp:1.8.0") // Optional for OkHttpDataSource
     implementation("androidx.media3:media3-datasource:1.8.0")
+
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
 }
