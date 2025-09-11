@@ -1,11 +1,14 @@
 package com.nlhd.shortvideo.components
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -23,26 +26,33 @@ fun ActionItem(
     modifierSpacer: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    Icon(
-        painter = painterResource(icon),
-        contentDescription = null,
-        tint = color,
-        modifier = modifierIcon
+    Column(
+        modifier = Modifier
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     if (!isScrolling) {
                         onClick()
                     }
                 })
-            }
-    )
-    Spacer(modifier = modifierSpacer)
-    Text(
-        text = title,
-        style = AppTheme.typography.headlineSmall.copy(
-            color = Color.White,
-            fontWeight = FontWeight.SemiBold
-        ),
-    )
-    Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
+            },
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = null,
+            tint = color,
+            modifier = modifierIcon
+        )
+        Spacer(modifier = modifierSpacer)
+        Text(
+            text = title,
+            style = AppTheme.typography.headlineSmall.copy(
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold
+            ),
+        )
+        Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
+    }
+
 }

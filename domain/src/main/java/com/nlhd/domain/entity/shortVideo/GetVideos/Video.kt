@@ -1,19 +1,22 @@
 package com.nlhd.domain.entity.shortVideo.GetVideos
 
 data class Video(
-    val id: String = "",
-    val title: String = "",
-    val description: String = "",
-    val publishedAt: String = "",
-    val channelId: String = "",
-    val channelTitle: String = "",
-    val categoryId: String = "",
-    val linkMusic: String = "",
-    val url: String = "",
-    val isFullScreen: Boolean = false,
-    val image: String? = null,
-    var isLike: Boolean = false,
-    var isFav: Boolean = false,
-    var search: String = "Find related content",
-    var images: List<String>? = null
+    val canFollow: Boolean,
+    val caption: String,
+    val comments: String,
+    val createdAt: String? = null,
+    val favorites: String,
+    val id: Int,
+    val isFollowing: Boolean,
+    val likes: String,
+    val productId: Int? = null,
+    val shares: String,
+    val thumbnailUrl: String,
+    val user: User,
+    val videoUrl: String,
+    val views: String,
+    val isLiked: Boolean,
+    val isFavorited: Boolean,
+    val versionId: Int? = null,
+    val colorId: Int? = null
 )

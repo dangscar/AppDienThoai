@@ -2,8 +2,8 @@ package com.nlhd.domain.usecase.shortvideo
 
 import com.nlhd.domain.repository.ShortVideoRepository
 
-class GetVideos(
+class GetComments(
     private val repository: ShortVideoRepository
 ) {
-    operator fun invoke(token: String) = repository.getVideos(token)
+    operator fun invoke(token: String, videoId: String) = repository.getComments(token, videoId)
 }

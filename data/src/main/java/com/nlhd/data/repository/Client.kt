@@ -1,7 +1,6 @@
 package com.nlhd.data.repository
 
-import com.nlhd.data.model.shortVideo.GetVideos.VideoResponseDto
-import com.nlhd.data.model.shortVideo.GetVideos.Video
+/*
 class Client {
     fun videoResponseFriend(page: Int): VideoResponseDto {
         return when (page) {
@@ -10,7 +9,8 @@ class Client {
                     status = 200,
                     results = listOf(
 
-                        /*Video(
+                        */
+/*Video(
                             title = "no cap #anime #animeedit #✨ # #xhxhxhxhxhxhxhxhxhxhxhxhxhxhxhxhxh #alya #xhtiktok # #☄ # #xhtiktok #trending #alyabanbanhaytreutoibangtiengnga",
                             publishedAt = "2025-02-08",
                             channelTitle = "Dangkt",
@@ -18,7 +18,8 @@ class Client {
                             description = "",
                             url = "https://drive.google.com/uc?id=1Okb316BuL0lJJ-LTMWt_da-ZyELn2iPf",
                             search = "Kotlin"
-                        ),*/
+                        ),*//*
+
                         Video(
                             title = "no cap #anime #animeedit #✨ # #xhxhxhxhxhxhxhxhxhxhxhxhxhxhxhxhxh #alya #xhtiktok # #☄ # #xhtiktok #trending #alyabanbanhaytreutoibangtiengnga",
                             publishedAt = "2025-02-08",
@@ -611,4 +612,4 @@ class Client {
             }
         }
     }
-}
+}*/

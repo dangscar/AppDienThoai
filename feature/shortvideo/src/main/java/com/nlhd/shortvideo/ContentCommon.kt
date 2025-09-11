@@ -2,6 +2,8 @@ package com.nlhd.shortvideo
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
@@ -47,17 +49,20 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -84,16 +89,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
+import com.nlhd.core.utils.Utils
+import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.shortVideo.GetVideos.Video
 import com.nlhd.shortvideo.components.ActionItem
 import com.nlhd.shortvideo.components.AvatarUser
+import com.nlhd.shortvideo.components.BottomSheet
+import com.nlhd.shortvideo.components.BottomSheetComment
 import com.nlhd.shortvideo.components.TimeFormat
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -129,11 +141,12 @@ fun CountText(settledPage: Int, pageCount: Int) {
         )
     }
 }
-@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("CoroutineCreationDuringComposition", "ConfigurationScreenWidthHeight")
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ContentCommon(
+    token: String,
     pageF: String,
     isPlaying: Boolean,
     pagerState: PagerState,
@@ -141,16 +154,10 @@ fun ContentCommon(
     videos: LazyPagingItems<Video>,
     onSearch: ((String)-> Unit)? = null,
     onHiddenText: ((Boolean) -> Unit)? = null,
+    onClickSeeProduct: (Int, Int, Int) -> Unit
 ) {
     val context = LocalContext.current
     val contentCommonViewModel: ContentCommonViewModel = koinViewModel(key = pageF)
-    DisposableEffect(key1 = pageF) {
-        onDispose {
-            if (!isPlaying) {
-                contentCommonViewModel.releaseAll()
-            }
-        }
-    }
     val isAutoScroll by contentCommonViewModel.isAutoScroll.collectAsStateWithLifecycle()
     val widthScreen = LocalConfiguration.current.screenWidthDp.dp/2
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -183,12 +190,15 @@ fun ContentCommon(
                     dampingRatio =Spring.DampingRatioMediumBouncy,
                 ),
                 decayAnimationSpec = exponentialDecay(0.9f)
-            )
+            ),
+            key = { page-> videos[page]?.id ?: page }
         ) { page->
+
             val videoViewModel: VideoViewModel = koinViewModel(key = "$pageF $page")
 
             val state by videoViewModel.videoState.collectAsStateWithLifecycle()
             val displayText by videoViewModel.displayText.collectAsStateWithLifecycle()
+
 
             val video = videos[page]!!
 
@@ -205,11 +215,14 @@ fun ContentCommon(
                 }
             }
 
-            val exoPlayer by remember {
+            val videoUrl = "${Utils.BASE_URL}/" + video.videoUrl
+            val exoPlayer by remember(page, videoUrl) {
                 mutableStateOf(
-                    contentCommonViewModel.getOrCreatePlayer(page, video.url, context)
+                    contentCommonViewModel.getOrCreatePlayer(page, videoUrl, context)
                 )
             }
+
+
 
             if (isAutoScroll) {
                 exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
@@ -218,7 +231,7 @@ fun ContentCommon(
 
             }
 
-            DisposableEffect(key1 = Unit, isPlaying) {
+            DisposableEffect(key1 = Unit) {
                 onDispose {
                     exoPlayer.pause()
 
@@ -246,6 +259,8 @@ fun ContentCommon(
                     lifeCycleOwner.lifecycle.removeObserver(observer)
                 }
             }
+
+
 
             exoPlayer.addListener(object : Player.Listener {
                 @SuppressLint("SwitchIntDef")
@@ -278,19 +293,17 @@ fun ContentCommon(
                 }
             })
 
+
+
             LaunchedEffect(key1 = pagerState.settledPage, key2 = isPlaying) {
                 if (pagerState.settledPage == page && isPlaying) {
                     exoPlayer.playWhenReady = true
-                    if (onSearch != null) {
-                        onSearch(video.search)
-                    }
                 } else {
                     exoPlayer.seekTo(0)
                     exoPlayer.playWhenReady = false
                 }
             }
 
-            //val alphaAnimation by animateFloatAsState(if (isScrolling && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 0.4f else 1f, label = "alphaA")
 
             val paddingBottom = paddingValues.calculateBottomPadding()
 
@@ -301,7 +314,7 @@ fun ContentCommon(
                         detectTapGestures(
                             onDoubleTap = {
                                 if (!isScrolling && isPlaying) {
-                                    videoViewModel.onActionButton(Perform.Like())
+
                                 }
                             },
                             onTap = {
@@ -412,7 +425,7 @@ fun ContentCommon(
                     }
                 }
 
-                if (video.images != null) {
+                /*if (video.images != null) {
                     val pageState = rememberPagerState { video.images!!.size }
                     LaunchedEffect(pageState.settledPage) {
                         videoViewModel.onImageStatus(video.images!!, pageState.settledPage)
@@ -488,45 +501,52 @@ fun ContentCommon(
                         CountText(settledPage = imageStatus.selectedIndex+1, pageCount = imageStatus.list.size)
                     }
                 } else {
-                    AndroidView(factory = {
-                        PlayerView(it).also {
-                            it.useController = false
-                            it.player = exoPlayer
-                            it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-                        }
-                    }, modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = paddingValues.calculateBottomPadding())
-                        .zIndex(0f)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onDoubleTap = {
-                                    if (!isScrolling) {
-                                        videoViewModel.onActionButton(Perform.Like())
-                                    }
-                                },
-                                onTap = {
-                                    if (!exoPlayer.isPlaying && isPlaying && pagerState.settledPage == page) {
-                                        exoPlayer.play()
-                                    } else {
-                                        exoPlayer.pause()
-                                    }
-                                },
-                                onLongPress = {
-                                    if (isPlaying && pagerState.settledPage == page) {
-                                        videoViewModel.onActionButton(Perform.General())
-                                    }
+
+                }*/
+
+                AndroidView(factory = {
+                    PlayerView(it).also {
+                        it.useController = false
+                        it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                    }
+                }, modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = paddingValues.calculateBottomPadding())
+                    .zIndex(0f)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onDoubleTap = {
+                                if (!isScrolling) {
+                                    videoViewModel.onActionButton(Perform.Like())
                                 }
-                            )
-                        },
-                        update = {
+                            },
+                            onTap = {
+                                if (!exoPlayer.isPlaying && isPlaying && pagerState.settledPage == page) {
+                                    exoPlayer.play()
+                                } else {
+                                    exoPlayer.pause()
+                                }
+                            },
+                            onLongPress = {
+                                if (isPlaying && pagerState.settledPage == page) {
+                                    videoViewModel.onActionButton(Perform.General())
+                                }
+                            }
+                        )
+                    },
+                    update = {
+                        if (pagerState.settledPage == page) {
                             it.player = exoPlayer
-                        },
-                        onRelease = {it.player = null}
-                    )
-                }
+                        } else {
+                            it.player = null
+                        }
+
+                    },
+                    onRelease = {it.player = null}
+                )
 
                 val alpha: Float by animateFloatAsState(if (actionButton.change == ChangeSlider.CHANGE || actionButton.comment == ShowHide.Show) 0f else if (isPlaying && isScrolling && pagerState.settledPage == page && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 0.3f else 1f, label = "alpha")
+
 
                 Column(
                     modifier = Modifier
@@ -540,31 +560,161 @@ fun ContentCommon(
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AvatarUser {
 
+
+                    val stateFollow by videoViewModel.stateFollow.collectAsStateWithLifecycle()
+                    when (stateFollow) {
+                        is ShortVideoState.Error -> {
+
+                        }
+                        ShortVideoState.Idle -> {
+                            if (video.isFollowing && video.canFollow || !video.isFollowing && !video.canFollow)  {
+                                videoViewModel.setFollow(Follow.Follow)
+                            } else {
+                                videoViewModel.setFollow(Follow.UnFollow)
+                            }
+                        }
+                        ShortVideoState.Loading -> {
+
+                        }
+                        is ShortVideoState.Success -> {
+                            videoViewModel.setFollow(Follow.Follow)
+                        }
                     }
+
+
+                    AvatarUser(
+                        avatar = if (video.user.avatarUrl == "null"){
+                            null
+                        } else {
+                            "${Utils.BASE_URL}/" + video.user.avatarUrl
+                        },
+                        isFollow = actionButton.avatar == Follow.Follow,
+                        onClick = {},
+                        onClickAdd = {
+                            videoViewModel.follows(token = token, userId = video.user.id.toString())
+                        }
+                    )
                     Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                    ActionItem("79.8K", R.drawable.ic_heart, color =actionButton.like, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
-                        if (isPlaying) {
-                            videoViewModel.onActionButton(Perform.Like())
+
+                    val stateLike by videoViewModel.stateLike.collectAsStateWithLifecycle()
+                    when (stateLike) {
+                        is ShortVideoState.Error -> {}
+                        ShortVideoState.Idle -> {
+                            if (video.isLiked) {
+                                videoViewModel.setLike(Color.Red)
+                            } else {
+                                videoViewModel.setLike(Color.White)
+                            }
+                        }
+                        ShortVideoState.Loading -> {}
+                        is ShortVideoState.Success -> {
+                            val message = (stateLike as ShortVideoState.Success).data.message
+                            when (message) {
+                                "Added" -> {
+                                    videoViewModel.setLike(Color.Red)
+                                }
+                                "Deleted" -> {
+                                    videoViewModel.setLike(Color.White)
+                                }
+                            }
                         }
                     }
-                    ActionItem("498", R.drawable.ic_chat, isScrolling = isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.iconAction), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+
+                    ActionItem(video.likes, R.drawable.ic_heart, color =actionButton.like, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+                        if (isPlaying) {
+                            videoViewModel.like(token, video.id.toString())
+                        }
+                    }
+
+                    ActionItem(video.comments, R.drawable.ic_chat, isScrolling = isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.iconAction), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+                        videoViewModel.onActionButton(Perform.Comment())
+                    }
+
+                    val contentComment by videoViewModel.contentComment.collectAsStateWithLifecycle()
+                    val addCommentState by videoViewModel.addCommentState.collectAsStateWithLifecycle()
+                    when (addCommentState) {
+                        is ShortVideoState.Error -> {}
+                        ShortVideoState.Idle -> {}
+                        ShortVideoState.Loading -> {}
+                        is ShortVideoState.Success -> {
+                            if (actionButton.comment == ShowHide.Show) {
+                                videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
+                                videoViewModel.setAddCommentState(ShortVideoState.Idle)
+                            }
+
+                        }
+                    }
+
+                    if (actionButton.comment == ShowHide.Show) {
+                        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                        val commentsFlow = remember(video.id) { videoViewModel.commentsFlow(token, video.id.toString()) }
+                        val comments = commentsFlow.collectAsLazyPagingItems()
+
+                        BottomSheet(
+                            sheetState = sheetState,
+                            onDismissRequest = {
+                                scope.launch {
+                                    sheetState.hide()
+                                    videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
+                                }
+                            }
+                        ) {
+                            BottomSheetComment(
+                                comments = comments,
+                                content = contentComment,
+                                onValueChange = videoViewModel::setContentComment,
+                                onClickCloseBottomSheet = {
+                                    scope.launch {
+                                        sheetState.hide()
+                                        videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
+                                    }
+                                },
+                                onSendComment = {
+                                    videoViewModel.addComment(token, video.id)
+                                }
+                            )
+                        }
 
                     }
-                    ActionItem("10.1K", R.drawable.ic_bookmark, color = actionButton.favorite, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
-                        if (isPlaying) {
-                            videoViewModel.onActionButton(Perform.Favorite())
+
+                    val stateFavorite by videoViewModel.stateFavorite.collectAsStateWithLifecycle()
+                    when (stateFavorite) {
+                        is ShortVideoState.Error -> {}
+                        ShortVideoState.Idle -> {
+                            if (video.isFavorited) {
+                                videoViewModel.setFavorite(Color.Yellow)
+                            } else {
+                                videoViewModel.setFavorite(Color.White)
+                            }
+                        }
+                        ShortVideoState.Loading -> {}
+                        is ShortVideoState.Success -> {
+                            val message = (stateFavorite as ShortVideoState.Success).data.message
+                            when (message) {
+                                "Added" -> {
+                                    videoViewModel.setFavorite(Color.Yellow)
+                                }
+                                "Deleted" -> {
+                                    videoViewModel.setFavorite(Color.White)
+                                }
+                            }
                         }
                     }
-                    ActionItem("1,588", R.drawable.ic_share, isScrolling = isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.iconAction), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+                    ActionItem(video.favorites, R.drawable.ic_bookmark, color = actionButton.favorite, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+                        if (isPlaying) {
+                            videoViewModel.favorite(token, video.id.toString())
+                        }
+                    }
+
+                    ActionItem(video.shares, R.drawable.ic_share, isScrolling = isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.iconAction), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
                         if (isPlaying) {
                             videoViewModel.onActionButton(Perform.Share())
                         }
                     }
                     val angleOperator = if (pagerState.settledPage == page && isPlaying && !isScrolling) angle else 0f
                     AsyncImage(
-                        model = "https://i.pinimg.com/1200x/69/78/19/69781905dd57ba144ab71ca4271ab294.jpg",
+                        model = if (video.user.avatarUrl == null) null else "${Utils.BASE_URL}/" + video.user.avatarUrl,
                         contentDescription = null,
                         modifier = Modifier
                             .size(AppTheme.dimens.icon)
@@ -591,16 +741,49 @@ fun ContentCommon(
                         .padding(horizontal = AppTheme.dimens.small3)
                         .padding(AppTheme.dimens.small)
                 ) {
+                    if (video.productId != null && video.versionId != null && video.colorId != null) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .background(color = Color(0x3919191F), shape = RoundedCornerShape(AppTheme.dimens.small))
+                                .padding(AppTheme.dimens.small)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            if (!isScrolling && isPlaying) {
+                                                onClickSeeProduct(video.productId!!, video.versionId!!, video.colorId!!)
+                                            }
+
+                                        }
+                                    )
+                                }
+
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_cart),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(AppTheme.dimens.medium)
+                            )
+                            Text(
+                                text = "Xem sản phẩm",
+                                style = AppTheme.typography.headlineSmall.copy(color = Color.White, fontWeight = FontWeight.SemiBold),
+                                maxLines = 1
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                    }
+
                     Row {
                         Text(
-                            text = video.channelTitle,
+                            text = video.user.name,
                             style = AppTheme.typography.titleMedium.copy(color = Color.White),
                             maxLines = 1
                         )
                         Text(
-                            text = " · ${video.publishedAt}",
+                            text = " · ${video.createdAt}",
                             style = AppTheme.typography.titleMedium.copy(
-                                color = Color.White,
+                                color = Color.LightGray,
                             ),
                             maxLines = 1
                         )
@@ -612,7 +795,7 @@ fun ContentCommon(
                     val visible = maxLine == 2
                     if (visible) {
                         Text(
-                            text = video.title,
+                            text = video.caption,
                             style = AppTheme.typography.bodyMedium.copy(
                                 color = Color(0xFFFFFFFF),
                             ),
@@ -620,7 +803,7 @@ fun ContentCommon(
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.pointerInput(Unit) {
                                 detectTapGestures(onTap = {
-                                    if (isPlaying) {
+                                    if (!isScrolling && isPlaying) {
                                         videoViewModel.onDisplayText()
                                     }
 
@@ -630,15 +813,15 @@ fun ContentCommon(
                     }
                     AnimatedVisibility(visible = !visible) {
                         Text(
-                            text = video.title,
-                            style = AppTheme.typography.bodySmall.copy(
+                            text = video.caption,
+                            style = AppTheme.typography.bodyMedium.copy(
                                 color = Color(0xFFFFFFFF),
                             ),
                             maxLines = maxLine,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.pointerInput(Unit) {
                                 detectTapGestures(onTap = {
-                                    if (isPlaying) {
+                                    if (!isScrolling && isPlaying) {
                                         videoViewModel.onDisplayText()
                                     }
 
@@ -680,7 +863,7 @@ fun ContentCommon(
                             Modifier
                         }
                         Text(
-                            text = video.linkMusic,
+                            text = "Nhạc nền ${video.user.name}",
                             style = AppTheme.typography.bodyMedium.copy(
                                 color = Color(0xFFFFFFFF)
                             ),

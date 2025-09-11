@@ -1,35 +1,111 @@
 package com.nlhd.data.mapper
 
-import com.nlhd.data.model.shortVideo.GetVideos.Video
+import android.os.Build
+import androidx.annotation.RequiresApi
+import com.nlhd.data.model.shortVideo.Comments.AddComment.AddCommentRequestDto
+import com.nlhd.data.model.shortVideo.Comments.GetComments.CommentResponseDto
+import com.nlhd.data.model.shortVideo.GetVideos.Data
+import com.nlhd.data.model.shortVideo.GetVideos.User
 import com.nlhd.data.model.shortVideo.GetVideos.VideoResponseDto
+import com.nlhd.domain.entity.shortVideo.Comments.AddComment.AddCommentRequest
+import com.nlhd.domain.entity.shortVideo.Comments.GetComments.CommentResponse
+import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
+import com.nlhd.domain.entity.shortVideo.GetVideos.Video
 import com.nlhd.domain.entity.shortVideo.GetVideos.VideoResponse
+import java.time.ZonedDateTime
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun VideoResponseDto.toDomain(videoResponseDto: VideoResponseDto): VideoResponse {
     return VideoResponse(
-        status = videoResponseDto.status,
-        page = videoResponseDto.page,
-        totalPage = videoResponseDto.totalPage,
-        results = videoResponseDto.results.map { it.toDomain(it) }
+        videos = videoResponseDto.data.map {
+            it.toDomain(it)
+        }
     )
 }
 
-fun Video.toDomain(video: Video): com.nlhd.domain.entity.shortVideo.GetVideos.Video {
-    return com.nlhd.domain.entity.shortVideo.GetVideos.Video(
-        id = video.id,
-        title = video.title,
-        description = video.description,
-        publishedAt = video.publishedAt,
-        channelId = video.channelId,
-        channelTitle = video.channelTitle,
-        categoryId = video.categoryId,
-        linkMusic = video.linkMusic,
-        url = video.url,
-        isFullScreen = video.isFullScreen,
-        image = video.image,
-        isLike = video.isLike,
-        isFav = video.isFav,
-        search = video.search,
-        images = video.images,
+@RequiresApi(Build.VERSION_CODES.O)
+fun Data.toDomain(data: Data): Video {
+    return Video(
+        canFollow = data.can_follow == 1,
+        caption = data.caption,
+        comments = data.comments_count.toShortString(),
+        createdAt = data.created_at?.toDateOnly(),
+        favorites = data.favorites_count.toShortString(),
+        id = data.id,
+        isFollowing = data.is_following == 1,
+        likes = data.likes_count.toShortString(),
+        productId = data.product_id,
+        shares = data.shares.toShortString(),
+        thumbnailUrl = data.thumbnail_url,
+        user = data.user.toDomain(data.user),
+        videoUrl = data.video_url,
+        views = data.views.toShortString(),
+        isLiked = data.is_liked == 1,
+        isFavorited = data.is_favorited == 1,
+        versionId = data.version_id,
+        colorId = data.color_id
+    )
+}
 
+fun User.toDomain(user: User): com.nlhd.domain.entity.shortVideo.GetVideos.User {
+    return com.nlhd.domain.entity.shortVideo.GetVideos.User(
+        avatarUrl = user.avatar_url.toString(),
+        id = user.id,
+        name = user.name
+    )
+}
+
+fun Int.toShortString(): String {
+    return when {
+        this >= 1_000_000_000 -> String.format("%.1fB", this / 1_000_000_000.0).removeSuffix(".0")
+        this >= 1_000_000     -> String.format("%.1fM", this / 1_000_000.0).removeSuffix(".0")
+        this >= 100_000       -> String.format("%dK", this / 1_000) // 100K, 250K...
+        this >= 10_000        -> String.format("%dK", this / 1_000) // 10K, 15K...
+        this >= 1_000         -> String.format("%.1fK", this / 1_000.0).removeSuffix(".0")
+        else                  -> this.toString()
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun String.toDateOnly(): String {
+    val zoned = ZonedDateTime.parse(this) // parse từ chuỗi ISO 8601
+    return zoned.toLocalDate().toString() // trả yyyy-MM-dd
+}
+
+
+//Comments
+@RequiresApi(Build.VERSION_CODES.O)
+fun CommentResponseDto.toDomain(commentResponseDto: CommentResponseDto): CommentResponse {
+    return CommentResponse(
+        comments = commentResponseDto.data.map {
+            it.toDomain(it)
+        }
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun com.nlhd.data.model.shortVideo.Comments.GetComments.Data.toDomain(data: com.nlhd.data.model.shortVideo.Comments.GetComments.Data): Comment {
+    return Comment(
+        content = data.content,
+        createdAt = data.created_at.toDateOnly(),
+        id = data.id,
+        user = data.user.toDomain(data.user),
+        userId = data.user_id,
+        videoId = data.video_id
+    )
+}
+
+fun com.nlhd.data.model.shortVideo.Comments.GetComments.User.toDomain(user: com.nlhd.data.model.shortVideo.Comments.GetComments.User): com.nlhd.domain.entity.shortVideo.Comments.GetComments.User {
+    return com.nlhd.domain.entity.shortVideo.Comments.GetComments.User(
+        avatarUrl = user.avatar_url,
+        id = user.id,
+        name = user.name
+    )
+}
+
+fun AddCommentRequestDto.toDomain(addCommentRequestDto: AddCommentRequestDto): AddCommentRequest {
+    return AddCommentRequest(
+        content = addCommentRequestDto.content,
+        videoId = addCommentRequestDto.video_id
     )
 }

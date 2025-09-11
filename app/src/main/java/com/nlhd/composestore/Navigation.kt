@@ -419,6 +419,9 @@ fun CustomerScreen(
                 onNavigateAdmin = onNavigateAdmin,
                 onClickEditProfile = {
                     navController.navigate(EditProfile)
+                },
+                onClickSeeProduct = { productId, versionId, colorId ->
+                    navController.navigate(Detail(productId, versionId, colorId))
                 }
             )
         }
@@ -767,7 +770,8 @@ fun GeneralScreen(
     onClickCart: () -> Unit,
     onClickSearch: () -> Unit,
     onClickEditProfile: () -> Unit,
-    onNavigateAdmin: () -> Unit
+    onNavigateAdmin: () -> Unit,
+    onClickSeeProduct: (Int, Int, Int) -> Unit
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -800,7 +804,14 @@ fun GeneralScreen(
 
             composable(Navigation.Video.route) {
                 ShortVideoScreen(
-                    innerPadding = innerPadding
+                    innerPadding = innerPadding,
+                    onClickBack = {
+                        navController.navigate(Navigation.Home.route) {
+                            popUpTo(0) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onClickSeeProduct = onClickSeeProduct
                 )
 
             }

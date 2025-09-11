@@ -4,7 +4,6 @@ import com.nlhd.data.repository.AddressRepositoryImp
 import com.nlhd.data.repository.AuthenticationRepositoryImp
 import com.nlhd.data.repository.CartRepositoryImp
 import com.nlhd.data.repository.CheckoutRepositoryImp
-import com.nlhd.data.repository.Client
 import com.nlhd.data.repository.DashboardRepositoryImp
 import com.nlhd.data.repository.ManageCategoryRepositoryImp
 import com.nlhd.data.repository.ManageProductRepositoryImp
@@ -52,11 +51,7 @@ val dataModule = module {
         OrderRepositoryImp(get())
     }
 
-
-    single<Client> {
-        Client()
-    }
     single<ShortVideoRepository> {
-        ShortVideoRepositoryImp(get(), get())
+        ShortVideoRepositoryImp(get())
     }
 }

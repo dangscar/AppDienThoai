@@ -2,8 +2,8 @@ package com.nlhd.domain.usecase.shortvideo
 
 import com.nlhd.domain.repository.ShortVideoRepository
 
-class GetVideos(
+class Favorites(
     private val repository: ShortVideoRepository
 ) {
-    operator fun invoke(token: String) = repository.getVideos(token)
+    suspend operator fun invoke(token: String, videoId: String) = repository.favorites(token, videoId)
 }

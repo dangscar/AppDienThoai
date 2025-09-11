@@ -117,7 +117,7 @@ val appModule = module {
     }
 
     viewModel {
-        VideoViewModel()
+        VideoViewModel(get())
     }
 
 

@@ -2,15 +2,25 @@ package com.nlhd.shortvideo
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.nlhd.domain.entity.Message.MessageResponse
+import com.nlhd.domain.entity.shortVideo.Comments.AddComment.AddCommentRequest
+import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
+import com.nlhd.domain.resultWrapper.ResultWrapper
+import com.nlhd.domain.usecase.shortvideo.ShortVideoUseCase
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class VideoViewModel(
-
+    private val shortVideoUseCase: ShortVideoUseCase
 ): ViewModel() {
     private var _videoState = MutableStateFlow(VideoState.IDLE)
     val videoState: StateFlow<VideoState> = _videoState.asStateFlow()
@@ -29,6 +39,87 @@ class VideoViewModel(
 
     private val _imageStatus = MutableStateFlow(ImageStatus())
     val imageStatus = _imageStatus.asStateFlow()
+
+    private var _stateFollow = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
+    val stateFollow = _stateFollow.asStateFlow()
+
+    private var _stateLike = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
+    val stateLike = _stateLike.asStateFlow()
+
+    private var _stateFavorite = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
+    val stateFavorite = _stateFavorite.asStateFlow()
+
+    private var _contentComment = MutableStateFlow("")
+    val contentComment = _contentComment.asStateFlow()
+
+    private val commentsFlows = mutableMapOf<String, Flow<PagingData<Comment>>>()
+
+    private var _addCommentState = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
+    val addCommentState = _addCommentState.asStateFlow()
+
+    fun setAddCommentState(state: ShortVideoState) { _addCommentState.update { state } }
+
+    fun addComment(token: String, videoId: Int) = viewModelScope.launch {
+        shortVideoUseCase.addComment.invoke(token, AddCommentRequest(_contentComment.value, videoId)).let { result ->
+            when (result) {
+                is ResultWrapper.Failure -> { _addCommentState.update { ShortVideoState.Error(result.exception.message.toString()) } }
+                is ResultWrapper.Success<*> -> { _addCommentState.update { ShortVideoState.Success(result.value as MessageResponse) } }
+            }
+        }
+    }
+    fun commentsFlow(token: String, videoId: String): Flow<PagingData<Comment>> {
+        return commentsFlows.getOrPut(videoId) {
+            shortVideoUseCase.getComments(token, videoId)  // trả về Pager(...)
+                .cachedIn(viewModelScope)
+        }
+    }
+
+    fun setContentComment(content: String) { _contentComment.update { content }  }
+
+    fun setFavorite(favorite: Color) = _actionButton.update { it.copy(favorite = favorite) }
+
+    fun setLike(like : Color) = _actionButton.update { it.copy(like = like) }
+
+    fun setFollow(follow: Follow) = _actionButton.update { it.copy(avatar = follow) }
+
+    fun favorite(token: String, videoId: String) = viewModelScope.launch {
+        shortVideoUseCase.favorites.invoke(token, videoId).let { result ->
+            when (result) {
+                is ResultWrapper.Failure -> {
+                    _stateFavorite.update { ShortVideoState.Error(result.exception.message.toString()) }
+                }
+                is ResultWrapper.Success<*> -> {
+                    _stateFavorite.update { ShortVideoState.Success(result.value as MessageResponse) }
+                }
+            }
+        }
+    }
+
+    fun like(token: String, videoId: String) = viewModelScope.launch {
+        shortVideoUseCase.likes.invoke(token, videoId).let { result ->
+            when (result) {
+                is ResultWrapper.Failure -> {
+                    _stateLike.update { ShortVideoState.Error(result.exception.message.toString()) }
+                }
+                is ResultWrapper.Success<*> -> {
+                    _stateLike.update { ShortVideoState.Success(result.value as MessageResponse) }
+                }
+            }
+        }
+    }
+
+    fun follows(token: String, userId: String) = viewModelScope.launch {
+        shortVideoUseCase.follows.invoke(token, userId).let { result ->
+            when (result) {
+                is ResultWrapper.Failure -> {
+                    _stateFollow.update { ShortVideoState.Error(result.exception.message.toString()) }
+                }
+                is ResultWrapper.Success<*> -> {
+                    _stateFollow.update { ShortVideoState.Success(result.value as MessageResponse) }
+                }
+            }
+        }
+    }
 
     fun onImageStatus(list: List<String>, index: Int) {
         _imageStatus.update {
@@ -198,3 +289,10 @@ data class ImageStatus(
     val list: List<String> = emptyList(),
     val selectedIndex: Int = 0,
 )
+
+sealed class ShortVideoState {
+    object Idle: ShortVideoState()
+    object Loading: ShortVideoState()
+    data class Success(val data: MessageResponse): ShortVideoState()
+    data class Error(val message: String): ShortVideoState()
+}

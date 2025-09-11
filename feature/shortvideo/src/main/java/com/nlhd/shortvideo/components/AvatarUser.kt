@@ -27,8 +27,10 @@ import com.nlhd.core.utils.Green
 @Composable
 fun AvatarUser(
     avatar: String? = null,
+    isFollow : Boolean = false,
     isStory: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onClickAdd: () -> Unit
 ) {
     if (isStory) {
         ConstraintLayout {
@@ -120,30 +122,38 @@ fun AvatarUser(
                     }
 
             )
-            Box(modifier = Modifier
-                .constrainAs(plus) {
-                    bottom.linkTo(image.bottom)
-                    top.linkTo(image.bottom)
-                    end.linkTo(image.end)
-                    start.linkTo(image.start)
+            if (!isFollow) {
+                Box(modifier = Modifier
+                    .constrainAs(plus) {
+                        bottom.linkTo(image.bottom)
+                        top.linkTo(image.bottom)
+                        end.linkTo(image.end)
+                        start.linkTo(image.start)
+                    }
+                    .border(
+                        width = AppTheme.dimens.border,
+                        color = Color.Red,
+                        shape = CircleShape
+                    )
+                    .clip(CircleShape)
+                    .background(color = Color.Red, shape = CircleShape)
+                    .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        onClickAdd()
+                    })
                 }
-                .border(
-                    width = AppTheme.dimens.border,
-                    color = Color.Red,
-                    shape = CircleShape
-                )
-                .clip(CircleShape)
-                .background(color = Color.Red, shape = CircleShape)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.add),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(AppTheme.dimens.iconAdd)
-                        .padding(AppTheme.dimens.paddingAdd)
-                )
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.add),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(AppTheme.dimens.iconAdd)
+                            .padding(AppTheme.dimens.paddingAdd)
+                    )
+                }
             }
+
 
         }
     }
