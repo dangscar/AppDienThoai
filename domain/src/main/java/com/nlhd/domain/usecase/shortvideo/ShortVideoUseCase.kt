@@ -6,5 +6,7 @@ data class ShortVideoUseCase(
     val likes: Likes,
     val favorites: Favorites,
     val getComments: GetComments,
-    val addComment: AddComment
+    val addComment: AddComment,
+    val getVideosSearch: GetVideosSearch,
+    val getInfoProfile: GetInfoProfile
 )

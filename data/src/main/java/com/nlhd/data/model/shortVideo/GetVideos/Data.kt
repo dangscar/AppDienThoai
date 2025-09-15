@@ -14,7 +14,7 @@ data class Data(
     val likes_count: Int,
     val product_id: Int? = null,
     val shares: Int,
-    val thumbnail_url: String,
+    val thumbnail_url: String? = null,
     val updated_at: String,
     val user: User,
     val user_id: Int,

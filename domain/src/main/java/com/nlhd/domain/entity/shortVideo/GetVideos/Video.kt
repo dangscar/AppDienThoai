@@ -11,7 +11,7 @@ data class Video(
     val likes: String,
     val productId: Int? = null,
     val shares: String,
-    val thumbnailUrl: String,
+    val thumbnailUrl: String? = null,
     val user: User,
     val videoUrl: String,
     val views: String,

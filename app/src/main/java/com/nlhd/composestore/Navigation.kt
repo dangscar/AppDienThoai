@@ -57,7 +57,10 @@ import com.nlhd.composestore.navigate.EditProduct
 import com.nlhd.composestore.navigate.EditProfile
 import com.nlhd.composestore.navigate.LoadProduct
 import com.nlhd.composestore.navigate.LoadVersionProduct
+import com.nlhd.composestore.navigate.ProfileShortVideo
 import com.nlhd.composestore.navigate.Search
+import com.nlhd.composestore.navigate.SearchShortSuccess
+import com.nlhd.composestore.navigate.SearchShortVideo
 import com.nlhd.composestore.navigate.SearchSuccess
 import com.nlhd.dashboard.Navigate
 import com.nlhd.home.HomeScreen
@@ -82,6 +85,8 @@ import com.nlhd.manage_product.LoadVersionProductScreen.LoadVersionProductScreen
 import com.nlhd.order.OrderScreen
 import com.nlhd.search.SearchScreen
 import com.nlhd.search.SearchSuccessScreen
+import com.nlhd.shortvideo.Profile.ProfileShortVideoScreen
+import com.nlhd.shortvideo.Search.SearchShortSuccessScreen
 import com.nlhd.shortvideo.ShortVideoScreen
 import com.nlhd.user.EditProfileScreen
 import com.nlhd.user.UserScreen
@@ -422,6 +427,12 @@ fun CustomerScreen(
                 },
                 onClickSeeProduct = { productId, versionId, colorId ->
                     navController.navigate(Detail(productId, versionId, colorId))
+                },
+                onClickSearchShortVideo = {
+                    navController.navigate(SearchShortVideo)
+                },
+                onClickProfile = { videoId, userId ->
+                    navController.navigate(ProfileShortVideo(videoId, userId))
                 }
             )
         }
@@ -759,6 +770,113 @@ fun CustomerScreen(
             )
         }
 
+        composable<SearchShortVideo>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            SearchScreen(
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                },
+                onClickSearchSuccess = {
+                    navController.navigate(SearchShortSuccess(it))
+                }
+            )
+        }
+
+        composable<SearchShortSuccess>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            SearchShortSuccessScreen(
+                search = it.toRoute<SearchShortSuccess>().search,
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                },
+                onClickSeeProduct = { productId, versionId, colorId ->
+                    navController.navigate(Detail(productId, versionId, colorId))
+                },
+                onClickProfile = { videoId, userId->
+                    navController.navigate(ProfileShortVideo(videoId, userId))
+                }
+            )
+        }
+
+        composable<ProfileShortVideo>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            ProfileShortVideoScreen(
+                videoId = it.toRoute<ProfileShortVideo>().videoId,
+                userId = it.toRoute<ProfileShortVideo>().userId,
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
+
+
+
     }
 }
 
@@ -771,7 +889,9 @@ fun GeneralScreen(
     onClickSearch: () -> Unit,
     onClickEditProfile: () -> Unit,
     onNavigateAdmin: () -> Unit,
-    onClickSeeProduct: (Int, Int, Int) -> Unit
+    onClickSeeProduct: (Int, Int, Int) -> Unit,
+    onClickSearchShortVideo: () -> Unit,
+    onClickProfile: (Int, Int) -> Unit
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -811,7 +931,9 @@ fun GeneralScreen(
                             launchSingleTop = true
                         }
                     },
-                    onClickSeeProduct = onClickSeeProduct
+                    onClickSeeProduct = onClickSeeProduct,
+                    onClickSearch = onClickSearchShortVideo,
+                    onClickProfile = onClickProfile
                 )
 
             }

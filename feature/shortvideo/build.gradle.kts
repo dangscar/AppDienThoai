@@ -89,4 +89,7 @@ dependencies {
     implementation("androidx.media3:media3-datasource:1.8.0")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
+
+    //Navigation
+    implementation("androidx.navigation:navigation-compose:2.9.4")
 }

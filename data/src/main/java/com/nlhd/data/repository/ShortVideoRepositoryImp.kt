@@ -7,16 +7,20 @@ import com.nlhd.core.utils.Utils
 import com.nlhd.data.mapper.toDomain
 import com.nlhd.data.model.Message.MessageResponseDto
 import com.nlhd.data.model.shortVideo.Comments.AddComment.AddCommentRequestDto
+import com.nlhd.data.model.shortVideo.ProfileShortVideo.Info.InfoProfileResponseDto
 import com.nlhd.data.remote.GetCommentsPagingSource
 import com.nlhd.data.remote.GetVideosPagingSource
+import com.nlhd.data.remote.GetVideosSearchPagingSource
 import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.shortVideo.Comments.AddComment.AddCommentRequest
 import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
 import com.nlhd.domain.entity.shortVideo.GetVideos.Video
+import com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.InfoProfileResponse
 import com.nlhd.domain.repository.ShortVideoRepository
 import com.nlhd.domain.resultWrapper.ResultWrapper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -119,6 +123,39 @@ class ShortVideoRepositoryImp(
                     )
                 )
             }.body<MessageResponseDto>()
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
+    override fun getVideosSearch(
+        token: String,
+        search: String
+    ): Flow<PagingData<Video>> {
+        return Pager(
+            config = PagingConfig(pageSize = 15),
+            pagingSourceFactory = {
+                GetVideosSearchPagingSource(
+                    ktor = ktor,
+                    token = token,
+                    search = search
+                )
+            }
+
+        ).flow
+    }
+
+    override suspend fun getInfoProfile(
+        token: String,
+        videoId: Int
+    ): ResultWrapper<InfoProfileResponse> {
+        return try {
+            val responseDto = ktor.get(Utils.BASE_URL+"/api/video/profile/${videoId}") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+            }.body<InfoProfileResponseDto>()
             val response = responseDto.toDomain(responseDto)
             ResultWrapper.Success(response)
         } catch (e: Exception) {

@@ -3,7 +3,6 @@ package com.nlhd.shortvideo
 import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
@@ -23,30 +22,20 @@ import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,19 +51,16 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -89,9 +75,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.paging.compose.LazyPagingItems
@@ -100,7 +84,6 @@ import coil.compose.AsyncImage
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Utils
-import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.shortVideo.GetVideos.Video
 import com.nlhd.shortvideo.components.ActionItem
 import com.nlhd.shortvideo.components.AvatarUser
@@ -109,7 +92,6 @@ import com.nlhd.shortvideo.components.BottomSheetComment
 import com.nlhd.shortvideo.components.TimeFormat
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import kotlin.collections.get
 
 @Composable
 fun Circle(
@@ -152,9 +134,10 @@ fun ContentCommon(
     pagerState: PagerState,
     paddingValues: PaddingValues,
     videos: LazyPagingItems<Video>,
-    onSearch: ((String)-> Unit)? = null,
+    onSearch: ((String) -> Unit)? = null,
     onHiddenText: ((Boolean) -> Unit)? = null,
-    onClickSeeProduct: (Int, Int, Int) -> Unit
+    onClickSeeProduct: (Int, Int, Int) -> Unit,
+    onClickProfile: (Int, Int) -> Unit
 ) {
     val context = LocalContext.current
     val contentCommonViewModel: ContentCommonViewModel = koinViewModel(key = pageF)
@@ -216,7 +199,7 @@ fun ContentCommon(
             }
 
             val videoUrl = "${Utils.BASE_URL}/" + video.videoUrl
-            val exoPlayer by remember(page, videoUrl) {
+            val exoPlayer by remember {
                 mutableStateOf(
                     contentCommonViewModel.getOrCreatePlayer(page, videoUrl, context)
                 )
@@ -261,7 +244,6 @@ fun ContentCommon(
             }
 
 
-
             exoPlayer.addListener(object : Player.Listener {
                 @SuppressLint("SwitchIntDef")
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -294,10 +276,13 @@ fun ContentCommon(
             })
 
 
-
-            LaunchedEffect(key1 = pagerState.settledPage, key2 = isPlaying) {
+            LaunchedEffect(key1 = pagerState.settledPage, key2 = isPlaying, key3 = pagerState.currentPage) {
                 if (pagerState.settledPage == page && isPlaying) {
                     exoPlayer.playWhenReady = true
+                    if (onSearch != null) {
+                        onSearch(video.user.name)
+                    }
+
                 } else {
                     exoPlayer.seekTo(0)
                     exoPlayer.playWhenReady = false
@@ -590,9 +575,16 @@ fun ContentCommon(
                             "${Utils.BASE_URL}/" + video.user.avatarUrl
                         },
                         isFollow = actionButton.avatar == Follow.Follow,
-                        onClick = {},
+                        onClick = {
+                            if (!isScrolling && isPlaying) {
+                                onClickProfile(video.id, video.user.id)
+                            }
+ 
+                        },
                         onClickAdd = {
-                            videoViewModel.follows(token = token, userId = video.user.id.toString())
+                            if (!isScrolling && isPlaying) {
+                                videoViewModel.follows(token = token, userId = video.user.id.toString())
+                            }
                         }
                     )
                     Spacer(modifier = Modifier.height(AppTheme.dimens.small2))

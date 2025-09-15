@@ -20,3 +20,17 @@ data class SearchSuccess(
 
 @Serializable
 object EditProfile
+
+@Serializable
+object SearchShortVideo
+
+@Serializable
+data class SearchShortSuccess(
+    val search: String
+)
+
+@Serializable
+data class ProfileShortVideo(
+    val videoId: Int,
+    val userId: Int
+)

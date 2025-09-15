@@ -29,6 +29,8 @@ import com.nlhd.manage_product.LoadVersionProductScreen.LoadVersionProductViewMo
 import com.nlhd.order.OrderViewModel
 import com.nlhd.search.SearchViewModel
 import com.nlhd.shortvideo.ContentCommonViewModel
+import com.nlhd.shortvideo.ProfileShortVideoViewModel
+import com.nlhd.shortvideo.Search.SearchShortVideoSuccessViewModel
 import com.nlhd.shortvideo.ShortVideoViewModel
 import com.nlhd.shortvideo.VideoViewModel
 import com.nlhd.user.EditProfileViewModel
@@ -118,6 +120,14 @@ val appModule = module {
 
     viewModel {
         VideoViewModel(get())
+    }
+
+    viewModel {
+        SearchShortVideoSuccessViewModel(get())
+    }
+
+    viewModel {
+        ProfileShortVideoViewModel(get())
     }
 
 
