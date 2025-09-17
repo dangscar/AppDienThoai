@@ -9,6 +9,7 @@ import com.nlhd.data.model.Message.MessageResponseDto
 import com.nlhd.data.model.shortVideo.Comments.AddComment.AddCommentRequestDto
 import com.nlhd.data.model.shortVideo.ProfileShortVideo.Info.InfoProfileResponseDto
 import com.nlhd.data.remote.GetCommentsPagingSource
+import com.nlhd.data.remote.GetVideoByUserPagingSource
 import com.nlhd.data.remote.GetVideosPagingSource
 import com.nlhd.data.remote.GetVideosSearchPagingSource
 import com.nlhd.domain.entity.Message.MessageResponse
@@ -20,6 +21,7 @@ import com.nlhd.domain.repository.ShortVideoRepository
 import com.nlhd.domain.resultWrapper.ResultWrapper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -149,13 +151,45 @@ class ShortVideoRepositoryImp(
 
     override suspend fun getInfoProfile(
         token: String,
-        videoId: Int
+        userId: Int
     ): ResultWrapper<InfoProfileResponse> {
         return try {
-            val responseDto = ktor.get(Utils.BASE_URL+"/api/video/profile/${videoId}") {
+            val responseDto = ktor.get(Utils.BASE_URL+"/api/video/profile/${userId}") {
                 header("Authorization", "Bearer $token")
                 contentType(ContentType.Application.Json)
             }.body<InfoProfileResponseDto>()
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
+    override fun getVideosByUser(
+        token: String,
+        userId: Int
+    ): Flow<PagingData<Video>> {
+        return Pager(
+            config = PagingConfig(pageSize = 15),
+            pagingSourceFactory = {
+                GetVideoByUserPagingSource(
+                    ktor = ktor,
+                    token = token,
+                    userId = userId
+                )
+            }
+        ).flow
+    }
+
+    override suspend fun increaseViews(
+        token: String,
+        videoId: Int
+    ): ResultWrapper<MessageResponse> {
+        return try {
+            val responseDto = ktor.post(Utils.BASE_URL+"/api/video/view/${videoId}") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+            }.body<MessageResponseDto>()
             val response = responseDto.toDomain(responseDto)
             ResultWrapper.Success(response)
         } catch (e: Exception) {

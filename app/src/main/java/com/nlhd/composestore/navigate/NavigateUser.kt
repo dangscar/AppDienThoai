@@ -31,6 +31,5 @@ data class SearchShortSuccess(
 
 @Serializable
 data class ProfileShortVideo(
-    val videoId: Int,
     val userId: Int
 )

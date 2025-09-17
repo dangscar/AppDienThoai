@@ -23,11 +23,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarProfileShortVideo(
-    onClickBack: () -> Unit
+    onClickBack: () -> Unit,
+    title: String = ""
 ) {
     TopAppBar(title = {
         Text(
-            "Android Jetpack Compose",
+            "$title - Profile",
             style = AppTheme.typography.titleMedium.copy(color = Color.Black),
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,

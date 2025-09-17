@@ -192,7 +192,7 @@ fun DetailShortVideoScreen (
     videos: LazyPagingItems<Video>,
     onClickBack: () -> Unit,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
-    onClickProfile: (Int, Int) -> Unit
+    onClickProfile: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
@@ -214,7 +214,7 @@ fun DetailShortVideoScreen (
         )
         ContentCommon(
             token = keyStore.value,
-            pageF = "DetailShortVideoScreen",
+            pageF = "Page",
             isPlaying = true,
             pagerState = pageState,
             paddingValues = innerPadding,

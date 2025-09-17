@@ -2,8 +2,8 @@ package com.nlhd.domain.usecase.shortvideo
 
 import com.nlhd.domain.repository.ShortVideoRepository
 
-class GetInfoProfile(
+class IncreaseViews(
     private val repository: ShortVideoRepository
 ) {
-    suspend operator fun invoke(token: String, userId: Int) = repository.getInfoProfile(token, userId)
+    suspend operator fun invoke(token: String, videoId: Int) = repository.increaseViews(token, videoId)
 }

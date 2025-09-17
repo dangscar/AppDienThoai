@@ -41,8 +41,10 @@ import com.nlhd.domain.usecase.shortvideo.Favorites
 import com.nlhd.domain.usecase.shortvideo.Follows
 import com.nlhd.domain.usecase.shortvideo.GetComments
 import com.nlhd.domain.usecase.shortvideo.GetInfoProfile
+import com.nlhd.domain.usecase.shortvideo.GetVideoByUser
 import com.nlhd.domain.usecase.shortvideo.GetVideos
 import com.nlhd.domain.usecase.shortvideo.GetVideosSearch
+import com.nlhd.domain.usecase.shortvideo.IncreaseViews
 import com.nlhd.domain.usecase.shortvideo.Likes
 import com.nlhd.domain.usecase.shortvideo.ShortVideoUseCase
 import org.koin.dsl.module
@@ -133,7 +135,9 @@ val domainModule = module {
             getComments = GetComments(get()),
             addComment = AddComment(get()),
             getVideosSearch = GetVideosSearch(get()),
-            getInfoProfile = GetInfoProfile(get())
+            getInfoProfile = GetInfoProfile(get()),
+            getVideosByUser = GetVideoByUser(get()),
+            increaseViews = IncreaseViews(get())
         )
     }
 

@@ -113,31 +113,16 @@ fun AddCommentRequestDto.toDomain(addCommentRequestDto: AddCommentRequestDto): A
 
 fun InfoProfileResponseDto.toDomain(infoProfileResponseDto: InfoProfileResponseDto): com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.InfoProfileResponse {
     return com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.InfoProfileResponse(
-        caption = infoProfileResponseDto.caption,
-        createdAt = infoProfileResponseDto.created_at,
-        favoritesCount = infoProfileResponseDto.favorites_count,
+        avatarUrl = infoProfileResponseDto.avatar_url,
+        canFollow = infoProfileResponseDto.can_follow == 1,
+        email = infoProfileResponseDto.email,
+        followersCount = infoProfileResponseDto.followers_count.toShortString(),
+        followingsCount = infoProfileResponseDto.followings_count.toShortString(),
         id = infoProfileResponseDto.id,
-        likesCount = infoProfileResponseDto.likes_count,
-        productId = infoProfileResponseDto.product_id,
-        shares = infoProfileResponseDto.shares,
-        thumbnailUrl = infoProfileResponseDto.thumbnail_url,
-        user = infoProfileResponseDto.user.toDomain(infoProfileResponseDto.user),
-        userId = infoProfileResponseDto.user_id,
-        videoUrl = infoProfileResponseDto.video_url,
-        views = infoProfileResponseDto.views.toShortString()
+        isFollowing = infoProfileResponseDto.is_following == 1,
+        name = infoProfileResponseDto.name,
+        favoritesCount = infoProfileResponseDto.received_favorites_count.toShortString(),
+        likesCount = infoProfileResponseDto.received_likes_count.toShortString(),
+        videosCount = infoProfileResponseDto.videos_count.toShortString()
     )
-}
-
-fun com.nlhd.data.model.shortVideo.ProfileShortVideo.Info.User.toDomain(user: com.nlhd.data.model.shortVideo.ProfileShortVideo.Info.User): com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.User {
-    return com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.User(
-        avatarUrl = user.avatar_url,
-        id = user.id,
-        name = user.name,
-        favoritesCount = user.received_favorites_count.toShortString(),
-        likesCount = user.received_likes_count.toShortString(),
-        email = user.email,
-        followersCount = user.followers_count.toShortString(),
-        followingsCount = user.followings_count.toShortString()
-    )
-
 }

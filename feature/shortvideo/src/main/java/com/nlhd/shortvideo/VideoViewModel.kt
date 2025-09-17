@@ -57,6 +57,22 @@ class VideoViewModel(
     private var _addCommentState = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
     val addCommentState = _addCommentState.asStateFlow()
 
+    private var _increaseViewState = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
+    val increaseViewState = _increaseViewState.asStateFlow()
+
+    fun increaseView(token: String, videoId: Int) = viewModelScope.launch {
+        shortVideoUseCase.increaseViews.invoke(token, videoId).let { result ->
+            when (result) {
+                is ResultWrapper.Failure -> {
+                    _increaseViewState.update { ShortVideoState.Error(result.exception.message.toString()) }
+                }
+                is ResultWrapper.Success<*> -> {
+                    _increaseViewState.update { ShortVideoState.Success(result.value as MessageResponse) }
+                }
+            }
+        }
+    }
+
     fun setAddCommentState(state: ShortVideoState) { _addCommentState.update { state } }
 
     fun addComment(token: String, videoId: Int) = viewModelScope.launch {

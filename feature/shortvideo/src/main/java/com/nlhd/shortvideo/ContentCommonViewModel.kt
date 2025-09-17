@@ -3,10 +3,13 @@ package com.nlhd.shortvideo
 import android.content.Context
 import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
@@ -35,6 +38,31 @@ class ContentCommonViewModel(
     private var isFirst = false
 
     @OptIn(UnstableApi::class)
+    fun loadControl() = DefaultLoadControl.Builder()
+        .setBufferDurationsMs(
+            /* minBufferMs = */ 3_000,
+            /* maxBufferMs = */ 10_000,
+            /* bufferForPlaybackMs = */ 500,
+            /* bufferForPlaybackAfterRebufferMs = */ 1_000
+        )
+        .build()
+
+    @OptIn(UnstableApi::class)
+    fun trackSelector(context: Context) = DefaultTrackSelector(context).apply {
+        setParameters(
+            buildUponParameters()
+                .setMaxVideoSizeSd()   // Giới hạn SD để tiết kiệm RAM
+        )
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun renderersFactory(context: Context) = DefaultRenderersFactory(context)
+        .setEnableDecoderFallback(true)
+        .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
+        .forceEnableMediaCodecAsynchronousQueueing()
+        .setEnableAudioTrackPlaybackParams(true)
+
+    @OptIn(UnstableApi::class)
     fun getOrCreatePlayer(page: Int, videoUrl: String, context: Context): ExoPlayer {
         // Nếu player đã tồn tại, trả về nó
         if (pageDefault < page) {
@@ -51,29 +79,23 @@ class ContentCommonViewModel(
         if (playerMap.size >= MAX_PLAYERS) {
             val oldestKey = if (isFirst) playerMap.keys.minOrNull() else playerMap.keys.maxOrNull()
             playerMap.remove(oldestKey)?.release()
+
         }
 
-        val loadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(
-                /* minBufferMs = */ 3_000,
-                /* maxBufferMs = */ 10_000,
-                /* bufferForPlaybackMs = */ 500,
-                /* bufferForPlaybackAfterRebufferMs = */ 1_000
-            )
-            .build()
 
-        val trackSelector = DefaultTrackSelector(context).apply {
-            setParameters(
-                buildUponParameters()
-                    .setMaxVideoSizeSd()   // Giới hạn SD để tiết kiệm RAM
-            )
-        }
 
         val exoPlayer = ExoPlayer
-            .Builder(context)
+            .Builder(context, renderersFactory(context))
             .setMediaSourceFactory(defaultMediaSourceFactory)
-            .setLoadControl(loadControl)
-            .setTrackSelector(trackSelector)
+            .setLoadControl(loadControl())
+            .setTrackSelector(trackSelector(context))
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(C.USAGE_MEDIA)
+                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                    .build(),
+                true
+            )
             .build()
             .apply {
                 setMediaItem(MediaItem.fromUri(videoUrl))

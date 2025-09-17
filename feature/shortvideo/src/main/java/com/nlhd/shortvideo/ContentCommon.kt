@@ -137,10 +137,10 @@ fun ContentCommon(
     onSearch: ((String) -> Unit)? = null,
     onHiddenText: ((Boolean) -> Unit)? = null,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
-    onClickProfile: (Int, Int) -> Unit
+    onClickProfile: (Int) -> Unit
 ) {
     val context = LocalContext.current
-    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(key = pageF)
+    val contentCommonViewModel: ContentCommonViewModel = koinViewModel()
     val isAutoScroll by contentCommonViewModel.isAutoScroll.collectAsStateWithLifecycle()
     val widthScreen = LocalConfiguration.current.screenWidthDp.dp/2
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -227,6 +227,7 @@ fun ContentCommon(
                         Lifecycle.Event.ON_RESUME -> {
                             if (pagerState.settledPage == page && isPlaying) {
                                 exoPlayer.playWhenReady = true
+                                videoViewModel.increaseView(token, video.id)
                             }
                         }
                         Lifecycle.Event.ON_PAUSE -> {
@@ -275,6 +276,11 @@ fun ContentCommon(
                 }
             })
 
+            LaunchedEffect(key1 = pagerState.settledPage) {
+                if (pagerState.settledPage == page && isPlaying) {
+                    videoViewModel.increaseView(token, video.id)
+                }
+            }
 
             LaunchedEffect(key1 = pagerState.settledPage, key2 = isPlaying, key3 = pagerState.currentPage) {
                 if (pagerState.settledPage == page && isPlaying) {
@@ -282,6 +288,7 @@ fun ContentCommon(
                     if (onSearch != null) {
                         onSearch(video.user.name)
                     }
+
 
                 } else {
                     exoPlayer.seekTo(0)
@@ -577,7 +584,7 @@ fun ContentCommon(
                         isFollow = actionButton.avatar == Follow.Follow,
                         onClick = {
                             if (!isScrolling && isPlaying) {
-                                onClickProfile(video.id, video.user.id)
+                                onClickProfile(video.user.id)
                             }
  
                         },
@@ -766,7 +773,18 @@ fun ContentCommon(
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                     }
 
-                    Row {
+                    Row(
+                        modifier = Modifier.pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    if (!isScrolling && isPlaying) {
+                                        onClickProfile(video.user.id)
+                                    }
+                                }
+                            )
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = video.user.name,
                             style = AppTheme.typography.titleMedium.copy(color = Color.White),
@@ -774,8 +792,9 @@ fun ContentCommon(
                         )
                         Text(
                             text = " · ${video.createdAt}",
-                            style = AppTheme.typography.titleMedium.copy(
-                                color = Color.LightGray,
+                            style = AppTheme.typography.labelMedium.copy(
+                                color = Color(0x83FAFAFA),
+                                fontWeight = FontWeight.SemiBold
                             ),
                             maxLines = 1
                         )

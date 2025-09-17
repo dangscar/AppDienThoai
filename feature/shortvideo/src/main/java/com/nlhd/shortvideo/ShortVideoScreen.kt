@@ -45,7 +45,7 @@ fun ShortVideoScreen(
     onClickSeeProduct: (Int, Int, Int) -> Unit,
     onClickBack: () -> Unit,
     onClickSearch: () -> Unit,
-    onClickProfile: (Int, Int) -> Unit
+    onClickProfile: (Int) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -138,9 +138,10 @@ fun ShortVideoScreen(
 
             }
             is LoadState.NotLoading -> {
+
                 ContentCommon(
                     token = keyStore.value,
-                    pageF = "F",
+                    pageF = "Page",
                     isPlaying = true,
                     pagerState = pagerState,
                     paddingValues = innerPadding,

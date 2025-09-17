@@ -431,8 +431,8 @@ fun CustomerScreen(
                 onClickSearchShortVideo = {
                     navController.navigate(SearchShortVideo)
                 },
-                onClickProfile = { videoId, userId ->
-                    navController.navigate(ProfileShortVideo(videoId, userId))
+                onClickProfile = { userId ->
+                    navController.navigate(ProfileShortVideo(userId))
                 }
             )
         }
@@ -844,8 +844,8 @@ fun CustomerScreen(
                 onClickSeeProduct = { productId, versionId, colorId ->
                     navController.navigate(Detail(productId, versionId, colorId))
                 },
-                onClickProfile = { videoId, userId->
-                    navController.navigate(ProfileShortVideo(videoId, userId))
+                onClickProfile = {userId->
+                    navController.navigate(ProfileShortVideo(userId))
                 }
             )
         }
@@ -865,12 +865,15 @@ fun CustomerScreen(
             }
         ) {
             ProfileShortVideoScreen(
-                videoId = it.toRoute<ProfileShortVideo>().videoId,
                 userId = it.toRoute<ProfileShortVideo>().userId,
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
                         navController.popBackStack()
                     }
+                },
+                onClickSeeProduct = {
+                    productId, versionId, colorId ->
+                    navController.navigate(Detail(productId, versionId, colorId))
                 }
             )
         }
@@ -891,7 +894,7 @@ fun GeneralScreen(
     onNavigateAdmin: () -> Unit,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
     onClickSearchShortVideo: () -> Unit,
-    onClickProfile: (Int, Int) -> Unit
+    onClickProfile: (Int) -> Unit
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()

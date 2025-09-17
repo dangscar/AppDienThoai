@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -67,7 +69,7 @@ fun SearchShortSuccessScreen(
     search: String,
     onClickBack: () -> Unit,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
-    onClickProfile: (Int, Int) -> Unit
+    onClickProfile: (Int) -> Unit
 ) {
     viewModel.setQuery(search)
     val context = LocalContext.current
@@ -102,105 +104,97 @@ fun SearchShortSuccessScreen(
             ) { innerPadding ->
                 val width = LocalConfiguration.current.screenWidthDp.dp/2
                 val height = LocalConfiguration.current.screenWidthDp.dp/1.25f
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(innerPadding)
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxWidth().padding(innerPadding),
+                    columns = GridCells.Fixed(2),
                 ) {
-                    item {
-                        ContextualFlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            maxItemsInEachRow = 2,
-                            itemCount = videos.itemCount,
+                    items(videos.itemCount) {
+                        val video = videos[it]
+                        Column(
+                            modifier = Modifier.pointerInput(Unit) {
+                                detectTapGestures(onTap = { offset->
+                                    navController.navigate(DetailShortVideo(it))
+                                })
+                            }
                         ) {
-                            val video = videos[it]
-                            if (videos.itemCount > 0) {
-                                Column(
-                                    modifier = Modifier.pointerInput(Unit) {
-                                        detectTapGestures(onTap = { offset->
-                                            navController.navigate(DetailShortVideo(it))
-                                        })
-                                    }
+                            AsyncImage(
+                                model = if (video?.thumbnailUrl != null && video.thumbnailUrl != "") "${Utils.BASE_URL}/"+ video.thumbnailUrl else R.drawable.anhden,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(width, height)
+                                    .padding(AppTheme.dimens.small2)
+                                    .clip(RoundedCornerShape(AppTheme.dimens.small3)),
+                                contentScale = ContentScale.Crop
+                            )
+                            Text(
+                                text = video!!.caption,
+                                style = AppTheme.typography.titleSmall.copy(
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Normal
+                                ),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.width(width).padding(horizontal = AppTheme.dimens.small2 ,vertical = AppTheme.dimens.extraSmall)
+                            )
+                            Row(
+                                modifier = Modifier.width(width),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = AppTheme.dimens.small2, vertical = AppTheme.dimens.small),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     AsyncImage(
-                                        model = if (video?.thumbnailUrl != null && video.thumbnailUrl != "") "${Utils.BASE_URL}/"+ video.thumbnailUrl else R.drawable.anhden,
+                                        model = if (video.user.avatarUrl == null) R.drawable.anhden else "${Utils.BASE_URL}/"+video.user.avatarUrl,
                                         contentDescription = null,
                                         modifier = Modifier
-                                            .size(width, height)
-                                            .padding(AppTheme.dimens.small2)
-                                            .clip(RoundedCornerShape(AppTheme.dimens.small3)),
+                                            .size(AppTheme.dimens.medium)
+                                            .pointerInput(Unit) {
+                                                detectTapGestures(onTap = { offset->
+                                                })
+                                            }
+                                            .clip(CircleShape),
                                         contentScale = ContentScale.Crop
                                     )
                                     Text(
-                                        text = video!!.caption,
+                                        text = video.user.name,
                                         style = AppTheme.typography.titleSmall.copy(
                                             color = Color.Black,
                                             fontWeight = FontWeight.Normal
                                         ),
-                                        maxLines = 2,
+                                        maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.width(width).padding(horizontal = AppTheme.dimens.small2 ,vertical = AppTheme.dimens.extraSmall)
+                                        modifier = Modifier.padding(AppTheme.dimens.small)
                                     )
-                                    Row(
-                                        modifier = Modifier.width(width),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = AppTheme.dimens.small2, vertical = AppTheme.dimens.small),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            AsyncImage(
-                                                model = if (video.user.avatarUrl == null) R.drawable.anhden else "${Utils.BASE_URL}/"+video.user.avatarUrl,
-                                                contentDescription = null,
-                                                modifier = Modifier
-                                                    .size(AppTheme.dimens.medium)
-                                                    .pointerInput(Unit) {
-                                                        detectTapGestures(onTap = { offset->
-                                                        })
-                                                    }
-                                                    .clip(CircleShape),
-                                                contentScale = ContentScale.Crop
-                                            )
-                                            Text(
-                                                text = video.user.name,
-                                                style = AppTheme.typography.titleSmall.copy(
-                                                    color = Color.Black,
-                                                    fontWeight = FontWeight.Normal
-                                                ),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                                modifier = Modifier.padding(AppTheme.dimens.small)
-                                            )
-                                        }
-                                        Row(
-                                            modifier = Modifier.padding(AppTheme.dimens.small2),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.ic_heart),
-                                                contentDescription = null,
-                                                modifier = Modifier
-                                                    .size(AppTheme.dimens.small3),
-                                                tint = Color.Red
-                                            )
-                                            Text(
-                                                text = video.likes,
-                                                style = AppTheme.typography.titleSmall.copy(
-                                                    color = Color.Black,
-                                                    fontWeight = FontWeight.Normal
-                                                ),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                                modifier = Modifier.padding(AppTheme.dimens.small)
-                                            )
-                                        }
-                                    }
-
+                                }
+                                Row(
+                                    modifier = Modifier.padding(AppTheme.dimens.small2),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_heart),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(AppTheme.dimens.small3),
+                                        tint = Color.Red
+                                    )
+                                    Text(
+                                        text = video.likes,
+                                        style = AppTheme.typography.titleSmall.copy(
+                                            color = Color.Black,
+                                            fontWeight = FontWeight.Normal
+                                        ),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(AppTheme.dimens.small)
+                                    )
                                 }
                             }
 
                         }
                     }
+
                 }
             }
         }

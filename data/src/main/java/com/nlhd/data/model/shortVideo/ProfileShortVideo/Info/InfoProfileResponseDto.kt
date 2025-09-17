@@ -4,16 +4,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class InfoProfileResponseDto(
-    val caption: String,
-    val created_at: String,
-    val favorites_count: Int,
+    val avatar_url: String? = null,
+    val can_follow: Int,
+    val email: String,
+    val followers_count: Int,
+    val followings_count: Int,
     val id: Int,
-    val likes_count: Int,
-    val product_id: Int? = null,
-    val shares: Int,
-    val thumbnail_url: String? = null,
-    val user: User,
-    val user_id: Int,
-    val video_url: String,
-    val views: Int
+    val is_following: Int,
+    val name: String,
+    val received_favorites_count: Int,
+    val received_likes_count: Int,
+    val videos_count: Int
 )

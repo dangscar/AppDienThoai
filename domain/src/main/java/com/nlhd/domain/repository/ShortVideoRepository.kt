@@ -17,5 +17,7 @@ interface ShortVideoRepository {
     fun getComments(token: String, videoId: String): Flow<PagingData<Comment>>
     suspend fun addComment(token: String, addCommentRequest: AddCommentRequest): ResultWrapper<MessageResponse>
     fun getVideosSearch(token: String, search: String): Flow<PagingData<Video>>
-    suspend fun getInfoProfile(token: String, videoId: Int): ResultWrapper<InfoProfileResponse>
+    suspend fun getInfoProfile(token: String, userId: Int): ResultWrapper<InfoProfileResponse>
+    fun getVideosByUser(token: String, userId: Int): Flow<PagingData<Video>>
+    suspend fun increaseViews(token: String, videoId: Int): ResultWrapper<MessageResponse>
 }
