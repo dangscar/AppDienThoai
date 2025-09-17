@@ -3,6 +3,7 @@ package com.nlhd.shortvideo
 import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
@@ -140,7 +141,8 @@ fun ContentCommon(
     onClickProfile: (Int) -> Unit
 ) {
     val context = LocalContext.current
-    val contentCommonViewModel: ContentCommonViewModel = koinViewModel()
+    val activity = LocalContext.current as ComponentActivity
+    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(viewModelStoreOwner = activity)
     val isAutoScroll by contentCommonViewModel.isAutoScroll.collectAsStateWithLifecycle()
     val widthScreen = LocalConfiguration.current.screenWidthDp.dp/2
     val infiniteTransition = rememberInfiniteTransition(label = "")

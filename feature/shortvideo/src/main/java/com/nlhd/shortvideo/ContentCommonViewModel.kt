@@ -73,13 +73,18 @@ class ContentCommonViewModel(
             isFirst = false
         }
 
+        Log.d("AAA", playerMap.toString())
         playerMap[page]?.let { return it }
 
         // Nếu số lượng player vượt quá giới hạn, giải phóng player cũ nhất
         if (playerMap.size >= MAX_PLAYERS) {
-            val oldestKey = if (isFirst) playerMap.keys.minOrNull() else playerMap.keys.maxOrNull()
-            playerMap.remove(oldestKey)?.release()
+            val victim = playerMap.keys
+                .filter { it != page }                               // loại trừ vị trí chuẩn bị thêm
+                .maxByOrNull { kotlin.math.abs(it - page) }          // xa nhất so với page hiện tại
 
+            victim?.let { key ->
+                playerMap.remove(key)?.release()
+            }
         }
 
 
