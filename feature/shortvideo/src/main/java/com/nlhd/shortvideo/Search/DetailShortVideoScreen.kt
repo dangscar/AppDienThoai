@@ -203,18 +203,24 @@ fun DetailShortVideoScreen (
     var search by remember {
         mutableStateOf("Find related content")
     }
+    var isHidden by remember {
+        mutableStateOf(false)
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Black,
     ) { innerPadding ->
-        TopBarDetailVideoScreen(
-            title = search ,
-            innerPadding = innerPadding,
-            onClickBack = onClickBack,
-            onSearch = {
-                onSearch()
-            }
-        )
+        if (!isHidden) {
+            TopBarDetailVideoScreen(
+                title = search ,
+                innerPadding = innerPadding,
+                onClickBack = onClickBack,
+                onSearch = {
+                    onSearch()
+                }
+            )
+        }
+
         ContentCommon(
             token = keyStore.value,
             pageF = "Page",
@@ -225,9 +231,11 @@ fun DetailShortVideoScreen (
             onSearch = {
                 search = it
             },
-            onHiddenText = {},
+            onHiddenText = {
+                isHidden = it
+            },
             onClickSeeProduct = onClickSeeProduct,
-            onClickProfile = onClickProfile
+            onClickProfile = onClickProfile,
         )
 
     }

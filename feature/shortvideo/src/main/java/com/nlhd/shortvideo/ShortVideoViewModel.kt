@@ -10,9 +10,11 @@ import com.nlhd.domain.usecase.shortvideo.ShortVideoUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ShortVideoViewModel(
@@ -20,6 +22,10 @@ class ShortVideoViewModel(
 ): ViewModel() {
 
     private val tokenFlow = MutableStateFlow<String?>(null)
+    private var _isHidden = MutableStateFlow(false)
+    val isHidden = _isHidden.asStateFlow()
+
+    fun setHidden(isHidden: Boolean) = _isHidden.update { isHidden }
 
     fun setToken(token: String) {
         // tránh rebuild khi token không đổi

@@ -3,6 +3,7 @@ package com.nlhd.shortvideo.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -52,6 +54,7 @@ import coil.compose.AsyncImage
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Utils
+import com.nlhd.core.utils.containerSearch
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
 
@@ -231,25 +234,11 @@ fun InputText(
     content: String,
     onValueChange: (String) -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Image(painter = painterResource(
-            R.drawable.tiktok
-        ),
-            contentDescription = null,
-            modifier = Modifier
-                .size(AppTheme.dimens.icon)
-                .padding(AppTheme.dimens.small)
-                .clip(CircleShape)
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-
-                    })
-                }
-
-        )
         val focusRequester = remember {
             FocusRequester()
         }
@@ -259,13 +248,18 @@ fun InputText(
             }
         }
         val focusManager = LocalFocusManager.current
+        Divider(
+            thickness = AppTheme.dimens.extraSmall,
+            color = containerSearch
+        )
         BasicTextField(
             value = content,
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester)
-                .heightIn(min = AppTheme.dimens.large),
+                .heightIn(min = AppTheme.dimens.large)
+                .padding(AppTheme.dimens.small),
             cursorBrush = SolidColor(contentPrice),
             maxLines = 1,
             keyboardOptions = KeyboardOptions(

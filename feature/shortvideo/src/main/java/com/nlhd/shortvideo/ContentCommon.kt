@@ -9,6 +9,7 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.exponentialDecay
@@ -55,6 +56,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +68,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -181,15 +185,11 @@ fun ContentCommon(
         ) { page->
 
             val videoViewModel: VideoViewModel = koinViewModel(key = "$pageF $page")
-
             val state by videoViewModel.videoState.collectAsStateWithLifecycle()
             val displayText by videoViewModel.displayText.collectAsStateWithLifecycle()
-
-
             val video = videos[page]!!
-
             val actionButton by videoViewModel.actionButton.collectAsStateWithLifecycle()
-            val imageStatus by videoViewModel.imageStatus.collectAsStateWithLifecycle()
+            //val imageStatus by videoViewModel.imageStatus.collectAsStateWithLifecycle()
             val currentPosition by videoViewModel.currentPosition.collectAsStateWithLifecycle()
             val duration by videoViewModel.duration.collectAsStateWithLifecycle()
 
@@ -209,7 +209,6 @@ fun ContentCommon(
             }
 
 
-
             if (isAutoScroll) {
                 exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
             } else {
@@ -220,7 +219,6 @@ fun ContentCommon(
             DisposableEffect(key1 = Unit) {
                 onDispose {
                     exoPlayer.pause()
-
                 }
             }
 
@@ -285,14 +283,12 @@ fun ContentCommon(
                 }
             }
 
-            LaunchedEffect(key1 = pagerState.settledPage, key2 = isPlaying, key3 = pagerState.currentPage) {
+            LaunchedEffect(key1 = pagerState.settledPage, key2 = isPlaying) {
                 if (pagerState.settledPage == page && isPlaying) {
                     exoPlayer.playWhenReady = true
                     if (onSearch != null) {
-                        onSearch(video.user.name)
+                        onSearch(video.caption)
                     }
-
-
                 } else {
                     exoPlayer.seekTo(0)
                     exoPlayer.playWhenReady = false
@@ -499,6 +495,28 @@ fun ContentCommon(
 
                 }*/
 
+                val configuration = LocalConfiguration.current
+                val screenHeight = configuration.screenHeightDp.dp
+
+                val scaleX by animateFloatAsState(
+                    targetValue = if (actionButton.comment == ShowHide.Show) 0.4f else 1f,
+                    label = "scaleAnim"
+                )
+
+                val scaleY by animateFloatAsState(
+                    targetValue = if (actionButton.comment == ShowHide.Show) 0.4f else 1f,
+                    label = "scaleAnim"
+                )
+
+                val offsetY by animateDpAsState(
+                    targetValue = if (actionButton.comment == ShowHide.Show) {
+                        -(screenHeight * 0.6f / 2) // dịch lên 1/2 chiều cao sheet
+                    } else {
+                        0.dp
+                    },
+                    label = "offsetAnim"
+                )
+
                 AndroidView(factory = {
                     PlayerView(it).also {
                         it.useController = false
@@ -506,6 +524,11 @@ fun ContentCommon(
                     }
                 }, modifier = Modifier
                     .fillMaxSize()
+                    .graphicsLayer {
+                        this.scaleX = scaleX
+                        this.scaleY = scaleY
+                        translationY = offsetY.toPx()
+                    }
                     .padding(bottom = paddingValues.calculateBottomPadding())
                     .zIndex(0f)
                     .pointerInput(Unit) {
@@ -648,6 +671,7 @@ fun ContentCommon(
                         }
                     }
 
+
                     if (actionButton.comment == ShowHide.Show) {
                         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
                         val commentsFlow = remember(video.id) { videoViewModel.commentsFlow(token, video.id.toString()) }
@@ -660,7 +684,7 @@ fun ContentCommon(
                                     sheetState.hide()
                                     videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
                                 }
-                            }
+                            },
                         ) {
                             BottomSheetComment(
                                 comments = comments,

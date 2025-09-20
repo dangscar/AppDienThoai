@@ -21,6 +21,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,51 +60,53 @@ fun ShortVideoScreen(
     val pagerState = rememberPagerState {
         videos.itemCount
     }
-    val scope = rememberCoroutineScope()
+    val isHidden by viewModel.isHidden.collectAsStateWithLifecycle()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Black,
         topBar = {
-            TopAppBar(
-                title = {
+            if (!isHidden) {
+                TopAppBar(
+                    title = {
 
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                ),
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            onClickBack()
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
+                    ),
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                onClickBack()
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = com.nlhd.core.R.drawable.ic_reload),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(AppTheme.dimens.medium3)
+                                    .padding(AppTheme.dimens.border)
+                            )
                         }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = com.nlhd.core.R.drawable.ic_reload),
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier
-                                .size(AppTheme.dimens.medium3)
-                                .padding(AppTheme.dimens.border)
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = onClickSearch
-                    ) {
-                        Icon(
-                            painter = painterResource(id = com.nlhd.core.R.drawable.ic_search),
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier
-                                .size(AppTheme.dimens.medium3)
-                                .padding(AppTheme.dimens.border)
-                        )
-                    }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = onClickSearch
+                        ) {
+                            Icon(
+                                painter = painterResource(id = com.nlhd.core.R.drawable.ic_search),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(AppTheme.dimens.medium3)
+                                    .padding(AppTheme.dimens.border)
+                            )
+                        }
 
 
-                }
-            )
+                    }
+                )
+            }
         }
     ) {
 
@@ -147,7 +150,10 @@ fun ShortVideoScreen(
                     paddingValues = innerPadding,
                     videos = videos,
                     onClickSeeProduct = onClickSeeProduct,
-                    onClickProfile = onClickProfile
+                    onClickProfile = onClickProfile,
+                    onHiddenText = {
+                        viewModel.setHidden(it)
+                    }
                 )
             }
         }
