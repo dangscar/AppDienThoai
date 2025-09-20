@@ -1,9 +1,11 @@
 package com.nlhd.order
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,10 +36,11 @@ import com.nlhd.keystore.KeyStoreManager
 import com.nlhd.order.components.CardOrder
 import org.koin.androidx.compose.koinViewModel
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderScreen(
-    viewModel: OrderViewModel = koinViewModel()
+    viewModel: OrderViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")

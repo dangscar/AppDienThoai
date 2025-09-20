@@ -1,13 +1,17 @@
 package com.nlhd.data.repository
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.nlhd.core.utils.Utils
 import com.nlhd.data.mapper.toDomain
+import com.nlhd.data.model.Message.MessageResponseDto
 import com.nlhd.data.model.login.LoginRequest
 import com.nlhd.data.model.logout.LogoutResponseDto
 import com.nlhd.data.model.profile.ProfileResponseDto
 import com.nlhd.data.model.profile.UpdateProfileRequestDto
 import com.nlhd.data.model.profile.UpdateProfileResponseDto
+import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.login.LoginResponse
 import com.nlhd.domain.entity.logout.LogoutResponse
 import com.nlhd.domain.entity.profile.ProfileResponse
@@ -17,13 +21,21 @@ import com.nlhd.domain.repository.AuthenticationRepository
 import com.nlhd.domain.resultWrapper.ResultWrapper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import io.ktor.http.headersOf
+import io.ktor.http.isSuccess
+import org.json.JSONObject
 
 class AuthenticationRepositoryImp(
     private val ktor: HttpClient
@@ -109,6 +121,47 @@ class AuthenticationRepositoryImp(
         } catch (e: Exception) {
             ResultWrapper.Failure(e)
         }
+
+    }
+
+    override suspend fun uploadAvatar(
+        token: String,
+        context: Context,
+        uri: Uri
+    ): ResultWrapper<MessageResponse> {
+        try {
+            val contentResolver = context.contentResolver
+            val inputStream = contentResolver.openInputStream(uri) ?: return ResultWrapper.Failure(Exception("Không thể mở tệp hình ảnh"))
+            val byteArray = inputStream.readBytes()
+            inputStream.close()
+
+            val headers = headersOf(
+                HttpHeaders.ContentDisposition to listOf("form-data; name=\"image\"; filename=\"upload.jpg\""),
+                HttpHeaders.ContentType to listOf("image/jpeg")
+            )
+
+            val multipartData = MultiPartFormDataContent(
+                formData {
+                    append("image", byteArray, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"upload.jpg\"")
+                    })
+                }
+            )
+
+            val responseDto = ktor.post(Utils.BASE_URL+"/api/image") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(multipartData)
+            }.body<MessageResponseDto>()
+
+            val response = responseDto.toDomain(responseDto)
+            return ResultWrapper.Success(response)
+
+        } catch (e: Exception) {
+            return ResultWrapper.Failure(e)
+        }
+
 
     }
 

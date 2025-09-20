@@ -21,7 +21,8 @@ fun User.toDomain(user: User): com.nlhd.domain.entity.profile.User {
         id = user.id,
         name = user.name,
         phone = user.phone,
-        role = user.role
+        role = user.role,
+        avatarUrl = user.avatar_url
     )
 }
 

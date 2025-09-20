@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
@@ -106,6 +107,7 @@ fun AvatarUser(
         ) {
             val (image, plus) = createRefs()
             AsyncImage(
+                contentScale = ContentScale.Crop,
                 model = avatar ?: R.drawable.tiktok,
                 contentDescription = null,
                 modifier = Modifier

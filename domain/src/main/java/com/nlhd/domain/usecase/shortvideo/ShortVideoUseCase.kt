@@ -10,5 +10,6 @@ data class ShortVideoUseCase(
     val getVideosSearch: GetVideosSearch,
     val getInfoProfile: GetInfoProfile,
     val getVideosByUser: GetVideoByUser,
-    val increaseViews: IncreaseViews
+    val increaseViews: IncreaseViews,
+    val addVideo: AddVideo
 )

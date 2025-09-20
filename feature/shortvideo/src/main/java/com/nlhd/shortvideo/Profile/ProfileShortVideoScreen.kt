@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -77,7 +78,8 @@ fun ProfileShortVideoScreen(
     viewModel: ProfileShortVideoViewModel = koinViewModel(),
     userId: Int,
     onClickBack: () -> Unit,
-    onClickSeeProduct: (Int, Int, Int) -> Unit
+    onClickSeeProduct: (Int, Int, Int) -> Unit,
+    onSearch: () -> Unit
 ) {
     val context = LocalContext.current
     val keyStore by KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
@@ -135,7 +137,7 @@ fun ProfileShortVideoScreen(
                         is ProfileShortVideoState.Success -> {
                             val user = (state as ProfileShortVideoState.Success).data
                             item {
-                                val image = if (user.avatarUrl == null) R.drawable.anhden else  "${Utils.BASE_URL}/" + user.avatarUrl
+                                val image = if (user.avatarUrl == "null" || user.avatarUrl == null || user.avatarUrl == "") R.drawable.anhden else  "${Utils.BASE_URL}/" + user.avatarUrl
                                 AsyncImage(
                                     model = image,
                                     contentDescription = null,
@@ -444,20 +446,21 @@ fun ProfileShortVideoScreen(
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier.padding(AppTheme.dimens.small)
                                     ) {
-                                        Text(
-                                            video.views,
-                                            style = AppTheme.typography.labelMedium.copy(
-                                                color = Color.White,
-                                                fontWeight = FontWeight.SemiBold,
-                                                textAlign = TextAlign.Start
-                                            ),
-                                        )
                                         Icon(
-                                            imageVector = Icons.Default.PlayArrow,
+                                            imageVector = Icons.Outlined.PlayArrow,
                                             contentDescription = null,
                                             modifier = Modifier.size(AppTheme.dimens.small3),
                                             tint = Color.White
                                         )
+                                        Text(
+                                            video.views,
+                                            style = AppTheme.typography.headlineSmall.copy(
+                                                color = Color.White,
+                                                fontWeight = FontWeight.Normal,
+                                                textAlign = TextAlign.Start
+                                            ),
+                                        )
+
                                     }
 
                                 }
@@ -485,7 +488,8 @@ fun ProfileShortVideoScreen(
                 onClickSeeProduct = onClickSeeProduct,
                 onClickProfile = { userId ->
 
-                }
+                },
+                onSearch = onSearch
             )
         }
     }

@@ -6,6 +6,7 @@ import com.nlhd.domain.entity.shortVideo.Comments.AddComment.AddCommentRequest
 import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
 import com.nlhd.domain.entity.shortVideo.GetVideos.Video
 import com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.InfoProfileResponse
+import com.nlhd.domain.entity.shortVideo.UploadVideo.UploadVideo
 import com.nlhd.domain.resultWrapper.ResultWrapper
 import kotlinx.coroutines.flow.Flow
 
@@ -20,4 +21,5 @@ interface ShortVideoRepository {
     suspend fun getInfoProfile(token: String, userId: Int): ResultWrapper<InfoProfileResponse>
     fun getVideosByUser(token: String, userId: Int): Flow<PagingData<Video>>
     suspend fun increaseViews(token: String, videoId: Int): ResultWrapper<MessageResponse>
+    suspend fun addVideo(token: String, uploadVideo: UploadVideo): ResultWrapper<MessageResponse>
 }

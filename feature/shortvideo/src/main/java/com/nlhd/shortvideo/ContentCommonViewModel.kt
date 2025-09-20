@@ -72,8 +72,7 @@ class ContentCommonViewModel(
             pageDefault = page
             isFirst = false
         }
-
-        Log.d("AAA", playerMap.toString())
+        
         playerMap[page]?.let { return it }
 
         // Nếu số lượng player vượt quá giới hạn, giải phóng player cũ nhất
@@ -90,17 +89,10 @@ class ContentCommonViewModel(
 
 
         val exoPlayer = ExoPlayer
-            .Builder(context, renderersFactory(context))
+            .Builder(context)
             .setMediaSourceFactory(defaultMediaSourceFactory)
             .setLoadControl(loadControl())
             .setTrackSelector(trackSelector(context))
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(C.USAGE_MEDIA)
-                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                    .build(),
-                true
-            )
             .build()
             .apply {
                 setMediaItem(MediaItem.fromUri(videoUrl))

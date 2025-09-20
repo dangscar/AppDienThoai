@@ -192,7 +192,8 @@ fun DetailShortVideoScreen (
     videos: LazyPagingItems<Video>,
     onClickBack: () -> Unit,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
-    onClickProfile: (Int) -> Unit
+    onClickProfile: (Int) -> Unit,
+    onSearch: () -> Unit
 ) {
     val context = LocalContext.current
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
@@ -210,7 +211,9 @@ fun DetailShortVideoScreen (
             title = search ,
             innerPadding = innerPadding,
             onClickBack = onClickBack,
-            onSearch = {}
+            onSearch = {
+                onSearch()
+            }
         )
         ContentCommon(
             token = keyStore.value,

@@ -61,7 +61,8 @@ fun BottomSheetComment(
     onSendComment: () -> Unit,
     content: String,
     onValueChange: (String) -> Unit,
-    onClickCloseBottomSheet: () -> Unit
+    onClickCloseBottomSheet: () -> Unit,
+    onClickProfile: (Int) -> Unit
 ) {
 
     Column(
@@ -134,7 +135,10 @@ fun BottomSheetComment(
 
                         items(comments.itemCount) { ind->
                             comments[ind]?.let { comment->
-                                CommentItem(comment)
+                                CommentItem(
+                                    comment = comment,
+                                    onClickProfile = onClickProfile
+                                )
                             }
 
 
@@ -162,7 +166,8 @@ fun BottomSheetComment(
 }
 @Composable
 fun CommentItem(
-    comment: Comment
+    comment: Comment,
+    onClickProfile: (Int) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -175,6 +180,11 @@ fun CommentItem(
                 .size(AppTheme.dimens.icon)
                 .padding(AppTheme.dimens.small)
                 .clip(CircleShape)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        onClickProfile(comment.user.id)
+                    })
+                }
 
         )
         Column(

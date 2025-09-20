@@ -13,6 +13,7 @@ import com.nlhd.domain.usecase.authentication.Logout
 import com.nlhd.domain.usecase.authentication.Profile
 import com.nlhd.domain.usecase.authentication.ProfileAdmin
 import com.nlhd.domain.usecase.authentication.UpdateProfile
+import com.nlhd.domain.usecase.authentication.UploadAvatar
 import com.nlhd.domain.usecase.cart.AddCart
 import com.nlhd.domain.usecase.cart.CartUseCase
 import com.nlhd.domain.usecase.cart.CheckoutPreview
@@ -37,6 +38,7 @@ import com.nlhd.domain.usecase.product.GetProducts
 import com.nlhd.domain.usecase.product.ProductUseCase
 import com.nlhd.domain.usecase.product.SearchProducts
 import com.nlhd.domain.usecase.shortvideo.AddComment
+import com.nlhd.domain.usecase.shortvideo.AddVideo
 import com.nlhd.domain.usecase.shortvideo.Favorites
 import com.nlhd.domain.usecase.shortvideo.Follows
 import com.nlhd.domain.usecase.shortvideo.GetComments
@@ -65,7 +67,8 @@ val domainModule = module {
             profile = Profile(get()),
             logout = Logout(get()),
             profileAdmin = ProfileAdmin(get()),
-            updateProfile = UpdateProfile(get())
+            updateProfile = UpdateProfile(get()),
+            uploadAvatar = UploadAvatar(get())
         )
     }
 
@@ -137,7 +140,8 @@ val domainModule = module {
             getVideosSearch = GetVideosSearch(get()),
             getInfoProfile = GetInfoProfile(get()),
             getVideosByUser = GetVideoByUser(get()),
-            increaseViews = IncreaseViews(get())
+            increaseViews = IncreaseViews(get()),
+            addVideo = AddVideo(get())
         )
     }
 

@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Font
+import com.nlhd.core.utils.Utils
 import com.nlhd.core.utils.borderTextField
 import com.nlhd.core.utils.containerButtonLogout
 import com.nlhd.core.utils.containerLogin
@@ -62,7 +65,9 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(
     profileViewModel: ProfileViewModel = koinViewModel(),
     onClickBack: () -> Unit,
-    onClickEditProfile: () -> Unit
+    onClickEditProfile: () -> Unit,
+    onClickAddVideo: () -> Unit,
+    onClickAvatar: () -> Unit
 ) {
     val context = LocalContext.current
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
@@ -125,12 +130,19 @@ fun ProfileScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             AsyncImage(
-                                model = "https://i.pinimg.com/1200x/69/78/19/69781905dd57ba144ab71ca4271ab294.jpg",
+                                model = if (profileResponse.user.avatarUrl == null || profileResponse.user.avatarUrl == "" || profileResponse.user.avatarUrl == "null") com.nlhd.core.R.drawable.anhden else "${Utils.BASE_URL}/" + profileResponse.user.avatarUrl,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(AppTheme.dimens.large2)
                                     .clip(CircleShape)
-                                    .background(color = containerTextFieldLogin),
+                                    .background(color = containerTextFieldLogin)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onTap = {
+                                                onClickAvatar()
+                                            }
+                                        )
+                                    },
                                 contentScale = ContentScale.Crop
                             )
                             Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
@@ -163,13 +175,10 @@ fun ProfileScreen(
                         CardInfo()
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
 
-                        Text(
-                            "Hỗ trợ",
-                            style = AppTheme.typography.bodyMedium.copy(
-                                color = Color.Black,
-                                fontFamily = Font.fontFamily,
-                                fontWeight = FontWeight.ExtraLight
-                            )
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                        ButtonProfile(
+                            "Thêm video của bạn",
+                            onClick = onClickAddVideo
                         )
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                         ButtonProfile(

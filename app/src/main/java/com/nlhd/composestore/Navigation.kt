@@ -62,6 +62,8 @@ import com.nlhd.composestore.navigate.Search
 import com.nlhd.composestore.navigate.SearchShortSuccess
 import com.nlhd.composestore.navigate.SearchShortVideo
 import com.nlhd.composestore.navigate.SearchSuccess
+import com.nlhd.composestore.navigate.UploadAvatar
+import com.nlhd.composestore.navigate.UploadVideo
 import com.nlhd.dashboard.Navigate
 import com.nlhd.home.HomeScreen
 import kotlinx.serialization.Serializable
@@ -88,7 +90,9 @@ import com.nlhd.search.SearchSuccessScreen
 import com.nlhd.shortvideo.Profile.ProfileShortVideoScreen
 import com.nlhd.shortvideo.Search.SearchShortSuccessScreen
 import com.nlhd.shortvideo.ShortVideoScreen
+import com.nlhd.shortvideo.UploadVideo.UploadVideoScreen
 import com.nlhd.user.EditProfileScreen
+import com.nlhd.user.UploadAvatar.UploadAvatarScreen
 import com.nlhd.user.UserScreen
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
@@ -110,6 +114,7 @@ sealed class Navigation(
 ) {
     object Home : Navigation("home", "Trang chủ", R.drawable.ic_home)
     object Video: Navigation("video", "Short Video", R.drawable.ic_video)
+    object AddVideo: Navigation("addVideo", "Upload", R.drawable.add)
     object Order: Navigation("seach", "Đơn hàng", R.drawable.ic_notification)
     object User : Navigation("user", "Người dùng", R.drawable.ic_profile)
 }
@@ -433,7 +438,11 @@ fun CustomerScreen(
                 },
                 onClickProfile = { userId ->
                     navController.navigate(ProfileShortVideo(userId))
-                }
+                },
+                onClickAddVideo = {
+                    navController.navigate(UploadVideo)
+                },
+                onClickAvatar = { navController.navigate(UploadAvatar)}
             )
         }
         composable<Detail>(
@@ -846,6 +855,9 @@ fun CustomerScreen(
                 },
                 onClickProfile = {userId->
                     navController.navigate(ProfileShortVideo(userId))
+                },
+                onSearch = {
+                    navController.navigate(SearchShortVideo)
                 }
             )
         }
@@ -874,11 +886,51 @@ fun CustomerScreen(
                 onClickSeeProduct = {
                     productId, versionId, colorId ->
                     navController.navigate(Detail(productId, versionId, colorId))
+                },
+                onSearch = {
+                    navController.navigate(SearchShortVideo)
                 }
             )
         }
 
+        composable<UploadVideo>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            UploadVideoScreen(
+                onClickBack = {
+                    navController.navigate(General) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onClickBackStack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
 
+        composable<UploadAvatar> {
+            UploadAvatarScreen(
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
 
     }
 }
@@ -894,7 +946,9 @@ fun GeneralScreen(
     onNavigateAdmin: () -> Unit,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
     onClickSearchShortVideo: () -> Unit,
-    onClickProfile: (Int) -> Unit
+    onClickProfile: (Int) -> Unit,
+    onClickAddVideo: () -> Unit,
+    onClickAvatar: () -> Unit
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -930,13 +984,13 @@ fun GeneralScreen(
                     innerPadding = innerPadding,
                     onClickBack = {
                         navController.navigate(Navigation.Home.route) {
-                            popUpTo(0) { inclusive = true }
+                            popUpTo(Navigation.Video.route) { inclusive = true } // 👈 xoá cả entry Video
                             launchSingleTop = true
                         }
                     },
                     onClickSeeProduct = onClickSeeProduct,
                     onClickSearch = onClickSearchShortVideo,
-                    onClickProfile = onClickProfile
+                    onClickProfile = onClickProfile,
                 )
 
             }
@@ -949,7 +1003,15 @@ fun GeneralScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     UserScreen(
                         onNavigateAdmin = onNavigateAdmin,
-                        onClickEditProfile = onClickEditProfile
+                        onClickEditProfile = onClickEditProfile,
+                        onClickAddVideo = onClickAddVideo,
+                        onClickBack = {
+                            navController.navigate(Navigation.Home.route) {
+                                popUpTo(0) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        },
+                        onClickAvatar = onClickAvatar
                     )
                 }
             }

@@ -62,6 +62,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -142,7 +143,7 @@ fun ContentCommon(
 ) {
     val context = LocalContext.current
     val activity = LocalContext.current as ComponentActivity
-    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(viewModelStoreOwner = activity)
+    val contentCommonViewModel: ContentCommonViewModel = koinViewModel()
     val isAutoScroll by contentCommonViewModel.isAutoScroll.collectAsStateWithLifecycle()
     val widthScreen = LocalConfiguration.current.screenWidthDp.dp/2
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -578,7 +579,7 @@ fun ContentCommon(
 
 
                     AvatarUser(
-                        avatar = if (video.user.avatarUrl == "null"){
+                        avatar = if (video.user.avatarUrl == "null" || video.user.avatarUrl == null || video.user.avatarUrl == ""){
                             null
                         } else {
                             "${Utils.BASE_URL}/" + video.user.avatarUrl
@@ -623,7 +624,7 @@ fun ContentCommon(
                     }
 
                     ActionItem(video.likes, R.drawable.ic_heart, color =actionButton.like, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
-                        if (isPlaying) {
+                        if (isPlaying && !isScrolling) {
                             videoViewModel.like(token, video.id.toString())
                         }
                     }
@@ -673,6 +674,9 @@ fun ContentCommon(
                                 },
                                 onSendComment = {
                                     videoViewModel.addComment(token, video.id)
+                                },
+                                onClickProfile = { userId->
+                                    onClickProfile(userId)
                                 }
                             )
                         }
@@ -694,7 +698,7 @@ fun ContentCommon(
                             val message = (stateFavorite as ShortVideoState.Success).data.message
                             when (message) {
                                 "Added" -> {
-                                    videoViewModel.setFavorite(Color.Yellow)
+                                    videoViewModel.setFavorite(Color(0xFFFACD19))
                                 }
                                 "Deleted" -> {
                                     videoViewModel.setFavorite(Color.White)
@@ -703,7 +707,7 @@ fun ContentCommon(
                         }
                     }
                     ActionItem(video.favorites, R.drawable.ic_bookmark, color = actionButton.favorite, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
-                        if (isPlaying) {
+                        if (isPlaying && !isScrolling) {
                             videoViewModel.favorite(token, video.id.toString())
                         }
                     }
@@ -715,7 +719,8 @@ fun ContentCommon(
                     }
                     val angleOperator = if (pagerState.settledPage == page && isPlaying && !isScrolling) angle else 0f
                     AsyncImage(
-                        model = if (video.user.avatarUrl == null) null else "${Utils.BASE_URL}/" + video.user.avatarUrl,
+                        contentScale = ContentScale.Crop,
+                        model = if (video.user.avatarUrl == null || video.user.avatarUrl == "null" || video.user.avatarUrl == "") null else "${Utils.BASE_URL}/" + video.user.avatarUrl,
                         contentDescription = null,
                         modifier = Modifier
                             .size(AppTheme.dimens.icon)

@@ -33,3 +33,9 @@ data class SearchShortSuccess(
 data class ProfileShortVideo(
     val userId: Int
 )
+
+@Serializable
+object UploadVideo
+
+@Serializable
+object UploadAvatar

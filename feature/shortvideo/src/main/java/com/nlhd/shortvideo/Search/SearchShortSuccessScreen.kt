@@ -69,7 +69,8 @@ fun SearchShortSuccessScreen(
     search: String,
     onClickBack: () -> Unit,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
-    onClickProfile: (Int) -> Unit
+    onClickProfile: (Int) -> Unit,
+    onSearch: () -> Unit
 ) {
     viewModel.setQuery(search)
     val context = LocalContext.current
@@ -146,7 +147,7 @@ fun SearchShortSuccessScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     AsyncImage(
-                                        model = if (video.user.avatarUrl == null) R.drawable.anhden else "${Utils.BASE_URL}/"+video.user.avatarUrl,
+                                        model = if (video.user.avatarUrl == "null" || video.user.avatarUrl == null || video.user.avatarUrl == "") R.drawable.anhden else "${Utils.BASE_URL}/"+video.user.avatarUrl,
                                         contentDescription = null,
                                         modifier = Modifier
                                             .size(AppTheme.dimens.medium)
@@ -209,7 +210,8 @@ fun SearchShortSuccessScreen(
                 },
                 videos = videos,
                 onClickSeeProduct = onClickSeeProduct,
-                onClickProfile = onClickProfile
+                onClickProfile = onClickProfile,
+                onSearch = onSearch
             )
         }
     }

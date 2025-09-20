@@ -10,4 +10,5 @@ data class User(
     val name: String,
     val phone: String?,
     val role: String,
+    val avatarUrl : String? = null
 )

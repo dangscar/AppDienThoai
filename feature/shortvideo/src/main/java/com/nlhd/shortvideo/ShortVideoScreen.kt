@@ -45,7 +45,7 @@ fun ShortVideoScreen(
     onClickSeeProduct: (Int, Int, Int) -> Unit,
     onClickBack: () -> Unit,
     onClickSearch: () -> Unit,
-    onClickProfile: (Int) -> Unit
+    onClickProfile: (Int) -> Unit,
 ) {
 
     val context = LocalContext.current

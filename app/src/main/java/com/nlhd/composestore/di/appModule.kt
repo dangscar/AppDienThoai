@@ -29,10 +29,12 @@ import com.nlhd.shortvideo.ContentCommonViewModel
 import com.nlhd.shortvideo.Profile.ProfileShortVideoViewModel
 import com.nlhd.shortvideo.Search.SearchShortVideoSuccessViewModel
 import com.nlhd.shortvideo.ShortVideoViewModel
+import com.nlhd.shortvideo.UploadVideo.UploadVideoViewModel
 import com.nlhd.shortvideo.VideoViewModel
 import com.nlhd.user.EditProfileViewModel
 import com.nlhd.user.LoginViewModel
 import com.nlhd.user.ProfileViewModel
+import com.nlhd.user.UploadAvatar.UploadAvatarViewModel
 import com.nlhd.user.UserViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -127,5 +129,16 @@ val appModule = module {
         ProfileShortVideoViewModel(get())
     }
 
+    single {
+        val ctx = androidContext()
+        ExoPlayer.Builder(ctx).build()
+    }
 
+    viewModel {
+        UploadVideoViewModel(get(), get())
+    }
+
+    viewModel {
+        UploadAvatarViewModel(get())
+    }
 }

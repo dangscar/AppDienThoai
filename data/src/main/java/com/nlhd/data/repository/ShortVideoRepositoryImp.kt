@@ -1,5 +1,8 @@
 package com.nlhd.data.repository
 
+import android.content.ContentResolver
+import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -17,17 +20,25 @@ import com.nlhd.domain.entity.shortVideo.Comments.AddComment.AddCommentRequest
 import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
 import com.nlhd.domain.entity.shortVideo.GetVideos.Video
 import com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.InfoProfileResponse
+import com.nlhd.domain.entity.shortVideo.UploadVideo.UploadVideo
 import com.nlhd.domain.repository.ShortVideoRepository
 import com.nlhd.domain.resultWrapper.ResultWrapper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
+import io.ktor.client.request.forms.InputProvider
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import io.ktor.utils.io.core.Input
+import io.ktor.utils.io.streams.asInput
 import kotlinx.coroutines.flow.Flow
 
 class ShortVideoRepositoryImp(
@@ -194,6 +205,72 @@ class ShortVideoRepositoryImp(
             ResultWrapper.Success(response)
         } catch (e: Exception) {
             ResultWrapper.Failure(e)
+        }
+    }
+
+    private fun ContentResolver.displayName(uri: Uri): String {
+        query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+            if (c.moveToFirst()) return c.getString(0)
+        }
+        return uri.lastPathSegment ?: "upload"
+    }
+    private fun ContentResolver.mimeType(uri: Uri): String =
+        getType(uri) ?: "application/octet-stream"
+    private fun ContentResolver.length(uri: Uri): Long? =
+        openAssetFileDescriptor(uri, "r")?.length
+
+    override suspend fun addVideo(
+        token: String,
+        uploadVideo: UploadVideo
+    ): ResultWrapper<MessageResponse> {
+        return try {
+            val cr = uploadVideo.context.contentResolver
+
+            val multipart = MultiPartFormDataContent(
+                formData {
+                    // IMAGE (optional)
+                    uploadVideo.image?.let { img ->
+                        appendInput(
+                            key = "image",
+                            headers = Headers.build {
+                                append(HttpHeaders.ContentType, cr.mimeType(img)) // ví dụ: image/jpeg
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "form-data; name=\"image\"; filename=\"${cr.displayName(img)}\""
+                                )
+                            },
+                            size = cr.length(img) // có thể để null nếu không biết trước
+                        ) { cr.openInputStream(img)!!.asInput() }
+                    }
+
+                    // VIDEO (required)
+                    val vid = uploadVideo.video
+                    appendInput(
+                        key = "video",
+                        headers = Headers.build {
+                            append(HttpHeaders.ContentType, cr.mimeType(vid)) // ví dụ: video/mp4
+                            append(
+                                HttpHeaders.ContentDisposition,
+                                "form-data; name=\"video\"; filename=\"${cr.displayName(vid)}\""
+                            )
+                        },
+                        size = cr.length(vid)
+                    ) { cr.openInputStream(vid)!!.asInput() }
+
+                    // TEXT fields
+                    append("caption", uploadVideo.caption.orEmpty())
+                }
+            )
+
+            val dto = ktor.post("${Utils.BASE_URL}/api/video") {
+                header(HttpHeaders.Authorization, "Bearer $token")
+                setBody(multipart)
+            }.body<MessageResponseDto>()
+
+            ResultWrapper.Success(dto.toDomain(dto))
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+
         }
     }
 }

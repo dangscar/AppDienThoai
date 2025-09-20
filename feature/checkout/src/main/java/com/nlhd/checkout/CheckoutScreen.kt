@@ -151,20 +151,20 @@ fun CheckoutScreen(
             Activity.RESULT_OK -> {
                 result.data?.let { intent ->
                     val paymentData = PaymentData.getFromIntent(intent)
-                    Log.d("AAA", "Payment Success: ${paymentData?.toJson()}")
+                    //Log.d("AAA", "Payment Success: ${paymentData?.toJson()}")
                     if (keyStore.value != "") {
                         val jsonList = gson.toJson(checkoutResponse.selectedProducts)
-
                         val checkout = CheckoutOrderRequest(
                             customerInfoId = customer.id,
                             paymentMethod = "momo",
                             selectedProducts = jsonList,
                             totalAmount = checkoutResponse.totalAmount.toString()
                         )
-                        /*viewModel.checkoutOrder(
+
+                        viewModel.checkoutOrder(
                             token = keyStore.value,
                             checkoutOrderRequest = checkout
-                        )*/
+                        )
                     }
                 }
             }
@@ -291,7 +291,6 @@ fun CheckoutScreen(
                                     )
                                 }
                             }
-
                         }
                     },
                     colors = ButtonDefaults.buttonColors(

@@ -38,7 +38,10 @@ object Admin
 fun UserScreen(
     userViewModel: UserViewModel = koinViewModel(),
     onNavigateAdmin: () -> Unit,
-    onClickEditProfile: () -> Unit
+    onClickEditProfile: () -> Unit,
+    onClickAddVideo: () -> Unit,
+    onClickBack: () -> Unit,
+    onClickAvatar: () -> Unit
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
@@ -71,9 +74,11 @@ fun UserScreen(
         composable<ProfileScreen> {
             ProfileScreen(
                 onClickBack = {
-                    navController.navigate(LoginScreen)
+                    onClickBack()
                 },
-                onClickEditProfile = onClickEditProfile
+                onClickEditProfile = onClickEditProfile,
+                onClickAddVideo = onClickAddVideo,
+                onClickAvatar = onClickAvatar
             )
         }
     }

@@ -12,5 +12,6 @@ data class User(
     val name: String,
     val phone: String? = null,
     val role: String,
-    val updated_at: String? = null
+    val updated_at: String? = null,
+    val avatar_url: String? = null
 )
