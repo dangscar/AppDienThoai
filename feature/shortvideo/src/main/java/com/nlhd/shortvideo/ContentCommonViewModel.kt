@@ -34,6 +34,7 @@ class ContentCommonViewModel(
 
     private val MAX_PLAYERS = 3 // Giới hạn số ExoPlayer cùng tồn tại
     private val playerMap = mutableMapOf<Int, ExoPlayer>()
+    private val preparedMap = mutableSetOf<Int>()
     private var pageDefault = 0
     private var isFirst = false
 
@@ -94,13 +95,16 @@ class ContentCommonViewModel(
             .setLoadControl(loadControl())
             .setTrackSelector(trackSelector(context))
             .build()
-            .apply {
-                setMediaItem(MediaItem.fromUri(videoUrl))
-                prepare()
-            }
+
+
         playerMap[page] = exoPlayer
+
+        exoPlayer.setMediaItem(MediaItem.fromUri(videoUrl))
+        exoPlayer.prepare()
+
         return exoPlayer
     }
+
     fun releaseAll() {
         playerMap.values.forEach { it.release() }
         playerMap.clear()

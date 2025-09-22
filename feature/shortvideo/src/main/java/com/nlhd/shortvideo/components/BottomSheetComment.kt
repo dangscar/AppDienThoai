@@ -23,6 +23,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -39,6 +41,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -77,12 +80,13 @@ fun BottomSheetComment(
             modifier = Modifier,
             contentAlignment = Alignment.TopEnd
         ) {
+            val commentCount = if (comments.loadState.refresh is LoadState.NotLoading) "${comments.itemCount} comments" else ""
             Text(
-                "${comments.itemCount} comments",
+                commentCount,
                 style = AppTheme.typography.labelMedium.copy(
                     color = Color.Black,
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.SemiBold
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -102,11 +106,25 @@ fun BottomSheetComment(
         }
         when (comments.loadState.refresh) {
             is LoadState.Error -> {
-                Box(
+                Column(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text("Có lỗi xảy ra", style = AppTheme.typography.titleMedium)
+                    Button(
+                        onClick = {
+                            comments.retry()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = contentPrice
+                        )
+                    ) {
+                        Text("Retry", style = AppTheme.typography.headlineMedium.copy(
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        ))
+                    }
                 }
 
             }
@@ -179,6 +197,7 @@ fun CommentItem(
         AsyncImage(
             model = if (comment.user.avatarUrl == null) R.drawable.tiktok else "${Utils.BASE_URL}/" + comment.user.avatarUrl,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(AppTheme.dimens.icon)
                 .padding(AppTheme.dimens.small)

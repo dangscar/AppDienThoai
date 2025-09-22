@@ -3,6 +3,9 @@ package com.nlhd.shortvideo
 import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
+import android.view.SurfaceView
+import android.view.TextureView
+import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
@@ -29,6 +32,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -82,6 +86,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.video.VideoDecoderGLSurfaceView
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.paging.compose.LazyPagingItems
@@ -95,6 +102,8 @@ import com.nlhd.shortvideo.components.ActionItem
 import com.nlhd.shortvideo.components.AvatarUser
 import com.nlhd.shortvideo.components.BottomSheet
 import com.nlhd.shortvideo.components.BottomSheetComment
+import com.nlhd.shortvideo.components.BottomSheetGeneral
+import com.nlhd.shortvideo.components.BottomSheetShare
 import com.nlhd.shortvideo.components.TimeFormat
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -130,6 +139,7 @@ fun CountText(settledPage: Int, pageCount: Int) {
     }
 }
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("CoroutineCreationDuringComposition", "ConfigurationScreenWidthHeight")
 @Composable
@@ -192,6 +202,8 @@ fun ContentCommon(
             //val imageStatus by videoViewModel.imageStatus.collectAsStateWithLifecycle()
             val currentPosition by videoViewModel.currentPosition.collectAsStateWithLifecycle()
             val duration by videoViewModel.duration.collectAsStateWithLifecycle()
+            val aspectRatio by videoViewModel.aspectRatio.collectAsStateWithLifecycle()
+            val isAutoScroll by contentCommonViewModel.isAutoScroll.collectAsStateWithLifecycle()
 
             LaunchedEffect(key1 = actionButton.comment) {
                 if (actionButton.comment == ShowHide.Show) {
@@ -260,6 +272,7 @@ fun ContentCommon(
                         Player.STATE_ENDED -> {
                             if (page <= pagerState.pageCount - 1) {
                                 scope.launch {
+                                    videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
                                     pagerState.animateScrollToPage(pagerState.currentPage + 1)
                                 }
                             }
@@ -273,6 +286,15 @@ fun ContentCommon(
                         videoViewModel.onEvent(VideoState.PAUSE)
                     } else if (isPlaying && exoPlayer.playbackState == Player.STATE_READY) {
                         videoViewModel.onEvent(VideoState.PLAY)
+                    }
+                }
+
+                override fun onVideoSizeChanged(videoSize: VideoSize) {
+                    super.onVideoSizeChanged(videoSize)
+                    val width = videoSize.width
+                    val height = videoSize.height
+                    if (width > 0 && height > 0) {
+                        videoViewModel.setAspectRatio(width, height)
                     }
                 }
             })
@@ -332,7 +354,7 @@ fun ContentCommon(
                         .zIndex(2f),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (state == VideoState.PAUSE) {
+                    if (state == VideoState.PAUSE && actionButton.comment == ShowHide.Hide) {
                         Icon(
                             painter = painterResource(R.drawable.play),
                             contentDescription = null,
@@ -510,7 +532,7 @@ fun ContentCommon(
 
                 val offsetY by animateDpAsState(
                     targetValue = if (actionButton.comment == ShowHide.Show) {
-                        -(screenHeight * 0.6f / 2) // dịch lên 1/2 chiều cao sheet
+                        -(screenHeight * 0.61f / 2) // dịch lên 1/2 chiều cao sheet
                     } else {
                         0.dp
                     },
@@ -518,9 +540,10 @@ fun ContentCommon(
                 )
 
                 AndroidView(factory = {
-                    PlayerView(it).also {
-                        it.useController = false
-                        it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                    TextureView(it).apply {
+                        // khi attach vào ExoPlayer
+                        exoPlayer.setVideoTextureView(this)
+
                     }
                 }, modifier = Modifier
                     .fillMaxSize()
@@ -530,6 +553,7 @@ fun ContentCommon(
                         translationY = offsetY.toPx()
                     }
                     .padding(bottom = paddingValues.calculateBottomPadding())
+                    .aspectRatio(aspectRatio)
                     .zIndex(0f)
                     .pointerInput(Unit) {
                         detectTapGestures(
@@ -554,13 +578,13 @@ fun ContentCommon(
                     },
                     update = {
                         if (pagerState.settledPage == page) {
-                            it.player = exoPlayer
+                            exoPlayer.setVideoTextureView(it)
                         } else {
-                            it.player = null
+                            exoPlayer.setVideoTextureView(null)
+
                         }
 
-                    },
-                    onRelease = {it.player = null}
+                    }
                 )
 
                 val alpha: Float by animateFloatAsState(if (actionButton.change == ChangeSlider.CHANGE || actionButton.comment == ShowHide.Show) 0f else if (isPlaying && isScrolling && pagerState.settledPage == page && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 0.3f else 1f, label = "alpha")
@@ -664,8 +688,9 @@ fun ContentCommon(
                         ShortVideoState.Loading -> {}
                         is ShortVideoState.Success -> {
                             if (actionButton.comment == ShowHide.Show) {
-                                videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
                                 videoViewModel.setAddCommentState(ShortVideoState.Idle)
+                                videoViewModel.setContentComment("")
+
                             }
 
                         }
@@ -677,6 +702,9 @@ fun ContentCommon(
                         val commentsFlow = remember(video.id) { videoViewModel.commentsFlow(token, video.id.toString()) }
                         val comments = commentsFlow.collectAsLazyPagingItems()
 
+                        if (addCommentState is ShortVideoState.Success) {
+                            comments.refresh()
+                        }
                         BottomSheet(
                             sheetState = sheetState,
                             onDismissRequest = {
@@ -741,6 +769,54 @@ fun ContentCommon(
                             videoViewModel.onActionButton(Perform.Share())
                         }
                     }
+
+                    if (actionButton.share == ShowHide.Show) {
+                        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                        BottomSheet(
+                            sheetState = sheetState,
+                            onDismissRequest = {
+                                scope.launch {
+                                    sheetState.hide()
+                                    videoViewModel.onActionButton(Perform.Share(ShowHide.Hide))
+                                }
+                            }
+                        ) {
+                            BottomSheetShare(
+                                videoId = video.id,
+                            ) {
+                                scope.launch {
+                                    sheetState.hide()
+                                    videoViewModel.onActionButton(Perform.Share(ShowHide.Hide))
+                                }
+                            }
+
+                        }
+                    }
+
+                    if (actionButton.general == ShowHide.Show) {
+                        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                        BottomSheet(
+                            sheetState = sheetState,
+                            onDismissRequest = {
+                                scope.launch {
+                                    sheetState.hide()
+                                    videoViewModel.onActionButton(Perform.General(ShowHide.Hide))
+                                }
+                            }
+                        ) {
+                            BottomSheetGeneral(
+                                onClickScroll = {
+                                    contentCommonViewModel.setAutoScroll()
+                                    scope.launch {
+                                        sheetState.hide()
+                                        videoViewModel.onActionButton(Perform.General(ShowHide.Hide))
+                                    }
+                                }
+                            )
+
+                        }
+                    }
+
                     val angleOperator = if (pagerState.settledPage == page && isPlaying && !isScrolling) angle else 0f
                     AsyncImage(
                         contentScale = ContentScale.Crop,
@@ -771,6 +847,33 @@ fun ContentCommon(
                         .padding(horizontal = AppTheme.dimens.small3)
                         .padding(AppTheme.dimens.small)
                 ) {
+                    if (isAutoScroll) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .background(color = Color(0x3919191F), shape = RoundedCornerShape(AppTheme.dimens.small))
+                                .padding(AppTheme.dimens.small)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            if (!isScrolling && isPlaying) {
+                                                contentCommonViewModel.setAutoScroll()
+                                            }
+
+                                        }
+                                    )
+                                }
+
+                        ) {
+                            Text(
+                                text = "AutoScroll: ON",
+                                style = AppTheme.typography.headlineSmall.copy(color = Color.White, fontWeight = FontWeight.SemiBold),
+                                maxLines = 1
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                    }
+
                     if (video.productId != null && video.versionId != null && video.colorId != null) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

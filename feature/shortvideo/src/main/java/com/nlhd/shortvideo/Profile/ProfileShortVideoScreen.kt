@@ -3,6 +3,7 @@ package com.nlhd.shortvideo.Profile
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -143,7 +144,8 @@ fun ProfileShortVideoScreen(
                                     contentDescription = null,
                                     modifier = Modifier
                                         .size(AppTheme.dimens.large2)
-                                        .clip(CircleShape),
+                                        .clip(CircleShape)
+                                        .border(AppTheme.dimens.extraSmall, Color.Gray, CircleShape),
                                     contentScale = ContentScale.Crop
                                 )
                                 Spacer(modifier = Modifier.height(AppTheme.dimens.small))
@@ -171,17 +173,17 @@ fun ProfileShortVideoScreen(
                                         modifier = Modifier.padding(AppTheme.dimens.small2)
                                     ) {
                                         Text(
-                                            "Following",
+                                            user.followingsCount,
                                             style = AppTheme.typography.headlineMedium.copy(
                                                 color = Color.Black,
-                                                fontWeight = FontWeight.SemiBold
+                                                fontWeight = FontWeight.Bold
                                             ),
                                             modifier = Modifier,
                                             maxLines = 1
                                         )
                                         Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                                         Text(
-                                            user.followingsCount,
+                                            "Following",
                                             style = AppTheme.typography.bodyMedium.copy(Color.Black),
                                             modifier = Modifier,
                                             maxLines = 1
@@ -195,18 +197,18 @@ fun ProfileShortVideoScreen(
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         modifier = Modifier.padding(AppTheme.dimens.small2)
                                     ) {
-                                        Text(
-                                            "Follower",
-                                            style = AppTheme.typography.headlineMedium.copy(
-                                                color = Color.Black,
-                                                fontWeight = FontWeight.SemiBold
-                                            ),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                                         Text(
                                             user.followersCount,
+                                            style = AppTheme.typography.headlineMedium.copy(
+                                                color = Color.Black,
+                                                fontWeight = FontWeight.Bold
+                                            ),
+                                            modifier = Modifier,
+                                            maxLines = 1
+                                        )
+                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
+                                        Text(
+                                            "Follower",
                                             style = AppTheme.typography.bodyMedium.copy(Color.Black),
                                             modifier = Modifier,
                                             maxLines = 1
@@ -219,18 +221,18 @@ fun ProfileShortVideoScreen(
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         modifier = Modifier.padding(AppTheme.dimens.small2)
                                     ) {
-                                        Text(
-                                            "Likes",
-                                            style = AppTheme.typography.headlineMedium.copy(
-                                                color = Color.Black,
-                                                fontWeight = FontWeight.SemiBold
-                                            ),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                                         Text(
                                             user.likesCount,
+                                            style = AppTheme.typography.headlineMedium.copy(
+                                                color = Color.Black,
+                                                fontWeight = FontWeight.Bold
+                                            ),
+                                            modifier = Modifier,
+                                            maxLines = 1
+                                        )
+                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
+                                        Text(
+                                            "Likes",
                                             style = AppTheme.typography.bodyMedium.copy(Color.Black),
                                             modifier = Modifier,
                                             maxLines = 1
@@ -245,17 +247,17 @@ fun ProfileShortVideoScreen(
                                         modifier = Modifier.padding(AppTheme.dimens.small2)
                                     ) {
                                         Text(
-                                            "Favorites",
+                                            user.favoritesCount,
                                             style = AppTheme.typography.headlineMedium.copy(
                                                 color = Color.Black,
-                                                fontWeight = FontWeight.SemiBold
+                                                fontWeight = FontWeight.Bold
                                             ),
                                             modifier = Modifier,
                                             maxLines = 1
                                         )
                                         Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                                         Text(
-                                            user.favoritesCount,
+                                            "Favorites",
                                             style = AppTheme.typography.bodyMedium.copy(Color.Black),
                                             modifier = Modifier,
                                             maxLines = 1
@@ -478,6 +480,7 @@ fun ProfileShortVideoScreen(
         ) {
             val position = it.toRoute<DetailShortVideoProfile>().position
             DetailShortVideoScreen(
+                isTopBar = false,
                 position = position,
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
@@ -485,203 +488,18 @@ fun ProfileShortVideoScreen(
                     }
                 },
                 videos = videos,
-                onClickSeeProduct = onClickSeeProduct,
+                onClickSeeProduct = { productId, versionId, colorId ->
+
+                },
                 onClickProfile = { userId ->
 
                 },
-                onSearch = onSearch
+                onSearch = {
+
+                }
             )
         }
     }
 
 
-}
-
-@SuppressLint("ConfigurationScreenWidthHeight")
-@OptIn(ExperimentalLayoutApi::class)
-@Preview
-@Composable
-private fun ProfileShortVideoScreenPre() {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.White,
-        topBar = {
-            TopBarProfileShortVideo(
-                onClickBack = {}
-            )
-        }
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color.White),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            item {
-                Image(
-                    painter = painterResource(R.drawable.tiktok),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(AppTheme.dimens.large2)
-                        .clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                Text(
-                    "@Kotlin",
-                    style = AppTheme.typography.labelLarge.copy(
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    modifier = Modifier.padding(horizontal = AppTheme.dimens.large, vertical = AppTheme.dimens.small2),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(AppTheme.dimens.small2)
-                    ) {
-                        Text(
-                            "Following",
-                            style = AppTheme.typography.titleMedium.copy(Color.Black),
-                            modifier = Modifier,
-                            maxLines = 1
-                        )
-                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                        Text(
-                            "500",
-                            style = AppTheme.typography.bodySmall.copy(Color.Black),
-                            modifier = Modifier,
-                            maxLines = 1
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
-
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(AppTheme.dimens.small2)
-                    ) {
-                        Text(
-                            "Follower",
-                            style = AppTheme.typography.titleMedium.copy(Color.Black),
-                            modifier = Modifier,
-                            maxLines = 1
-                        )
-                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                        Text(
-                            "500",
-                            style = AppTheme.typography.bodySmall.copy(Color.Black),
-                            modifier = Modifier,
-                            maxLines = 1
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
-
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(AppTheme.dimens.small2)
-                    ) {
-                        Text(
-                            "Likes",
-                            style = AppTheme.typography.titleMedium.copy(Color.Black),
-                            modifier = Modifier,
-                            maxLines = 1
-                        )
-                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                        Text(
-                            "500",
-                            style = AppTheme.typography.bodySmall.copy(Color.Black),
-                            modifier = Modifier,
-                            maxLines = 1
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
-
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(AppTheme.dimens.small2)
-                    ) {
-                        Text(
-                            "Favorites",
-                            style = AppTheme.typography.titleMedium.copy(Color.Black),
-                            modifier = Modifier,
-                            maxLines = 1
-                        )
-                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                        Text(
-                            "500",
-                            style = AppTheme.typography.bodySmall.copy(Color.Black),
-                            modifier = Modifier,
-                            maxLines = 1
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
-
-                Text("Theo dõi kênh",
-                    style = AppTheme.typography.titleMedium.copy(Color.Black),
-                    modifier = Modifier
-                )
-                Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                Button(
-                    onClick = {  },
-                    modifier = Modifier.padding(AppTheme.dimens.extraSmall),
-                    shape = RoundedCornerShape(AppTheme.dimens.small3),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = contentPrice,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text(
-                        "Follow",
-                        style = AppTheme.typography.titleMedium.copy(Color.White),
-                        maxLines = 1
-                    )
-                }
-
-
-                Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
-            }
-
-            item {
-                val width = LocalConfiguration.current.screenWidthDp.dp/3
-                val height = LocalConfiguration.current.screenWidthDp.dp/2.25f
-
-                ContextualFlowRow(
-                    itemCount = 10,
-                    maxItemsInEachRow = 3
-                ) { index: Int ->
-
-                    Image(
-                        painter = painterResource(R.drawable.anhden),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(height = height, width = width)
-                            .padding(AppTheme.dimens.extraSmall)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onTap = {
-
-                                })
-                            },
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-        }
-    }
 }

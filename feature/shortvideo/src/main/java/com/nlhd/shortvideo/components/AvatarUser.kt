@@ -124,7 +124,7 @@ fun AvatarUser(
                     }
 
             )
-            if (!isFollow) {
+            /*if (!isFollow) {
                 Box(modifier = Modifier
                     .constrainAs(plus) {
                         bottom.linkTo(image.bottom)
@@ -154,7 +154,7 @@ fun AvatarUser(
                             .padding(AppTheme.dimens.paddingAdd)
                     )
                 }
-            }
+            }*/
 
 
         }

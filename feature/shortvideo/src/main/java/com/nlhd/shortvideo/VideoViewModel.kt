@@ -60,6 +60,11 @@ class VideoViewModel(
     private var _increaseViewState = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
     val increaseViewState = _increaseViewState.asStateFlow()
 
+    private var _aspectRatio = MutableStateFlow<Float>(9f/16f)
+    val aspectRatio = _aspectRatio.asStateFlow()
+
+    fun setAspectRatio(width: Int, height: Int) { _aspectRatio.update { width.toFloat()/height.toFloat() } }
+
     fun increaseView(token: String, videoId: Int) = viewModelScope.launch {
         shortVideoUseCase.increaseViews.invoke(token, videoId).let { result ->
             when (result) {

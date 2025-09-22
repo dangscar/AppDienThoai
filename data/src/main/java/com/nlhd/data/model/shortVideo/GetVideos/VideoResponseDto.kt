@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VideoResponseDto(
-    @SerialName("data")val data: List<Data>
+    val data: List<Data>
 )

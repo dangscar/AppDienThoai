@@ -51,6 +51,7 @@ import com.nlhd.shortvideo.ContentCommon
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarDetailVideoScreen(
+    isTopBar: Boolean = true,
     title: String,
     innerPadding: PaddingValues,
     onClickBack: () -> Unit,
@@ -75,112 +76,115 @@ fun TopBarDetailVideoScreen(
                 modifier = Modifier.size(AppTheme.dimens.medium2)
             )
         }
-        BasicTextField(
-            value = "",
-            readOnly = true,
-            onValueChange = {},
-            interactionSource = remember { MutableInteractionSource() },
-            keyboardOptions = KeyboardOptions(autoCorrect = false),
-            modifier = Modifier
-                .padding(end = AppTheme.dimens.small3)
-                .fillMaxWidth()
-                .border(
-                    AppTheme.dimens.border,
-                    Color.White,
-                    RoundedCornerShape(AppTheme.dimens.small2)
-                ).padding(AppTheme.dimens.small)
-            ,
-            singleLine = true,
-            textStyle = TextStyle(color = Color.White),
-            decorationBox = { innerTextField ->
-                ConstraintLayout(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .pointerInput(Unit) {
-                            detectTapGestures(onTap = {
-                                onSearch(title)
-                            })
-                        }
-                ) {
-                    val (icon ,text, line,search) = createRefs()
-
-                    Icon(
-                        painter = painterResource(R.drawable.search),
-                        contentDescription = null,
+        if (isTopBar) {
+            BasicTextField(
+                value = "",
+                readOnly = true,
+                onValueChange = {},
+                interactionSource = remember { MutableInteractionSource() },
+                keyboardOptions = KeyboardOptions(autoCorrect = false),
+                modifier = Modifier
+                    .padding(end = AppTheme.dimens.small3)
+                    .fillMaxWidth()
+                    .border(
+                        AppTheme.dimens.border,
+                        Color.White,
+                        RoundedCornerShape(AppTheme.dimens.small2)
+                    ).padding(AppTheme.dimens.small)
+                ,
+                singleLine = true,
+                textStyle = TextStyle(color = Color.White),
+                decorationBox = { innerTextField ->
+                    ConstraintLayout(
                         modifier = Modifier
-                            .size(AppTheme.dimens.medium2)
-                            .constrainAs(icon) {
-                                start.linkTo(parent.start)
-                                top.linkTo(parent.top)
-                                bottom.linkTo(parent.bottom)
-                                end.linkTo(text.start)
-                            }.padding(AppTheme.dimens.paddingAdd),
-                        tint = Color.White
-                    )
-
-                    Text(
-                        title,
-                        color = Color.White,
-                        style = AppTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .constrainAs(text) {
-                                start.linkTo(icon.end)
-                                top.linkTo(parent.top)
-                                bottom.linkTo(parent.bottom)
-                                end.linkTo(line.start)
-                                width =Dimension.fillToConstraints
+                            .fillMaxWidth()
+                            .pointerInput(Unit) {
+                                detectTapGestures(onTap = {
+                                    onSearch(title)
+                                })
                             }
-                            .padding(
-                                end = AppTheme.dimens.small2,
-                                top = AppTheme.dimens.small,
-                                bottom = AppTheme.dimens.small,
-                            )
-                    )
+                    ) {
+                        val (icon ,text, line,search) = createRefs()
 
-                    Box(
-                        modifier = Modifier
-                            .size(
-                                width = AppTheme.dimens.extraSmall,
-                                height = AppTheme.dimens.small3
-                            )
-                            .background(color = Color(0x80FAFAFA))
-                            .constrainAs(line) {
-                                start.linkTo(text.end)
-                                top.linkTo(parent.top)
-                                bottom.linkTo(parent.bottom)
-                                end.linkTo(search.start)
-                            }
-                            .padding(
-                                horizontal = AppTheme.dimens.small2,
-                                vertical = AppTheme.dimens.small
-                            )
-                    )
+                        Icon(
+                            painter = painterResource(R.drawable.search),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(AppTheme.dimens.medium2)
+                                .constrainAs(icon) {
+                                    start.linkTo(parent.start)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                    end.linkTo(text.start)
+                                }.padding(AppTheme.dimens.paddingAdd),
+                            tint = Color.White
+                        )
 
-                    Text(
-                        "Search",
-                        color = Color.White,
-                        style = AppTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .constrainAs(search) {
-                                end.linkTo(parent.end)
-                                top.linkTo(parent.top)
-                                bottom.linkTo(parent.bottom)
-                                start.linkTo(line.end)
-                            }
-                            .padding(
-                                horizontal = AppTheme.dimens.small2,
-                                vertical = AppTheme.dimens.small
-                            )
-                    )
+                        Text(
+                            title,
+                            color = Color.White,
+                            style = AppTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .constrainAs(text) {
+                                    start.linkTo(icon.end)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                    end.linkTo(line.start)
+                                    width =Dimension.fillToConstraints
+                                }
+                                .padding(
+                                    end = AppTheme.dimens.small2,
+                                    top = AppTheme.dimens.small,
+                                    bottom = AppTheme.dimens.small,
+                                )
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .size(
+                                    width = AppTheme.dimens.extraSmall,
+                                    height = AppTheme.dimens.small3
+                                )
+                                .background(color = Color(0x80FAFAFA))
+                                .constrainAs(line) {
+                                    start.linkTo(text.end)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                    end.linkTo(search.start)
+                                }
+                                .padding(
+                                    horizontal = AppTheme.dimens.small2,
+                                    vertical = AppTheme.dimens.small
+                                )
+                        )
+
+                        Text(
+                            "Search",
+                            color = Color.White,
+                            style = AppTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .constrainAs(search) {
+                                    end.linkTo(parent.end)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                    start.linkTo(line.end)
+                                }
+                                .padding(
+                                    horizontal = AppTheme.dimens.small2,
+                                    vertical = AppTheme.dimens.small
+                                )
+                        )
+
+                    }
 
                 }
+            )
+        }
 
-            }
-        )
     }
 
 
@@ -188,6 +192,7 @@ fun TopBarDetailVideoScreen(
 
 @Composable
 fun DetailShortVideoScreen (
+    isTopBar: Boolean = true,
     position: Int,
     videos: LazyPagingItems<Video>,
     onClickBack: () -> Unit,
@@ -212,6 +217,7 @@ fun DetailShortVideoScreen (
     ) { innerPadding ->
         if (!isHidden) {
             TopBarDetailVideoScreen(
+                isTopBar = isTopBar,
                 title = search ,
                 innerPadding = innerPadding,
                 onClickBack = onClickBack,

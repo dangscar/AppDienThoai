@@ -1,5 +1,6 @@
 package com.nlhd.data.remote
 
+import android.net.Uri
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -27,7 +28,7 @@ class GetVideosSearchPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Video> {
         return try {
             val page = params.key ?: 1
-            val responseDto = ktor.get(Utils.BASE_URL+"/api/video?q=${search}&page=$page") {
+            val responseDto = ktor.get(Utils.BASE_URL+"/api/video?q=${Uri.encode(search)}&page=$page") {
                 header("Authorization", "Bearer $token")
                 contentType(ContentType.Application.Json)
             }.body<VideoResponseDto>()
