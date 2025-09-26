@@ -32,6 +32,8 @@ import com.nlhd.shortvideo.ShortVideoViewModel
 import com.nlhd.shortvideo.UploadVideo.UploadVideoViewModel
 import com.nlhd.shortvideo.VideoViewModel
 import com.nlhd.user.EditProfileViewModel
+import com.nlhd.shortvideo.LikedVideo.LikedVideoViewModel
+import com.nlhd.shortvideo.MyVideos.MyVideoViewModel
 import com.nlhd.user.LoginViewModel
 import com.nlhd.user.ProfileViewModel
 import com.nlhd.user.UploadAvatar.UploadAvatarViewModel
@@ -140,5 +142,13 @@ val appModule = module {
 
     viewModel {
         UploadAvatarViewModel(get())
+    }
+
+    viewModel {
+        LikedVideoViewModel(get())
+    }
+
+    viewModel {
+        MyVideoViewModel(get())
     }
 }

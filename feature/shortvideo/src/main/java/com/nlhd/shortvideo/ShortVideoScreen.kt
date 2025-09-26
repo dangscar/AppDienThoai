@@ -68,7 +68,13 @@ fun ShortVideoScreen(
             if (!isHidden) {
                 TopAppBar(
                     title = {
-
+                        Text(
+                            "Short Videos",
+                            style = AppTheme.typography.headlineMedium.copy(
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent

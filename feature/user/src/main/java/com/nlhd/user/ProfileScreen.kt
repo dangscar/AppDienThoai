@@ -67,7 +67,9 @@ fun ProfileScreen(
     onClickBack: () -> Unit,
     onClickEditProfile: () -> Unit,
     onClickAddVideo: () -> Unit,
-    onClickAvatar: () -> Unit
+    onClickAvatar: () -> Unit,
+    onClickLikedVideo: () -> Unit,
+    onClickMyVideo: () -> Unit
 ) {
     val context = LocalContext.current
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
@@ -177,15 +179,19 @@ fun ProfileScreen(
 
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                         ButtonProfile(
+                            "Video của bạn",
+                            onClick = onClickMyVideo
+                        )
+
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                        ButtonProfile(
                             "Thêm video của bạn",
                             onClick = onClickAddVideo
                         )
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                         ButtonProfile(
-                            "Đến trung tâm hỗ trợ",
-                            onClick = {
-
-                            }
+                            "Những video đã thích",
+                            onClick = onClickLikedVideo
                         )
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                     }

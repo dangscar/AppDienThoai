@@ -24,8 +24,12 @@ fun BottomSheet(
         dragHandle = {},
         shape = BottomSheetDefaults.ExpandedShape,
         scrimColor = Color.Transparent,
+        contentWindowInsets = {
+            BottomSheetDefaults.windowInsets
+        },
         modifier = Modifier
             .fillMaxWidth()
+
     ) {
         bottomAction()
     }

@@ -55,8 +55,10 @@ import com.nlhd.composestore.navigate.Address
 import com.nlhd.composestore.navigate.EditAddress
 import com.nlhd.composestore.navigate.EditProduct
 import com.nlhd.composestore.navigate.EditProfile
+import com.nlhd.composestore.navigate.LikedVideo
 import com.nlhd.composestore.navigate.LoadProduct
 import com.nlhd.composestore.navigate.LoadVersionProduct
+import com.nlhd.composestore.navigate.MyVideos
 import com.nlhd.composestore.navigate.ProfileShortVideo
 import com.nlhd.composestore.navigate.Search
 import com.nlhd.composestore.navigate.SearchShortSuccess
@@ -92,6 +94,8 @@ import com.nlhd.shortvideo.Search.SearchShortSuccessScreen
 import com.nlhd.shortvideo.ShortVideoScreen
 import com.nlhd.shortvideo.UploadVideo.UploadVideoScreen
 import com.nlhd.user.EditProfileScreen
+import com.nlhd.shortvideo.LikedVideo.LikedVideoScreen
+import com.nlhd.shortvideo.MyVideos.MyVideoScreen
 import com.nlhd.user.UploadAvatar.UploadAvatarScreen
 import com.nlhd.user.UserScreen
 import kotlinx.serialization.json.Json
@@ -442,7 +446,13 @@ fun CustomerScreen(
                 onClickAddVideo = {
                     navController.navigate(UploadVideo)
                 },
-                onClickAvatar = { navController.navigate(UploadAvatar)}
+                onClickAvatar = { navController.navigate(UploadAvatar)},
+                onClickLikedVideo = {
+                    navController.navigate(LikedVideo)
+                },
+                onClickMyVideo = {
+                    navController.navigate(MyVideos)
+                }
             )
         }
         composable<Detail>(
@@ -922,7 +932,20 @@ fun CustomerScreen(
             )
         }
 
-        composable<UploadAvatar> {
+        composable<UploadAvatar>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
             UploadAvatarScreen(
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
@@ -932,6 +955,51 @@ fun CustomerScreen(
             )
         }
 
+        composable<LikedVideo>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            LikedVideoScreen(
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
+
+        composable<MyVideos>(
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            MyVideoScreen(
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -948,7 +1016,9 @@ fun GeneralScreen(
     onClickSearchShortVideo: () -> Unit,
     onClickProfile: (Int) -> Unit,
     onClickAddVideo: () -> Unit,
-    onClickAvatar: () -> Unit
+    onClickAvatar: () -> Unit,
+    onClickLikedVideo: () -> Unit,
+    onClickMyVideo: () -> Unit
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -1011,7 +1081,9 @@ fun GeneralScreen(
                                 launchSingleTop = true
                             }
                         },
-                        onClickAvatar = onClickAvatar
+                        onClickAvatar = onClickAvatar,
+                        onClickLikedVideo = onClickLikedVideo,
+                        onClickMyVideo = onClickMyVideo
                     )
                 }
             }

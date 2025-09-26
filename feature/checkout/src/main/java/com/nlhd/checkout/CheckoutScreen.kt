@@ -231,7 +231,7 @@ fun CheckoutScreen(
             Column(
                 modifier = Modifier.fillMaxWidth().background(color = Color.White)
             ) {
-                Text(
+                /*Text(
                     "Lưu ý: Vui lòng kiểm tra kỹ thông tin trước khi mua hàng",
                     style = AppTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.SemiBold,
@@ -246,7 +246,7 @@ fun CheckoutScreen(
                         .background(color = Color(0xFFFEF2F4))
                         .padding(AppTheme.dimens.small3)
                 )
-                Spacer(modifier = Modifier.height(AppTheme.dimens.small))
+                Spacer(modifier = Modifier.height(AppTheme.dimens.small))*/
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
                     horizontalArrangement = Arrangement.SpaceBetween,

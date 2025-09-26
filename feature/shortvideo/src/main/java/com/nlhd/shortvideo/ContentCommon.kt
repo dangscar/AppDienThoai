@@ -32,13 +32,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
@@ -73,6 +76,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -105,6 +109,8 @@ import com.nlhd.shortvideo.components.BottomSheetComment
 import com.nlhd.shortvideo.components.BottomSheetGeneral
 import com.nlhd.shortvideo.components.BottomSheetShare
 import com.nlhd.shortvideo.components.TimeFormat
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -157,8 +163,8 @@ fun ContentCommon(
 ) {
     val context = LocalContext.current
     val activity = LocalContext.current as ComponentActivity
+    val keyboardController = LocalSoftwareKeyboardController.current
     val contentCommonViewModel: ContentCommonViewModel = koinViewModel()
-    val isAutoScroll by contentCommonViewModel.isAutoScroll.collectAsStateWithLifecycle()
     val widthScreen = LocalConfiguration.current.screenWidthDp.dp/2
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val angle by infiniteTransition.animateFloat(
@@ -205,13 +211,6 @@ fun ContentCommon(
             val aspectRatio by videoViewModel.aspectRatio.collectAsStateWithLifecycle()
             val isAutoScroll by contentCommonViewModel.isAutoScroll.collectAsStateWithLifecycle()
 
-            LaunchedEffect(key1 = actionButton.comment) {
-                if (actionButton.comment == ShowHide.Show) {
-                    onHiddenText?.invoke(true)
-                } else {
-                    onHiddenText?.invoke(false)
-                }
-            }
 
             val videoUrl = "${Utils.BASE_URL}/" + video.videoUrl
             val exoPlayer by remember {
@@ -225,7 +224,6 @@ fun ContentCommon(
                 exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
             } else {
                 exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
-
             }
 
             DisposableEffect(key1 = Unit) {
@@ -257,7 +255,6 @@ fun ContentCommon(
                 }
             }
 
-
             exoPlayer.addListener(object : Player.Listener {
                 @SuppressLint("SwitchIntDef")
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -270,9 +267,8 @@ fun ContentCommon(
                             videoViewModel.onEvent(VideoState.IDLE)
                         }
                         Player.STATE_ENDED -> {
-                            if (page <= pagerState.pageCount - 1) {
+                            if (page <= pagerState.pageCount - 1 && actionButton.comment == ShowHide.Hide) {
                                 scope.launch {
-                                    videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
                                     pagerState.animateScrollToPage(pagerState.currentPage + 1)
                                 }
                             }
@@ -316,7 +312,6 @@ fun ContentCommon(
                     exoPlayer.playWhenReady = false
                 }
             }
-
 
             val paddingBottom = paddingValues.calculateBottomPadding()
 
@@ -519,25 +514,35 @@ fun ContentCommon(
 
                 val configuration = LocalConfiguration.current
                 val screenHeight = configuration.screenHeightDp.dp
+                val density = LocalDensity.current
+                val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
 
-                val scaleX by animateFloatAsState(
-                    targetValue = if (actionButton.comment == ShowHide.Show) 0.4f else 1f,
-                    label = "scaleAnim"
-                )
+                var sheetHeight by remember { mutableStateOf(0.dp) }
+                val sheetVisible =  if(sheetHeight / screenHeight >= 0.0f) (sheetHeight / screenHeight).toFloat() else 0f  //Giá trị của bottomSheet hiển thị 0.6f
 
-                val scaleY by animateFloatAsState(
-                    targetValue = if (actionButton.comment == ShowHide.Show) 0.4f else 1f,
-                    label = "scaleAnim"
-                )
+                val minScale = aspectRatio // nhỏ nhất khi sheet chiếm 60%
+                val maxScale = 1f    // scale gốc
+
+// Tính tỉ lệ dựa vào sheetVisible
+                val targetScale = (maxScale - (sheetVisible.coerceAtMost(0.6f) / 0.6f) * (maxScale - minScale))
+
+                val scaleX by animateFloatAsState(targetValue = targetScale, label = "scaleX")
+                val scaleY by animateFloatAsState(targetValue = targetScale, label = "scaleY")
 
                 val offsetY by animateDpAsState(
-                    targetValue = if (actionButton.comment == ShowHide.Show) {
-                        -(screenHeight * 0.61f / 2) // dịch lên 1/2 chiều cao sheet
-                    } else {
-                        0.dp
-                    },
+                    targetValue = -(screenHeight * sheetVisible / 2f),
                     label = "offsetAnim"
                 )
+
+                LaunchedEffect(key1 = targetScale) {
+                    if (targetScale != 1f) { //Nếu mở bottomSheet lên thì giá trị sẽ khác 1, khi đó sẽ ẩn text
+                        onHiddenText?.invoke(true)
+                    }
+                    else {
+                        onHiddenText?.invoke(false)
+                    }
+                }
+
 
                 AndroidView(factory = {
                     TextureView(it).apply {
@@ -558,9 +563,7 @@ fun ContentCommon(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onDoubleTap = {
-                                if (!isScrolling) {
-                                    videoViewModel.onActionButton(Perform.Like())
-                                }
+
                             },
                             onTap = {
                                 if (!exoPlayer.isPlaying && isPlaying && pagerState.settledPage == page) {
@@ -587,7 +590,7 @@ fun ContentCommon(
                     }
                 )
 
-                val alpha: Float by animateFloatAsState(if (actionButton.change == ChangeSlider.CHANGE || actionButton.comment == ShowHide.Show) 0f else if (isPlaying && isScrolling && pagerState.settledPage == page && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 0.3f else 1f, label = "alpha")
+                val alpha: Float by animateFloatAsState(if (actionButton.change == ChangeSlider.CHANGE || targetScale != 1f) 0f else if (isPlaying && isScrolling && pagerState.settledPage == page && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 0.3f else 1f, label = "alpha")
 
 
                 Column(
@@ -677,7 +680,9 @@ fun ContentCommon(
                     }
 
                     ActionItem(video.comments, R.drawable.ic_chat, isScrolling = isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.iconAction), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
-                        videoViewModel.onActionButton(Perform.Comment())
+                        if (isPlaying && !isScrolling) {
+                            videoViewModel.onActionButton(Perform.Comment())
+                        }
                     }
 
                     val contentComment by videoViewModel.contentComment.collectAsStateWithLifecycle()
@@ -704,6 +709,15 @@ fun ContentCommon(
 
                         if (addCommentState is ShortVideoState.Success) {
                             comments.refresh()
+                        }
+                        LaunchedEffect(sheetState) {
+                            snapshotFlow { runCatching { sheetState.requireOffset() }.getOrNull() }
+                                .filterNotNull()
+                                .distinctUntilChanged()
+                                .collect { offsetPx ->
+                                    val heightPx = (screenHeightPx - offsetPx).coerceAtLeast(0f)
+                                    sheetHeight = with(density) { heightPx.toDp() }
+                                }
                         }
                         BottomSheet(
                             sheetState = sheetState,
@@ -732,15 +746,16 @@ fun ContentCommon(
                                 }
                             )
                         }
-
                     }
 
+
                     val stateFavorite by videoViewModel.stateFavorite.collectAsStateWithLifecycle()
+                    val colorYellow = Color(0xFFFABA32)
                     when (stateFavorite) {
                         is ShortVideoState.Error -> {}
                         ShortVideoState.Idle -> {
                             if (video.isFavorited) {
-                                videoViewModel.setFavorite(Color.Yellow)
+                                videoViewModel.setFavorite(colorYellow)
                             } else {
                                 videoViewModel.setFavorite(Color.White)
                             }
@@ -750,7 +765,7 @@ fun ContentCommon(
                             val message = (stateFavorite as ShortVideoState.Success).data.message
                             when (message) {
                                 "Added" -> {
-                                    videoViewModel.setFavorite(Color(0xFFFACD19))
+                                    videoViewModel.setFavorite(colorYellow)
                                 }
                                 "Deleted" -> {
                                     videoViewModel.setFavorite(Color.White)
@@ -1008,8 +1023,8 @@ fun ContentCommon(
                             Modifier
                         }
                         Text(
-                            text = "Nhạc nền ${video.user.name}",
-                            style = AppTheme.typography.bodyMedium.copy(
+                            text = "${video.user.name} - Hiện tại chưa cập nhật được nhạc nền",
+                            style = AppTheme.typography.labelMedium.copy(
                                 color = Color(0xFFFFFFFF)
                             ),
                             maxLines = 1,

@@ -41,7 +41,9 @@ fun UserScreen(
     onClickEditProfile: () -> Unit,
     onClickAddVideo: () -> Unit,
     onClickBack: () -> Unit,
-    onClickAvatar: () -> Unit
+    onClickAvatar: () -> Unit,
+    onClickLikedVideo: () -> Unit,
+    onClickMyVideo: () -> Unit
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
@@ -78,7 +80,9 @@ fun UserScreen(
                 },
                 onClickEditProfile = onClickEditProfile,
                 onClickAddVideo = onClickAddVideo,
-                onClickAvatar = onClickAvatar
+                onClickAvatar = onClickAvatar,
+                onClickLikedVideo = onClickLikedVideo,
+                onClickMyVideo = onClickMyVideo
             )
         }
     }

@@ -28,7 +28,7 @@ fun TopBarProfileShortVideo(
 ) {
     TopAppBar(title = {
         Text(
-            "$title - Profile",
+            title,
             style = AppTheme.typography.titleMedium.copy(color = Color.Black),
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,

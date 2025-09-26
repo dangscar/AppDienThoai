@@ -183,6 +183,15 @@ fun TopBarDetailVideoScreen(
 
                 }
             )
+        } else {
+
+            Text(
+                "Short Videos",
+                style = AppTheme.typography.headlineMedium.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
         }
 
     }

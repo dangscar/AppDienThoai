@@ -1,6 +1,5 @@
 package com.nlhd.data.remote
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.nlhd.core.utils.Utils
@@ -15,18 +14,18 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-class GetVideosPagingSource(
+class GetFavoriteVideosPagingSource(
     private val ktor: HttpClient,
     private val token: String
 ): PagingSource<Int, Video>() {
     override fun getRefreshKey(state: PagingState<Int, Video>): Int? {
-        return null
+        return returnState(state)
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Video> {
         return try {
             val page = params.key ?: 1
-            val responseDto = ktor.get(Utils.BASE_URL+"/api/video?page=$page") {
+            val responseDto = ktor.get(Utils.BASE_URL+"/api/video/favorite?page=$page") {
                 header("Authorization", "Bearer $token")
                 contentType(ContentType.Application.Json)
             }.body<VideoResponseDto>()
@@ -48,6 +47,5 @@ class GetVideosPagingSource(
         } catch (e: Exception) {
             LoadResult.Error(e)
         }
-
     }
 }

@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.nlhd.core.theme.AppTheme
+import com.nlhd.core.utils.contentPrice
 import com.nlhd.domain.entity.product.Product
 import com.nlhd.search.components.CardProduct
 import com.nlhd.search.components.SearchTopBar
@@ -57,33 +58,55 @@ fun SearchSuccessScreen(
         },
         containerColor = Color.White
     ) { innerPadding ->
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2),
-            modifier = Modifier.padding(innerPadding),
-            verticalItemSpacing = AppTheme.dimens.small2,
-            horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.small2),
-            contentPadding = PaddingValues(AppTheme.dimens.small)
-        ) {
-            items(products.itemCount) {
-                if (products.itemCount > 0) {
-                    products[it]?.let { product ->
-                        CardProduct(
-                            product = product,
-                            onClick = {
-                                onClickProduct(product)
-                            }
-                        )
-                    }
+        when (products.loadState.refresh) {
+            is LoadState.Error -> {
+                val message = (products.loadState.refresh as LoadState.Error).error.message ?: "Unknown error"
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding), contentAlignment = Alignment.Center) {
+                    Text(message, style = AppTheme.typography.titleMedium)
                 }
             }
-            item {
-                if (products.loadState.append is LoadState.Loading) {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+            LoadState.Loading -> {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        color = contentPrice
+                    )
+                }
+            }
+            is LoadState.NotLoading -> {
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(2),
+                    modifier = Modifier.padding(innerPadding),
+                    verticalItemSpacing = AppTheme.dimens.small2,
+                    horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.small2),
+                    contentPadding = PaddingValues(AppTheme.dimens.small)
+                ) {
+                    items(products.itemCount) {
+                        if (products.itemCount > 0) {
+                            products[it]?.let { product ->
+                                CardProduct(
+                                    product = product,
+                                    onClick = {
+                                        onClickProduct(product)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    item {
+                        if (products.loadState.append is LoadState.Loading) {
+                            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                        }
+
                     }
                 }
-
             }
         }
+
     }
 }

@@ -11,7 +11,11 @@ import com.nlhd.data.mapper.toDomain
 import com.nlhd.data.model.Message.MessageResponseDto
 import com.nlhd.data.model.shortVideo.Comments.AddComment.AddCommentRequestDto
 import com.nlhd.data.model.shortVideo.ProfileShortVideo.Info.InfoProfileResponseDto
+import com.nlhd.data.model.shortVideo.UpdateCaptionVideo.UpdateCaptionRequest
 import com.nlhd.data.remote.GetCommentsPagingSource
+import com.nlhd.data.remote.GetFavoriteVideosPagingSource
+import com.nlhd.data.remote.GetLikedVideosPagingSource
+import com.nlhd.data.remote.GetMyVideoPagingSource
 import com.nlhd.data.remote.GetVideoByUserPagingSource
 import com.nlhd.data.remote.GetVideosPagingSource
 import com.nlhd.data.remote.GetVideosSearchPagingSource
@@ -31,6 +35,7 @@ import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -271,6 +276,87 @@ class ShortVideoRepositoryImp(
         } catch (e: Exception) {
             ResultWrapper.Failure(e)
 
+        }
+    }
+
+    override fun getVideosLiked(token: String): Flow<PagingData<Video>> {
+        return Pager(
+            config = PagingConfig(pageSize = 15, prefetchDistance = 5),
+            pagingSourceFactory = {
+                GetLikedVideosPagingSource(
+                    ktor = ktor,
+                    token = token
+                )
+            }
+
+        ).flow
+    }
+
+    override fun getVideosFavorite(token: String): Flow<PagingData<Video>> {
+        return Pager(
+            config = PagingConfig(pageSize = 15, prefetchDistance = 5),
+            pagingSourceFactory = {
+                GetFavoriteVideosPagingSource(
+                    ktor = ktor,
+                    token = token
+                )
+            }
+
+        ).flow
+    }
+
+    override fun getMyVideos(
+        token: String,
+        search: String
+    ): Flow<PagingData<Video>> {
+        return Pager(
+            config = PagingConfig(pageSize = 15, prefetchDistance = 5),
+            pagingSourceFactory = {
+                GetMyVideoPagingSource(
+                    ktor = ktor,
+                    token = token,
+                    search = search
+                )
+            }
+
+        ).flow
+    }
+
+    override suspend fun deleteVideo(
+        token: String,
+        videoId: Int
+    ): ResultWrapper<MessageResponse> {
+        return try {
+            val responseDto = ktor.delete(Utils.BASE_URL+"/api/video/${videoId}") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+            }.body<MessageResponseDto>()
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
+    override suspend fun updateCaptionVideo(
+        token: String,
+        videoId: Int,
+        caption: String?
+    ): ResultWrapper<MessageResponse> {
+        return try {
+            val responseDto = ktor.patch(Utils.BASE_URL+"/api/video/${videoId}") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(
+                    UpdateCaptionRequest(
+                        caption = caption
+                    )
+                )
+            }.body<MessageResponseDto>()
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
         }
     }
 }

@@ -34,7 +34,7 @@ class ContentCommonViewModel(
 
     private val MAX_PLAYERS = 3 // Giới hạn số ExoPlayer cùng tồn tại
     private val playerMap = mutableMapOf<Int, ExoPlayer>()
-    private val preparedMap = mutableSetOf<Int>()
+    val preparedMap = mutableSetOf<Int>()
     private var pageDefault = 0
     private var isFirst = false
 

@@ -22,4 +22,9 @@ interface ShortVideoRepository {
     fun getVideosByUser(token: String, userId: Int): Flow<PagingData<Video>>
     suspend fun increaseViews(token: String, videoId: Int): ResultWrapper<MessageResponse>
     suspend fun addVideo(token: String, uploadVideo: UploadVideo): ResultWrapper<MessageResponse>
+    fun getVideosLiked(token: String): Flow<PagingData<Video>>
+    fun getVideosFavorite(token: String): Flow<PagingData<Video>>
+    fun getMyVideos(token: String, search: String): Flow<PagingData<Video>>
+    suspend fun deleteVideo(token: String, videoId: Int): ResultWrapper<MessageResponse>
+    suspend fun updateCaptionVideo(token: String, videoId: Int, caption: String?): ResultWrapper<MessageResponse>
 }

@@ -39,3 +39,9 @@ object UploadVideo
 
 @Serializable
 object UploadAvatar
+
+@Serializable
+object LikedVideo
+
+@Serializable
+object MyVideos

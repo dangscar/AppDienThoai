@@ -39,16 +39,21 @@ import com.nlhd.domain.usecase.product.ProductUseCase
 import com.nlhd.domain.usecase.product.SearchProducts
 import com.nlhd.domain.usecase.shortvideo.AddComment
 import com.nlhd.domain.usecase.shortvideo.AddVideo
+import com.nlhd.domain.usecase.shortvideo.DeleteVideo
 import com.nlhd.domain.usecase.shortvideo.Favorites
 import com.nlhd.domain.usecase.shortvideo.Follows
 import com.nlhd.domain.usecase.shortvideo.GetComments
+import com.nlhd.domain.usecase.shortvideo.GetFavoriteVideos
 import com.nlhd.domain.usecase.shortvideo.GetInfoProfile
+import com.nlhd.domain.usecase.shortvideo.GetLikedVideos
+import com.nlhd.domain.usecase.shortvideo.GetMyVideos
 import com.nlhd.domain.usecase.shortvideo.GetVideoByUser
 import com.nlhd.domain.usecase.shortvideo.GetVideos
 import com.nlhd.domain.usecase.shortvideo.GetVideosSearch
 import com.nlhd.domain.usecase.shortvideo.IncreaseViews
 import com.nlhd.domain.usecase.shortvideo.Likes
 import com.nlhd.domain.usecase.shortvideo.ShortVideoUseCase
+import com.nlhd.domain.usecase.shortvideo.UpdateCaption
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -141,7 +146,12 @@ val domainModule = module {
             getInfoProfile = GetInfoProfile(get()),
             getVideosByUser = GetVideoByUser(get()),
             increaseViews = IncreaseViews(get()),
-            addVideo = AddVideo(get())
+            addVideo = AddVideo(get()),
+            getVideosLiked = GetLikedVideos(get()),
+            getVideosFavorite = GetFavoriteVideos(get()),
+            getMyVideos = GetMyVideos(get()),
+            deleteVideo = DeleteVideo(get()),
+            updateCaption = UpdateCaption(get())
         )
     }
 
