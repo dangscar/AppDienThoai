@@ -31,6 +31,7 @@ import com.nlhd.domain.usecase.manageProduct.GetVersionProducts
 import com.nlhd.domain.usecase.manageProduct.LoadProducts
 import com.nlhd.domain.usecase.manageProduct.ManageProductUseCase
 import com.nlhd.domain.usecase.manageProduct.UpdateProduct
+import com.nlhd.domain.usecase.manageProduct.UpdateVersionProduct
 import com.nlhd.domain.usecase.order.GetOrders
 import com.nlhd.domain.usecase.order.OrderUseCase
 import com.nlhd.domain.usecase.product.GetProductDetail
@@ -98,7 +99,8 @@ val domainModule = module {
             getProduct = GetProduct(get()),
             updateProduct = UpdateProduct(get()),
             getVersionProducts = GetVersionProducts(get()),
-            addVersionProduct = AddVersionProduct(get())
+            addVersionProduct = AddVersionProduct(get()),
+            updateVersionProduct = UpdateVersionProduct(get())
         )
     }
 

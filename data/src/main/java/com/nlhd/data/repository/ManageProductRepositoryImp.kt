@@ -2,6 +2,7 @@ package com.nlhd.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -12,8 +13,10 @@ import com.nlhd.data.model.manageProduct.AddProduct.ManageProductResponseDto
 import com.nlhd.data.model.manageProduct.EditProduct.EditProductResponseDto
 import com.nlhd.data.model.manageProduct.LoadVersionProduct.LoadVersionProductResponseDto
 import com.nlhd.data.model.manageProduct.UpdateProduct.UpdateProductRequestDto
+import com.nlhd.data.model.manageProduct.UpdateVersionProduct.UpdateVersionProductRequestDto
 import com.nlhd.data.remote.LoadProductPagingSource
 import com.nlhd.domain.entity.Message.MessageResponse
+import com.nlhd.domain.entity.UpdateVersionProduct.UpdateVersionProductRequest
 import com.nlhd.domain.entity.manageProduct.AddProduct.ManageProductResponse
 import com.nlhd.domain.entity.manageProduct.AddProduct.UploadProduct
 import com.nlhd.domain.entity.manageProduct.EditProduct.EditProductResponse
@@ -231,6 +234,30 @@ class ManageProductRepositoryImp(
                 header("Authorization", "Bearer $token")
                 contentType(ContentType.Application.Json)
                 setBody(multipartData)
+            }.body<MessageResponseDto>()
+
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
+    override suspend fun updateVersionProduct(
+        token: String,
+        updateVersionProductRequest: UpdateVersionProductRequest
+    ): ResultWrapper<MessageResponse> {
+        return try {
+            val responseDto = ktor.patch(Utils.BASE_URL+"/api/versionProduct/update") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(
+                    UpdateVersionProductRequestDto(
+                        ram = updateVersionProductRequest.ram,
+                        storage = updateVersionProductRequest.storage,
+                        version_product_id = updateVersionProductRequest.versionProductId
+                    )
+                )
             }.body<MessageResponseDto>()
 
             val response = responseDto.toDomain(responseDto)

@@ -22,7 +22,7 @@ import com.nlhd.manage_product.EditProductScreen.EditProductViewModel
 import com.nlhd.manage_product.LoadProductScreen.LoadProductViewModel
 import com.nlhd.manage_product.AddProductScreen.ManageProductViewModel
 import com.nlhd.manage_product.AddVersionProductScreen.AddVersionProductViewModel
-import com.nlhd.manage_product.LoadVersionProductScreen.LoadVersionProductViewModel
+import com.nlhd.manage_product.VersionProductScreen.LoadVersionProductViewModel
 import com.nlhd.order.OrderViewModel
 import com.nlhd.search.SearchViewModel
 import com.nlhd.shortvideo.ContentCommonViewModel

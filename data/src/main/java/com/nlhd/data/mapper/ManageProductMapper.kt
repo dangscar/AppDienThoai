@@ -8,6 +8,8 @@ import com.nlhd.data.model.manageProduct.AddProduct.VersionProduct
 import com.nlhd.data.model.manageProduct.EditProduct.EditProductResponseDto
 import com.nlhd.data.model.manageProduct.LoadVersionProduct.LoadVersionProductResponseDto
 import com.nlhd.data.model.manageProduct.UpdateProduct.UpdateProductRequestDto
+import com.nlhd.data.model.manageProduct.UpdateVersionProduct.UpdateVersionProductRequestDto
+import com.nlhd.domain.entity.UpdateVersionProduct.UpdateVersionProductRequest
 import com.nlhd.domain.entity.manageProduct.LoadProduct.ProductsResponse
 import com.nlhd.domain.entity.manageProduct.AddProduct.ManageProductResponse
 import com.nlhd.domain.entity.manageProduct.EditProduct.EditProductResponse
@@ -153,5 +155,15 @@ fun com.nlhd.data.model.manageProduct.LoadVersionProduct.Version.toDomain(versio
         productId = product_id,
         ram = ram,
         storage = storage
+    )
+}
+
+//Update Version Product
+
+fun UpdateVersionProductRequestDto.toDomain(updateVersionProductRequestDto: UpdateVersionProductRequestDto): UpdateVersionProductRequest {
+    return UpdateVersionProductRequest(
+        ram = ram,
+        storage = storage,
+        versionProductId = version_product_id
     )
 }

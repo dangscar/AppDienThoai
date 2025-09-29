@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.paging.PagingData
 import com.nlhd.domain.entity.Message.MessageResponse
+import com.nlhd.domain.entity.UpdateVersionProduct.UpdateVersionProductRequest
 import com.nlhd.domain.entity.manageProduct.LoadProduct.Product
 import com.nlhd.domain.entity.manageProduct.AddProduct.ManageProductResponse
 import com.nlhd.domain.entity.manageProduct.AddProduct.UploadProduct
@@ -22,4 +23,5 @@ interface ManageProductRepository {
     suspend fun updateProduct(token: String, updateProductRequest: UpdateProductRequest): ResultWrapper<MessageResponse>
     suspend fun getVersionProducts(token: String, productId: Int): ResultWrapper<LoadVersionProductResponse>
     suspend fun addVersionProduct(uploadVersionProduct: UploadVersionProduct, token: String): ResultWrapper<MessageResponse>
+    suspend fun updateVersionProduct(token: String, updateVersionProductRequest: UpdateVersionProductRequest): ResultWrapper<MessageResponse>
 }

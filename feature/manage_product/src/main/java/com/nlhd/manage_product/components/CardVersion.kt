@@ -28,7 +28,8 @@ import com.nlhd.domain.entity.manageProduct.LoadVersionProduct.Version
 @Composable
 fun CardVersion(
     version: Version,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onClickEdit: () -> Unit
 ) {
     Card(
         onClick = onClick,
@@ -83,7 +84,7 @@ fun CardVersion(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-
+                                onClickEdit()
                             }
                         )
                     }

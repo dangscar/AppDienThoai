@@ -2,6 +2,7 @@ package com.nlhd.composestore
 
 import android.app.Activity
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
@@ -56,6 +57,7 @@ import com.nlhd.composestore.navigate.EditAddress
 import com.nlhd.composestore.navigate.EditProduct
 import com.nlhd.composestore.navigate.EditProfile
 import com.nlhd.composestore.navigate.LikedVideo
+import com.nlhd.composestore.navigate.LoadColorProduct
 import com.nlhd.composestore.navigate.LoadProduct
 import com.nlhd.composestore.navigate.LoadVersionProduct
 import com.nlhd.composestore.navigate.MyVideos
@@ -84,8 +86,9 @@ import com.nlhd.keystore.KeyStoreManager
 import com.nlhd.manage_product.EditProductScreen.EditProductScreen
 import com.nlhd.manage_product.AddProductScreen.ManageProductScreen
 import com.nlhd.manage_product.AddVersionProductScreen.AddVersionProductScreen
+import com.nlhd.manage_product.ColorProductScreen.LoadColorProductScreen
 import com.nlhd.manage_product.LoadProductScreen.ProductScreen
-import com.nlhd.manage_product.LoadVersionProductScreen.LoadVersionProductScreen
+import com.nlhd.manage_product.VersionProductScreen.LoadVersionProductScreen
 import com.nlhd.order.OrderScreen
 import com.nlhd.search.SearchScreen
 import com.nlhd.search.SearchSuccessScreen
@@ -375,7 +378,7 @@ fun AdminScreen(
                     }
                 },
                 onClick = {
-
+                    navController.navigate(LoadColorProduct(it))
                 },
                 onClickAddVersionProduct = {
                     navController.navigate(AddVersionProduct(productId))
@@ -392,6 +395,10 @@ fun AdminScreen(
                     }
                 }
             )
+        }
+        composable<LoadColorProduct> {
+            val id = it.toRoute<LoadColorProduct>().id
+            LoadColorProductScreen()
         }
     }
 }

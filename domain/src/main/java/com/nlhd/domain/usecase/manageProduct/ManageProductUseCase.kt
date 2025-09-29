@@ -6,5 +6,6 @@ data class ManageProductUseCase(
     val getProduct: GetProduct,
     val updateProduct: UpdateProduct,
     val getVersionProducts: GetVersionProducts,
-    val addVersionProduct: AddVersionProduct
+    val addVersionProduct: AddVersionProduct,
+    val updateVersionProduct: UpdateVersionProduct
 )
