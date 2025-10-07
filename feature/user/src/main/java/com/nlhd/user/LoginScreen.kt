@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +55,7 @@ import com.nlhd.core.utils.containerButtonLightGray
 import com.nlhd.core.utils.containerLogin
 import com.nlhd.core.utils.containerTextFieldLogin
 import com.nlhd.core.utils.containerTopBar
+import com.nlhd.core.utils.contentPrice
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,16 +75,17 @@ fun LoginScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("ĐĂNG NHẬP", style = AppTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
+                    Text("Log in", style = AppTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
                     ),
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = containerLogin
+                    containerColor = Color.White
                 )
             )
         },
@@ -96,13 +99,7 @@ fun LoginScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(AppTheme.dimens.medium3))
-            Text("KTOR STORE", style = AppTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.Black
-                )
-            )
-            Spacer(modifier = Modifier.height(AppTheme.dimens.medium3))
+
             OutlinedTextField(
                 value = email.value,
                 onValueChange = { loginViewModel.setEmail(it) },
@@ -118,7 +115,7 @@ fun LoginScreen(
                 shape = RoundedCornerShape(AppTheme.dimens.small3),
                 colors = TextFieldDefaults.colors(
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = containerLogin,
+                    focusedIndicatorColor = Color.Transparent,
                     focusedContainerColor = containerTextFieldLogin,
                     unfocusedContainerColor = containerTextFieldLogin
                 ),
@@ -143,7 +140,7 @@ fun LoginScreen(
                 shape = RoundedCornerShape(AppTheme.dimens.small3),
                 colors = TextFieldDefaults.colors(
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = containerLogin,
+                    focusedIndicatorColor = Color.Transparent,
                     focusedContainerColor = containerTextFieldLogin,
                     unfocusedContainerColor = containerTextFieldLogin
                 ),
@@ -160,7 +157,7 @@ fun LoginScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = containerLogin),
+                colors = ButtonDefaults.buttonColors(containerColor = contentPrice),
                 shape = RoundedCornerShape(AppTheme.dimens.small3)
             ) {
                 Text("Tiếp tục", style = AppTheme.typography.labelMedium.copy(
@@ -172,6 +169,38 @@ fun LoginScreen(
                     textAlign = TextAlign.Center
                 )
             }
+
+            when (state.value) {
+                is LoginState.Error -> {
+                    Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
+                    Text("*Đăng nhập sai thông tin, vui lòng thử lại", style = AppTheme.typography.labelMedium.copy(
+                        fontFamily = Font.fontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Red
+                    ))
+                }
+                LoginState.Loading -> {
+                    Box(modifier = Modifier
+                        .fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            color = contentPrice
+                        )
+                    }
+                }
+                is LoginState.Success -> {
+                    val token = (state.value as LoginState.Success).data.token
+                    val role = (state.value as LoginState.Success).data.user.role
+                    loginViewModel.saveToken(context, token, role)
+                }
+
+                is LoginState.SaveTokenSuccess -> {
+                    onLoginSuccess((state.value as LoginState.SaveTokenSuccess).role)
+                    loginViewModel.setState(LoginState.Loading)
+                }
+
+                LoginState.Idle -> {}
+            }
+
 
             Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
 
@@ -186,54 +215,12 @@ fun LoginScreen(
                 Text("Đăng ký", style = AppTheme.typography.labelMedium.copy(
                     fontFamily = Font.fontFamily,
                     fontWeight = FontWeight.Bold,
-                    color = containerLogin
+                    color = contentPrice
                 ))
             }
-
-            Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
-
-            when (state.value) {
-                is LoginState.Error -> {
-                    Text("Đăng nhập bất thường", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black
-                    ))
-                }
-                LoginState.Loading -> {
-                    Text("Vui lòng đăng nhập", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black
-                    ))
-                }
-                is LoginState.Success -> {
-                    val token = (state.value as LoginState.Success).data.token
-                    val role = (state.value as LoginState.Success).data.user.role
-                    Text("Đăng nhập thành công", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black
-                    ))
-                    loginViewModel.saveToken(context, token, role)
-                }
-
-                is LoginState.SaveTokenSuccess -> {
-                    onLoginSuccess((state.value as LoginState.SaveTokenSuccess).role)
-                    loginViewModel.setState(LoginState.Loading)
-                }
-            }
-
         }
     }
 
 
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-private fun LoginPre() {
 
 }

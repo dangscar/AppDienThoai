@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.ContextualFlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -105,7 +106,7 @@ fun ProfileShortVideoScreen(
                 containerColor = Color.White,
                 topBar = {
                     TopBarProfileShortVideo(
-                        title = if (state is ProfileShortVideoState.Success) (state as ProfileShortVideoState.Success).data.name else "",
+                        title = "Creator",
                         onClickBack = onClickBack
                     )
                 }
@@ -139,146 +140,144 @@ fun ProfileShortVideoScreen(
                             val user = (state as ProfileShortVideoState.Success).data
                             item {
                                 val image = if (user.avatarUrl == "null" || user.avatarUrl == null || user.avatarUrl == "") R.drawable.anhden else  "${Utils.BASE_URL}/" + user.avatarUrl
-                                AsyncImage(
-                                    model = image,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(AppTheme.dimens.large2)
-                                        .clip(CircleShape)
-                                        .border(AppTheme.dimens.extraSmall, Color.Gray, CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
-                                Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                                Text(
-                                    "@${user.name}",
-                                    style = AppTheme.typography.labelLarge.copy(
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.Bold
-                                    ),
-                                    modifier = Modifier.padding(horizontal = AppTheme.dimens.large, vertical = AppTheme.dimens.small2),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-
-                                Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
 
                                 Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
+                                    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    AsyncImage(
+                                        model = image,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(AppTheme.dimens.large2)
+                                            .clip(CircleShape)
+                                            .border(AppTheme.dimens.extraSmall, Color.Gray, CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Spacer(modifier = Modifier.width(AppTheme.dimens.small))
+
                                     Column(
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier.padding(AppTheme.dimens.small2)
+                                        modifier = Modifier.weight(0.7f).fillMaxHeight().padding(horizontal = AppTheme.dimens.small),
+                                        verticalArrangement = Arrangement.SpaceBetween,
+                                        horizontalAlignment = Alignment.Start
                                     ) {
                                         Text(
-                                            user.followingsCount,
-                                            style = AppTheme.typography.headlineMedium.copy(
+                                            user.name,
+                                            style = AppTheme.typography.headlineLarge.copy(
                                                 color = Color.Black,
                                                 fontWeight = FontWeight.Bold
                                             ),
-                                            modifier = Modifier,
-                                            maxLines = 1
+                                            modifier = Modifier.padding(horizontal = AppTheme.dimens.small2),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                                        Text(
-                                            "Following",
-                                            style = AppTheme.typography.bodyMedium.copy(Color.Black),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
+                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Column(
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier
+                                            ) {
+                                                Text(
+                                                    user.followingsCount,
+                                                    style = AppTheme.typography.headlineMedium.copy(
+                                                        color = Color.Black,
+                                                        fontWeight = FontWeight.Bold
+                                                    ),
+                                                    modifier = Modifier,
+                                                    maxLines = 1
+                                                )
+                                                Spacer(modifier = Modifier.height(AppTheme.dimens.small))
+                                                Text(
+                                                    "Following",
+                                                    style = AppTheme.typography.bodyMedium.copy(Color.Black),
+                                                    modifier = Modifier,
+                                                    maxLines = 1
+                                                )
+                                            }
+
+                                            Column(
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier
+                                            ) {
+                                                Text(
+                                                    user.followersCount,
+                                                    style = AppTheme.typography.headlineMedium.copy(
+                                                        color = Color.Black,
+                                                        fontWeight = FontWeight.Bold
+                                                    ),
+                                                    modifier = Modifier,
+                                                    maxLines = 1
+                                                )
+                                                Spacer(modifier = Modifier.height(AppTheme.dimens.small))
+                                                Text(
+                                                    "Follower",
+                                                    style = AppTheme.typography.bodyMedium.copy(Color.Black),
+                                                    modifier = Modifier,
+                                                    maxLines = 1
+                                                )
+                                            }
+
+                                            Column(
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier
+                                            ) {
+                                                Text(
+                                                    user.likesCount,
+                                                    style = AppTheme.typography.headlineMedium.copy(
+                                                        color = Color.Black,
+                                                        fontWeight = FontWeight.Bold
+                                                    ),
+                                                    modifier = Modifier,
+                                                    maxLines = 1
+                                                )
+                                                Spacer(modifier = Modifier.height(AppTheme.dimens.small))
+                                                Text(
+                                                    "Likes",
+                                                    style = AppTheme.typography.bodyMedium.copy(Color.Black),
+                                                    modifier = Modifier,
+                                                    maxLines = 1
+                                                )
+                                            }
+
+                                            Column(
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier
+                                            ) {
+                                                Text(
+                                                    user.favoritesCount,
+                                                    style = AppTheme.typography.headlineMedium.copy(
+                                                        color = Color.Black,
+                                                        fontWeight = FontWeight.Bold
+                                                    ),
+                                                    modifier = Modifier,
+                                                    maxLines = 1
+                                                )
+                                                Spacer(modifier = Modifier.height(AppTheme.dimens.small))
+                                                Text(
+                                                    "Favorites",
+                                                    style = AppTheme.typography.bodyMedium.copy(Color.Black),
+                                                    modifier = Modifier,
+                                                    maxLines = 1
+                                                )
+                                            }
+                                        }
+
                                     }
 
-                                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
-
-                                    Column(
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier.padding(AppTheme.dimens.small2)
-                                    ) {
-                                        Text(
-                                            user.followersCount,
-                                            style = AppTheme.typography.headlineMedium.copy(
-                                                color = Color.Black,
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                                        Text(
-                                            "Follower",
-                                            style = AppTheme.typography.bodyMedium.copy(Color.Black),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
-
-                                    Column(
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier.padding(AppTheme.dimens.small2)
-                                    ) {
-                                        Text(
-                                            user.likesCount,
-                                            style = AppTheme.typography.headlineMedium.copy(
-                                                color = Color.Black,
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                                        Text(
-                                            "Likes",
-                                            style = AppTheme.typography.bodyMedium.copy(Color.Black),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
-
-                                    Column(
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier.padding(AppTheme.dimens.small2)
-                                    ) {
-                                        Text(
-                                            user.favoritesCount,
-                                            style = AppTheme.typography.headlineMedium.copy(
-                                                color = Color.Black,
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small))
-                                        Text(
-                                            "Favorites",
-                                            style = AppTheme.typography.bodyMedium.copy(Color.Black),
-                                            modifier = Modifier,
-                                            maxLines = 1
-                                        )
-                                    }
                                 }
-
-                                Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
 
                             }
 
                             item {
-
-                                Text("Theo dõi kênh",
-                                    style = AppTheme.typography.headlineMedium.copy(
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.SemiBold
-                                    ) ,
-                                    modifier = Modifier
-                                )
-                                Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
 
                                 when (followState) {
                                     is FollowActionState.Error -> {
@@ -291,7 +290,7 @@ fun ProfileShortVideoScreen(
                                         if (!user.isFollowing && !user.canFollow) {
                                             Button(
                                                 onClick = {  },
-                                                modifier = Modifier.padding(AppTheme.dimens.extraSmall),
+                                                modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
                                                 shape = RoundedCornerShape(AppTheme.dimens.small3),
                                                 colors = ButtonDefaults.buttonColors(
                                                     containerColor = containerButtonLightGray,
@@ -312,7 +311,7 @@ fun ProfileShortVideoScreen(
                                                 onClick = {
                                                     viewModel.follow(keyStore, userId)
                                                 },
-                                                modifier = Modifier.padding(AppTheme.dimens.extraSmall),
+                                                modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
                                                 shape = RoundedCornerShape(AppTheme.dimens.small3),
                                                 colors = ButtonDefaults.buttonColors(
                                                     containerColor = containerButtonLightGray,
@@ -331,7 +330,7 @@ fun ProfileShortVideoScreen(
                                         } else {
                                             Button(
                                                 onClick = { viewModel.follow(keyStore, userId) },
-                                                modifier = Modifier.padding(AppTheme.dimens.extraSmall),
+                                                modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
                                                 shape = RoundedCornerShape(AppTheme.dimens.small3),
                                                 colors = ButtonDefaults.buttonColors(
                                                     containerColor = contentPrice,
@@ -363,7 +362,7 @@ fun ProfileShortVideoScreen(
                                             "Follow thành công" -> {
                                                 Button(
                                                     onClick = { viewModel.follow(keyStore, userId) },
-                                                    modifier = Modifier.padding(AppTheme.dimens.extraSmall),
+                                                    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
                                                     shape = RoundedCornerShape(AppTheme.dimens.small3),
                                                     colors = ButtonDefaults.buttonColors(
                                                         containerColor = containerButtonLightGray,
@@ -383,7 +382,7 @@ fun ProfileShortVideoScreen(
                                             else -> {
                                                 Button(
                                                     onClick = { viewModel.follow(keyStore, userId) },
-                                                    modifier = Modifier.padding(AppTheme.dimens.extraSmall),
+                                                    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
                                                     shape = RoundedCornerShape(AppTheme.dimens.small3),
                                                     colors = ButtonDefaults.buttonColors(
                                                         containerColor = contentPrice,
@@ -401,7 +400,7 @@ fun ProfileShortVideoScreen(
                                                 }
                                             }
                                         }
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
+
                                     }
                                 }
 
@@ -415,7 +414,11 @@ fun ProfileShortVideoScreen(
                     item {
                         val width = LocalConfiguration.current.screenWidthDp.dp/3
                         val height = LocalConfiguration.current.screenWidthDp.dp/2.25f
-
+                        Text("Danh sách video", style = AppTheme.typography.headlineMedium.copy(
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold
+                        ))
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                         ContextualFlowRow(
                             modifier = Modifier.fillMaxWidth(),
                             itemCount = videos.itemCount,

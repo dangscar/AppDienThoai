@@ -29,3 +29,13 @@ data class AddVersionProduct(
 data class LoadColorProduct(
     val id: Int
 )
+
+@Serializable
+data class AddColorProduct(
+    val versionProduct: Int
+)
+
+@Serializable
+data class EditColorProduct(
+    val id: Int
+)

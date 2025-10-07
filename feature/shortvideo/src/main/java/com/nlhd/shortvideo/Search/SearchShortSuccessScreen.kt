@@ -156,7 +156,7 @@ fun SearchShortSuccessScreen(
                                             color = Color.Black,
                                             fontWeight = FontWeight.Normal
                                         ),
-                                        maxLines = 2,
+                                        maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.width(width).padding(horizontal = AppTheme.dimens.small2 ,vertical = AppTheme.dimens.extraSmall)
                                     )

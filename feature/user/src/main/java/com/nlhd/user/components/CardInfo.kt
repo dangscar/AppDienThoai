@@ -17,30 +17,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Font
 import com.nlhd.core.utils.containerCardProfile
+import com.nlhd.core.utils.containerTextFieldLogin
 
 @Composable
 fun CardInfo(modifier: Modifier = Modifier) {
     Card(
         onClick = {},
         colors = CardDefaults.cardColors(
-            containerColor = containerCardProfile
+            containerColor = containerTextFieldLogin
         )
     ) {
         Column(
-            modifier = Modifier.padding(AppTheme.dimens.small3)
+            modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small3)
         ) {
-            Text(
-                "Thông tin chung",
-                style = AppTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(AppTheme.dimens.small),
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
             Text(
                 "Địa chỉ: Sóc Trăng",
                 style = AppTheme.typography.bodyMedium.copy(

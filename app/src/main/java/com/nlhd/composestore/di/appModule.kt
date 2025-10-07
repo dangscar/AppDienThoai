@@ -22,6 +22,8 @@ import com.nlhd.manage_product.EditProductScreen.EditProductViewModel
 import com.nlhd.manage_product.LoadProductScreen.LoadProductViewModel
 import com.nlhd.manage_product.AddProductScreen.ManageProductViewModel
 import com.nlhd.manage_product.AddVersionProductScreen.AddVersionProductViewModel
+import com.nlhd.manage_product.ColorProductScreen.ColorProductViewModel
+import com.nlhd.manage_product.ColorProductScreen.EditColorProductViewModel
 import com.nlhd.manage_product.VersionProductScreen.LoadVersionProductViewModel
 import com.nlhd.order.OrderViewModel
 import com.nlhd.search.SearchViewModel
@@ -150,5 +152,13 @@ val appModule = module {
 
     viewModel {
         MyVideoViewModel(get())
+    }
+
+    viewModel {
+        ColorProductViewModel(get())
+    }
+
+    viewModel {
+        EditColorProductViewModel(get())
     }
 }

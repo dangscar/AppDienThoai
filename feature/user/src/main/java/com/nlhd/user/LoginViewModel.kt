@@ -17,7 +17,7 @@ class LoginViewModel(
     private val authenticationUseCase: AuthenticationUseCase
 ): ViewModel() {
 
-    private var _state = MutableStateFlow<LoginState>(LoginState.Loading)
+    private var _state = MutableStateFlow<LoginState>(LoginState.Idle)
     val state = _state.asStateFlow()
 
     private var _email: MutableStateFlow<String> = MutableStateFlow("admin@gmail.com")
@@ -31,6 +31,7 @@ class LoginViewModel(
     fun setPassword(password: String) = _password.update { password }
 
     fun login() {
+        _state.update { LoginState.Loading }
         viewModelScope.launch {
             authenticationUseCase.login(email.value, password.value).let {result->
                 when(result) {
@@ -59,6 +60,7 @@ class LoginViewModel(
 }
 
 sealed class LoginState {
+    object Idle: LoginState()
     data object Loading: LoginState()
     data class Success(val data: LoginResponse): LoginState()
     data class SaveTokenSuccess(val role: String): LoginState()

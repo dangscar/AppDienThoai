@@ -221,17 +221,6 @@ fun DetailScreen(
                                 AppTheme.dimens.medium3)
                         )
                     }
-                    IconButton(
-                        onClick = {}
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(
-                                AppTheme.dimens.medium2)
-                        )
-                    }
                 }
             )
         },
@@ -384,7 +373,7 @@ fun DetailScreen(
         when (state.value) {
             is DetailState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text((state.value as DetailState.Error).message, style = AppTheme.typography.titleMedium)
+                    Text("Có lỗi xảy ra, vui lòng thử lại", style = AppTheme.typography.titleMedium)
                 }
             }
             is DetailState.Loading -> {
@@ -415,7 +404,7 @@ fun DetailScreen(
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(AppTheme.dimens.extraLarge)
+                                .height(AppTheme.dimens.extraLarge+ AppTheme.dimens.extraLarge)
                                 .background(color = containerButtonLightGray),
                             contentScale = ContentScale.Fit
                         )

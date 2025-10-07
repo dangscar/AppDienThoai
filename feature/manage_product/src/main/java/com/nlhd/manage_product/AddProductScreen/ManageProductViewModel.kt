@@ -187,6 +187,7 @@ class ManageProductViewModel(
             os = manageProductAction.value.os
         )
         viewModelScope.launch {
+            _state.update { ManageProductState.Loading }
             useCase.addProduct(uploadProduct, token).let { result->
                 when (result) {
                     is ResultWrapper.Failure -> {
@@ -194,7 +195,6 @@ class ManageProductViewModel(
                     }
                     is ResultWrapper.Success<*> -> {
                         _state.update { ManageProductState.Success(result.value as ManageProductResponse) }
-                        _state.update { ManageProductState.Pending }
                     }
                 }
             }

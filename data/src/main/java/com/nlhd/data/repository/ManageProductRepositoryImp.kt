@@ -10,8 +10,11 @@ import com.nlhd.core.utils.Utils
 import com.nlhd.data.mapper.toDomain
 import com.nlhd.data.model.Message.MessageResponseDto
 import com.nlhd.data.model.manageProduct.AddProduct.ManageProductResponseDto
+import com.nlhd.data.model.manageProduct.EditColorProduct.EditColorResponseDto
 import com.nlhd.data.model.manageProduct.EditProduct.EditProductResponseDto
+import com.nlhd.data.model.manageProduct.LoadColorProduct.ColorResponseDto
 import com.nlhd.data.model.manageProduct.LoadVersionProduct.LoadVersionProductResponseDto
+import com.nlhd.data.model.manageProduct.UpdateColorProduct.UpdateColorRequestDto
 import com.nlhd.data.model.manageProduct.UpdateProduct.UpdateProductRequestDto
 import com.nlhd.data.model.manageProduct.UpdateVersionProduct.UpdateVersionProductRequestDto
 import com.nlhd.data.remote.LoadProductPagingSource
@@ -19,9 +22,13 @@ import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.UpdateVersionProduct.UpdateVersionProductRequest
 import com.nlhd.domain.entity.manageProduct.AddProduct.ManageProductResponse
 import com.nlhd.domain.entity.manageProduct.AddProduct.UploadProduct
+import com.nlhd.domain.entity.manageProduct.ColorProduct.AddColorProductRequest
+import com.nlhd.domain.entity.manageProduct.EditColorProduct.EditColorResponse
 import com.nlhd.domain.entity.manageProduct.EditProduct.EditProductResponse
+import com.nlhd.domain.entity.manageProduct.LoadColorProduct.ColorResponse
 import com.nlhd.domain.entity.manageProduct.LoadProduct.Product
 import com.nlhd.domain.entity.manageProduct.LoadVersionProduct.LoadVersionProductResponse
+import com.nlhd.domain.entity.manageProduct.UpdateColorProduct.UpdateColorRequest
 import com.nlhd.domain.entity.manageProduct.UpdateProduct.UpdateProductRequest
 import com.nlhd.domain.entity.manageProduct.UploadVersionProduct.UploadVersionProduct
 import com.nlhd.domain.repository.ManageProductRepository
@@ -34,6 +41,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -262,6 +270,138 @@ class ManageProductRepositoryImp(
 
             val response = responseDto.toDomain(responseDto)
             ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
+    override suspend fun getColorProducts(
+        token: String,
+        versionProductId: Int
+    ): ResultWrapper<ColorResponse> {
+        return try {
+            val responseDto = ktor.get(Utils.BASE_URL+"/api/colorProduct/${versionProductId}") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+            }.body<ColorResponseDto>()
+
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
+    override suspend fun addColorProducts(
+        token: String,
+        addColorProductRequest: AddColorProductRequest
+    ): ResultWrapper<MessageResponse> {
+        return try {
+            val contentResolver = addColorProductRequest.context.contentResolver
+            val inputStream = contentResolver.openInputStream(addColorProductRequest.image) ?: return ResultWrapper.Failure(Exception("Không thể mở tệp hình ảnh"))
+            val byteArray = inputStream.readBytes()
+            inputStream.close()
+
+            val multipartData = MultiPartFormDataContent(
+                formData {
+                    append("image", byteArray, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"upload.jpg\"")
+                    })
+                    append("price", addColorProductRequest.price)
+                    append("status", addColorProductRequest.status)
+                    append("color", addColorProductRequest.color)
+                    append("value", addColorProductRequest.value)
+                    append("version_id", addColorProductRequest.versionId)
+                }
+            )
+
+            val responseDto = ktor.post(Utils.BASE_URL+"/api/colorProduct") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+                setBody(multipartData)
+            }.body<MessageResponseDto>()
+
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
+    override suspend fun editColorProduct(
+        token: String,
+        id: Int
+    ): ResultWrapper<EditColorResponse> {
+        return try {
+            val responseDto = ktor.get(Utils.BASE_URL+"/api/colorProduct/edit/$id") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+            }.body<EditColorResponseDto>()
+
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
+    override suspend fun updateColorProduct(
+        token: String,
+        updateColorRequest: UpdateColorRequest
+    ): ResultWrapper<MessageResponse> {
+        return try {
+            if (!updateColorRequest.image.toString().contains("images")) {
+                val contentResolver = updateColorRequest.context.contentResolver
+                val inputStream = contentResolver.openInputStream(updateColorRequest.image!!) ?: return ResultWrapper.Failure(Exception("Không thể mở tệp hình ảnh"))
+                val byteArray = inputStream.readBytes()
+                inputStream.close()
+
+                val multipartData = MultiPartFormDataContent(
+                    formData {
+                        append("image", byteArray, Headers.build {
+                            append(HttpHeaders.ContentType, "image/jpeg")
+                            append(HttpHeaders.ContentDisposition, "filename=\"upload.jpg\"")
+                        })
+                        append("price", updateColorRequest.price)
+                        append("status", updateColorRequest.status)
+                        append("color", updateColorRequest.color)
+                        append("value", updateColorRequest.value)
+                        append("color_id", updateColorRequest.colorId)
+                    }
+                )
+
+                val responseDto = ktor.post(Utils.BASE_URL+"/api/colorProduct/update") {
+                    header("Authorization", "Bearer $token")
+                    contentType(ContentType.Application.Json)
+                    setBody(multipartData)
+                }.body<MessageResponseDto>()
+
+                val response = responseDto.toDomain(responseDto)
+                ResultWrapper.Success(response)
+            } else {
+
+                val multipartData = MultiPartFormDataContent(
+                    formData {
+                        append("price", updateColorRequest.price)
+                        append("status", updateColorRequest.status)
+                        append("color", updateColorRequest.color)
+                        append("value", updateColorRequest.value)
+                        append("color_id", updateColorRequest.colorId)
+                    }
+                )
+
+                val responseDto = ktor.post(Utils.BASE_URL+"/api/colorProduct/update") {
+                    header("Authorization", "Bearer $token")
+                    contentType(ContentType.Application.Json)
+                    setBody(multipartData)
+                }.body<MessageResponseDto>()
+
+                val response = responseDto.toDomain(responseDto)
+                ResultWrapper.Success(response)
+            }
+
+
         } catch (e: Exception) {
             ResultWrapper.Failure(e)
         }

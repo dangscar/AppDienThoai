@@ -50,10 +50,12 @@ import com.nlhd.admin.AdminProfileScreen
 import com.nlhd.cart.CartScreen
 import com.nlhd.checkout.CheckoutScreen
 import com.nlhd.checkout.CheckoutSuccessScreen
+import com.nlhd.composestore.navigate.AddColorProduct
 import com.nlhd.composestore.navigate.AddProduct
 import com.nlhd.composestore.navigate.AddVersionProduct
 import com.nlhd.composestore.navigate.Address
 import com.nlhd.composestore.navigate.EditAddress
+import com.nlhd.composestore.navigate.EditColorProduct
 import com.nlhd.composestore.navigate.EditProduct
 import com.nlhd.composestore.navigate.EditProfile
 import com.nlhd.composestore.navigate.LikedVideo
@@ -75,6 +77,7 @@ import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Font
 import com.nlhd.core.utils.containerSearch
+import com.nlhd.core.utils.containerTextFieldLogin
 import com.nlhd.core.utils.containerTopBar
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.dashboard.Dashboard
@@ -86,6 +89,8 @@ import com.nlhd.keystore.KeyStoreManager
 import com.nlhd.manage_product.EditProductScreen.EditProductScreen
 import com.nlhd.manage_product.AddProductScreen.ManageProductScreen
 import com.nlhd.manage_product.AddVersionProductScreen.AddVersionProductScreen
+import com.nlhd.manage_product.ColorProductScreen.AddColorProductScreen
+import com.nlhd.manage_product.ColorProductScreen.EditColorProductScreen
 import com.nlhd.manage_product.ColorProductScreen.LoadColorProductScreen
 import com.nlhd.manage_product.LoadProductScreen.ProductScreen
 import com.nlhd.manage_product.VersionProductScreen.LoadVersionProductScreen
@@ -398,7 +403,42 @@ fun AdminScreen(
         }
         composable<LoadColorProduct> {
             val id = it.toRoute<LoadColorProduct>().id
-            LoadColorProductScreen()
+            LoadColorProductScreen(
+                versionProductId = id,
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                },
+                onClickAddColor = {
+                    navController.navigate(AddColorProduct(it))
+                },
+                onClickEditColor = {
+                    navController.navigate(EditColorProduct(it))
+                }
+            )
+        }
+        composable<AddColorProduct> {
+            val versionProductId = it.toRoute<AddColorProduct>().versionProduct
+            AddColorProductScreen(
+                versionProductId = versionProductId,
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
+        composable<EditColorProduct> {
+            val colorId = it.toRoute<EditColorProduct>().id
+            EditColorProductScreen(
+                colorId = colorId,
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
         }
     }
 }
@@ -1033,7 +1073,7 @@ fun GeneralScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Color.White,
+        containerColor = containerTextFieldLogin,
         contentColor = Color.Black,
         bottomBar = {
             BottomBar(
@@ -1060,7 +1100,7 @@ fun GeneralScreen(
                 ShortVideoScreen(
                     innerPadding = innerPadding,
                     onClickBack = {
-                        navController.navigate(Navigation.Home.route) {
+                        navController.navigate(Navigation.Video.route) {
                             popUpTo(Navigation.Video.route) { inclusive = true } // 👈 xoá cả entry Video
                             launchSingleTop = true
                         }

@@ -90,7 +90,7 @@ fun ShortVideoScreen(
                                 contentDescription = null,
                                 tint = Color.White,
                                 modifier = Modifier
-                                    .size(AppTheme.dimens.medium3)
+                                    .size(AppTheme.dimens.medium2)
                                     .padding(AppTheme.dimens.border)
                             )
                         }
@@ -104,8 +104,7 @@ fun ShortVideoScreen(
                                 contentDescription = null,
                                 tint = Color.White,
                                 modifier = Modifier
-                                    .size(AppTheme.dimens.medium3)
-                                    .padding(AppTheme.dimens.border)
+                                    .size(AppTheme.dimens.medium2)
                             )
                         }
 

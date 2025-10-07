@@ -563,7 +563,9 @@ fun ContentCommon(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onDoubleTap = {
-
+                                if (isPlaying && !isScrolling) {
+                                    videoViewModel.like(token, video.id.toString())
+                                }
                             },
                             onTap = {
                                 if (!exoPlayer.isPlaying && isPlaying && pagerState.settledPage == page) {

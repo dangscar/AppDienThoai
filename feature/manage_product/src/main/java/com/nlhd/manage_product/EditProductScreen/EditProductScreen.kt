@@ -160,7 +160,7 @@ fun EditProductScreen(
                                 Toast.makeText(context, "Chưa nhập đủ thông tin", Toast.LENGTH_SHORT).show()
                                 return@OutlinedButton
                             }
-                            viewModel.updateProduct(keyStore.value)
+                            viewModel.updateProduct(keyStore.value, id)
                         },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(

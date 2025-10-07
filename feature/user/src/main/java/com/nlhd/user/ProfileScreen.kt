@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,6 +54,7 @@ import com.nlhd.core.utils.borderTextField
 import com.nlhd.core.utils.containerButtonLogout
 import com.nlhd.core.utils.containerLogin
 import com.nlhd.core.utils.containerTextFieldLogin
+import com.nlhd.core.utils.contentPrice
 import com.nlhd.keystore.KeyStoreManager
 import com.nlhd.user.components.ButtonProfile
 import com.nlhd.user.components.CardInfo
@@ -122,14 +124,13 @@ fun ProfileScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(bottom = innerPadding.calculateBottomPadding(), start = AppTheme.dimens.small, end = AppTheme.dimens.small),
-                    verticalArrangement = Arrangement.SpaceBetween,
+                        .padding(AppTheme.dimens.small2),
 
                 ) {
                     item {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             AsyncImage(
                                 model = if (profileResponse.user.avatarUrl == null || profileResponse.user.avatarUrl == "" || profileResponse.user.avatarUrl == "null") com.nlhd.core.R.drawable.anhden else "${Utils.BASE_URL}/" + profileResponse.user.avatarUrl,
@@ -138,6 +139,7 @@ fun ProfileScreen(
                                     .size(AppTheme.dimens.large2)
                                     .clip(CircleShape)
                                     .background(color = containerTextFieldLogin)
+                                    .border(width = AppTheme.dimens.extraSmall, color = borderTextField, shape = CircleShape)
                                     .pointerInput(Unit) {
                                         detectTapGestures(
                                             onTap = {
@@ -168,14 +170,14 @@ fun ProfileScreen(
                         }
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
 
+                        /*CardInfo()
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))*/
+
                         ButtonProfile(
                             "Chỉnh sửa thông tin cá nhân",
                             onClick = onClickEditProfile
                         )
-                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
 
-                        CardInfo()
-                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
 
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                         ButtonProfile(
@@ -203,7 +205,7 @@ fun ProfileScreen(
                             },
                             shape = RoundedCornerShape(AppTheme.dimens.small3),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = containerButtonLogout,
+                                containerColor = contentPrice,
                                 contentColor = Color.White
                             ),
                             border = _root_ide_package_.androidx.compose.foundation.BorderStroke(

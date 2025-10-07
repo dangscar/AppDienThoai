@@ -3,6 +3,7 @@ package com.nlhd.data.repository
 import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -271,9 +272,9 @@ class ShortVideoRepositoryImp(
                 header(HttpHeaders.Authorization, "Bearer $token")
                 setBody(multipart)
             }.body<MessageResponseDto>()
-
             ResultWrapper.Success(dto.toDomain(dto))
         } catch (e: Exception) {
+
             ResultWrapper.Failure(e)
 
         }

@@ -24,12 +24,16 @@ import com.nlhd.domain.usecase.dashboard.DashboardUseCase
 import com.nlhd.domain.usecase.dashboard.GetDashboard
 import com.nlhd.domain.usecase.manageCategory.GetCategory
 import com.nlhd.domain.usecase.manageCategory.ManageCategoryUseCase
+import com.nlhd.domain.usecase.manageProduct.AddColorProduct
 import com.nlhd.domain.usecase.manageProduct.AddProduct
 import com.nlhd.domain.usecase.manageProduct.AddVersionProduct
+import com.nlhd.domain.usecase.manageProduct.EditColorProduct
+import com.nlhd.domain.usecase.manageProduct.GetColorProducts
 import com.nlhd.domain.usecase.manageProduct.GetProduct
 import com.nlhd.domain.usecase.manageProduct.GetVersionProducts
 import com.nlhd.domain.usecase.manageProduct.LoadProducts
 import com.nlhd.domain.usecase.manageProduct.ManageProductUseCase
+import com.nlhd.domain.usecase.manageProduct.UpdateColorProduct
 import com.nlhd.domain.usecase.manageProduct.UpdateProduct
 import com.nlhd.domain.usecase.manageProduct.UpdateVersionProduct
 import com.nlhd.domain.usecase.order.GetOrders
@@ -100,7 +104,11 @@ val domainModule = module {
             updateProduct = UpdateProduct(get()),
             getVersionProducts = GetVersionProducts(get()),
             addVersionProduct = AddVersionProduct(get()),
-            updateVersionProduct = UpdateVersionProduct(get())
+            updateVersionProduct = UpdateVersionProduct(get()),
+            getColorProducts = GetColorProducts(get()),
+            addColorProducts = AddColorProduct(get()),
+            editColorProduct = EditColorProduct(get()),
+            updateColorProduct = UpdateColorProduct(get())
         )
     }
 

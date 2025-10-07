@@ -167,9 +167,7 @@ fun ManageProductScreen(
                         .background(Color.White)
                 ) {
                     OutlinedButton(
-                        onClick = {
-
-                        },
+                        onClick = onClickBack,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = containerButtonLightGray,
@@ -280,7 +278,6 @@ fun ManageProductScreen(
             }
             is ManageCategoryState.Success -> {
                 val data = (manageCategoryState.value as ManageCategoryState.Success).data
-
             }
         }
 

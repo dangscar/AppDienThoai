@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -103,6 +104,7 @@ fun HomeScreen(
                             ConstraintLayout(
                                 modifier = Modifier
                                     .background(color = Color.White,RoundedCornerShape(AppTheme.dimens.small3))
+                                    .border(width = AppTheme.dimens.border, color = contentPrice, shape = RoundedCornerShape(AppTheme.dimens.small3))
                                     .padding(AppTheme.dimens.small)
                                     .pointerInput(Unit) {
                                         detectTapGestures(
@@ -112,7 +114,7 @@ fun HomeScreen(
                                         )
                                     }
                             ) {
-                                val (search, text, camera, textSearch) = createRefs()
+                                val (search, text, textSearch) = createRefs()
                                 IconButton(
                                     onClick = {},
                                     modifier = Modifier.constrainAs(search) {
@@ -143,12 +145,12 @@ fun HomeScreen(
                                         top.linkTo(parent.top)
                                         bottom.linkTo(parent.bottom)
                                         start.linkTo(search.end)
-                                        end.linkTo(camera.start)
+                                        end.linkTo(textSearch.start)
                                         width = Dimension.fillToConstraints
                                     }
                                 )
 
-                                IconButton(
+                                /*IconButton(
                                     onClick = {},
                                     modifier = Modifier.constrainAs(camera) {
                                         top.linkTo(parent.top)
@@ -163,7 +165,7 @@ fun HomeScreen(
                                         tint = Color.Black,
                                         modifier = Modifier.size(AppTheme.dimens.medium)
                                     )
-                                }
+                                }*/
 
                                 Text(
                                     text = "Search",
@@ -176,7 +178,7 @@ fun HomeScreen(
                                         top.linkTo(parent.top)
                                         bottom.linkTo(parent.bottom)
                                         end.linkTo(parent.end)
-                                        start.linkTo(camera.end)
+                                        start.linkTo(text.end)
                                     }.padding(end = 12.dp)
                                 )
 
@@ -196,7 +198,7 @@ fun HomeScreen(
                         Icon(
                             painter = painterResource(R.drawable.ic_cart),
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = Color.Black,
                             modifier = Modifier.size(
                                 AppTheme.dimens.medium3)
                         )
@@ -204,7 +206,7 @@ fun HomeScreen(
 
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = containerTopBar
+                    containerColor = Color.White
                 )
             )
 

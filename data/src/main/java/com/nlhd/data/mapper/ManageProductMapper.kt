@@ -5,15 +5,21 @@ import com.nlhd.data.model.manageProduct.LoadProduct.ProductsResponseDto
 import com.nlhd.data.model.manageProduct.AddProduct.ManageProductResponseDto
 import com.nlhd.data.model.manageProduct.AddProduct.Product
 import com.nlhd.data.model.manageProduct.AddProduct.VersionProduct
+import com.nlhd.data.model.manageProduct.EditColorProduct.EditColorResponseDto
 import com.nlhd.data.model.manageProduct.EditProduct.EditProductResponseDto
+import com.nlhd.data.model.manageProduct.LoadColorProduct.ColorResponseDto
 import com.nlhd.data.model.manageProduct.LoadVersionProduct.LoadVersionProductResponseDto
+import com.nlhd.data.model.manageProduct.UpdateColorProduct.UpdateColorRequestDto
 import com.nlhd.data.model.manageProduct.UpdateProduct.UpdateProductRequestDto
 import com.nlhd.data.model.manageProduct.UpdateVersionProduct.UpdateVersionProductRequestDto
 import com.nlhd.domain.entity.UpdateVersionProduct.UpdateVersionProductRequest
 import com.nlhd.domain.entity.manageProduct.LoadProduct.ProductsResponse
 import com.nlhd.domain.entity.manageProduct.AddProduct.ManageProductResponse
+import com.nlhd.domain.entity.manageProduct.EditColorProduct.EditColorResponse
 import com.nlhd.domain.entity.manageProduct.EditProduct.EditProductResponse
+import com.nlhd.domain.entity.manageProduct.LoadColorProduct.ColorResponse
 import com.nlhd.domain.entity.manageProduct.LoadVersionProduct.LoadVersionProductResponse
+import com.nlhd.domain.entity.manageProduct.UpdateColorProduct.UpdateColorRequest
 import com.nlhd.domain.entity.manageProduct.UpdateProduct.UpdateProductRequest
 
 fun ManageProductResponseDto.toDomain(manageProductResponseDto: ManageProductResponseDto): ManageProductResponse {
@@ -165,5 +171,47 @@ fun UpdateVersionProductRequestDto.toDomain(updateVersionProductRequestDto: Upda
         ram = ram,
         storage = storage,
         versionProductId = version_product_id
+    )
+}
+
+
+//Load Color Product
+fun ColorResponseDto.toDomain(colorResponseDto: ColorResponseDto): ColorResponse {
+    return ColorResponse(
+        message = message,
+        colors = colors.map { it.toDomain(it) }
+    )
+}
+
+fun com.nlhd.data.model.manageProduct.LoadColorProduct.Color.toDomain(color: com.nlhd.data.model.manageProduct.LoadColorProduct.Color): com.nlhd.domain.entity.manageProduct.LoadColorProduct.Color {
+    return com.nlhd.domain.entity.manageProduct.LoadColorProduct.Color(
+        createAt = created_at,
+        id = id,
+        name = name,
+        image = image,
+        price = price,
+        status = status,
+        value = value,
+        versionProductId = version_product_id
+    )
+}
+
+//Edit Color Product
+fun EditColorResponseDto.toDomain(editColorResponseDto: EditColorResponseDto): EditColorResponse {
+    return EditColorResponse(
+        colorProduct = colorProduct.toDomain(colorProduct)
+    )
+}
+
+fun com.nlhd.data.model.manageProduct.EditColorProduct.ColorProduct.toDomain(colorProduct: com.nlhd.data.model.manageProduct.EditColorProduct.ColorProduct): com.nlhd.domain.entity.manageProduct.EditColorProduct.ColorProduct {
+    return com.nlhd.domain.entity.manageProduct.EditColorProduct.ColorProduct(
+        createdAt = created_at,
+        id = id,
+        image = image,
+        name = name,
+        price = price,
+        status = status,
+        value = value,
+        versionId = version_product_id
     )
 }

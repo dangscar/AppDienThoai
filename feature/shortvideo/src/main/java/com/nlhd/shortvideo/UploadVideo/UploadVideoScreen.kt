@@ -1,16 +1,21 @@
 package com.nlhd.shortvideo.UploadVideo
 
+import android.content.Context
 import android.net.Uri
+import android.os.Build
+import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +44,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -59,7 +65,20 @@ import com.nlhd.core.utils.contentPrice
 import com.nlhd.keystore.KeyStoreManager
 import org.koin.androidx.compose.koinViewModel
 import com.nlhd.core.R
+import com.nlhd.core.utils.containerTextFieldLogin
 
+fun getVideoSizeInMB(context: Context, uri: Uri): Double {
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+    val sizeIndex = cursor?.getColumnIndex(OpenableColumns.SIZE)
+    cursor?.moveToFirst()
+    val sizeInBytes = sizeIndex?.let { cursor.getLong(it) } ?: 0L
+    cursor?.close()
+
+    // Chuyển từ bytes sang MB
+    return sizeInBytes / (1024.0 * 1024.0)
+}
+
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadVideoScreen(
@@ -68,6 +87,8 @@ fun UploadVideoScreen(
     onClickBackStack: ()-> Unit
 ) {
 
+    val context = LocalContext.current
+    val keyStore by KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
     val launcherImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(), // Chọn 1 file
         onResult = { uri: Uri? ->
@@ -81,15 +102,16 @@ fun UploadVideoScreen(
         contract = ActivityResultContracts.GetContent(), // Chọn 1 file
         onResult = { uri: Uri? ->
             uri?.let { uriVideo->
+                val size = getVideoSizeInMB(context, uriVideo)
+                viewModel.setSize(size)
                 viewModel.setVideo(uriVideo)
             }
 
         }
     )
-    val context = LocalContext.current
-    val keyStore by KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val size by viewModel.size.collectAsStateWithLifecycle()
     val addVideoState by viewModel.addVideoState.collectAsStateWithLifecycle()
 
     DisposableEffect(key1 = Unit) {
@@ -185,40 +207,38 @@ fun UploadVideoScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(AppTheme.dimens.small2)
         ) {
+
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    AsyncImage(
-                        model = state.image ?: R.drawable.anhden,
-                        contentDescription = null,
-                        modifier = Modifier.size(AppTheme.dimens.large3),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
-                    Button(
-                        onClick = { launcherImage.launch("image/*") },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Black,
-                            contentColor = Color.White
-                        )
+                    Column(
+                        modifier = Modifier.weight(0.7f)
                     ) {
-                        Text("Chọn ảnh", style = AppTheme.typography.headlineMedium.copy(
-                            color = Color.White
-                        ))
+                        val source = if (state.video.toString().isEmpty()) "Vui lòng chọn source có kích thước dưới 20MB" else "Source: ${state.video}"
+                        Text(source, style = AppTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.ExtraLight,
+                            fontFamily = Font.fontFamily,
+                            color = Color.Gray
+                        ),
+                        )
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                        Text("Size: %.2f MB".format(size), style = AppTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.ExtraLight,
+                            fontFamily = Font.fontFamily,
+                            color = Color.Gray
+                        ),
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
                     }
-                }
-
-                Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
                     AndroidView(
                         modifier = Modifier
-                            .size(AppTheme.dimens.large3)
+                            .size(width = AppTheme.dimens.large3, height = AppTheme.dimens.large3 + AppTheme.dimens.medium3)
+                            .clip(RoundedCornerShape(AppTheme.dimens.small2))
                             .background(color = Color.Black)
                             .pointerInput(key1 = Unit) {
                                 detectTapGestures(
@@ -237,21 +257,35 @@ fun UploadVideoScreen(
                             it.player = viewModel.getExoPlayer()
                         }
                     )
-                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
-                    Button(
-                        onClick = { launcherVideo.launch("video/*") },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Black,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Chọn video", style = AppTheme.typography.headlineMedium.copy(
-                            color = Color.White
-                        ))
-                    }
+
+                }
+
+                Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                OutlinedButton(
+                    onClick = {
+                        launcherVideo.launch("video/*")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = contentPrice,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(AppTheme.dimens.small2),
+                    border = BorderStroke(AppTheme.dimens.extraSmall, Color.Transparent)
+                ) {
+                    Text(
+                        "Thêm video",
+                        style = AppTheme.typography.headlineMedium.copy(
+                            fontFamily = Font.fontFamily,
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        modifier = Modifier.padding(AppTheme.dimens.small)
+                    )
                 }
 
             }
+
             item {
                 Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
                 //Description
@@ -284,15 +318,70 @@ fun UploadVideoScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(AppTheme.dimens.large2),
+                        .height(AppTheme.dimens.large3 + AppTheme.dimens.large),
                     shape = RoundedCornerShape(AppTheme.dimens.small2),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF7F56D9),
-                        unfocusedBorderColor = Color.LightGray
+                        focusedBorderColor = containerTextFieldLogin,
+                        unfocusedBorderColor = Color.LightGray,
+                        cursorColor = contentPrice,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
                     ),
                 )
                 Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
             }
+
+            item {
+                Text(
+                    buildAnnotatedString {
+                        append("Thêm ảnh tại đây")
+                    },
+                    style = AppTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start
+                )
+                Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            launcherImage.launch("image/*")
+                        },
+                        modifier = Modifier.weight(0.7f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = containerButtonLightGray,
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(AppTheme.dimens.small2),
+                        border = BorderStroke(AppTheme.dimens.extraSmall, Color.Transparent)
+                    ) {
+                        Text(
+                            "Thêm hình ảnh",
+                            style = AppTheme.typography.headlineMedium.copy(
+                                fontFamily = Font.fontFamily,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier.padding(AppTheme.dimens.small)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(AppTheme.dimens.small2))
+                    AsyncImage(
+                        model = state.image ?: R.drawable.anhden,
+                        contentDescription = null,
+                        modifier = Modifier.size(width = AppTheme.dimens.large3, height = AppTheme.dimens.large3 + AppTheme.dimens.medium3)
+                            .clip(RoundedCornerShape(AppTheme.dimens.small2)),
+                        contentScale = ContentScale.Crop
+                    )
+
+                }
+            }
+
             when (addVideoState) {
                 is UploadVideoState.Error -> {
                     item {

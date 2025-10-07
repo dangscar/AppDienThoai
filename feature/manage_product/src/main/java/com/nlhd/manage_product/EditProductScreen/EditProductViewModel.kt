@@ -69,9 +69,9 @@ class EditProductViewModel(
         _editProductAction.update { it.copy(categoryId = category) }
     }
 
-    fun updateProduct(token: String) = viewModelScope.launch {
+    fun updateProduct(token: String, id: Int) = viewModelScope.launch {
         val updateProductRequest = UpdateProductRequest(
-            id = editProductAction.value.categoryId.toInt(),
+            id = id,
             name = editProductAction.value.name,
             description = editProductAction.value.description ?: "",
             screenSize = editProductAction.value.screenSize.toDouble(),

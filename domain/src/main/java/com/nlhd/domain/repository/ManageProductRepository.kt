@@ -8,8 +8,12 @@ import com.nlhd.domain.entity.UpdateVersionProduct.UpdateVersionProductRequest
 import com.nlhd.domain.entity.manageProduct.LoadProduct.Product
 import com.nlhd.domain.entity.manageProduct.AddProduct.ManageProductResponse
 import com.nlhd.domain.entity.manageProduct.AddProduct.UploadProduct
+import com.nlhd.domain.entity.manageProduct.ColorProduct.AddColorProductRequest
+import com.nlhd.domain.entity.manageProduct.EditColorProduct.EditColorResponse
 import com.nlhd.domain.entity.manageProduct.EditProduct.EditProductResponse
+import com.nlhd.domain.entity.manageProduct.LoadColorProduct.ColorResponse
 import com.nlhd.domain.entity.manageProduct.LoadVersionProduct.LoadVersionProductResponse
+import com.nlhd.domain.entity.manageProduct.UpdateColorProduct.UpdateColorRequest
 import com.nlhd.domain.entity.manageProduct.UpdateProduct.UpdateProductRequest
 import com.nlhd.domain.entity.manageProduct.UploadVersionProduct.UploadVersionProduct
 import com.nlhd.domain.resultWrapper.ResultWrapper
@@ -24,4 +28,8 @@ interface ManageProductRepository {
     suspend fun getVersionProducts(token: String, productId: Int): ResultWrapper<LoadVersionProductResponse>
     suspend fun addVersionProduct(uploadVersionProduct: UploadVersionProduct, token: String): ResultWrapper<MessageResponse>
     suspend fun updateVersionProduct(token: String, updateVersionProductRequest: UpdateVersionProductRequest): ResultWrapper<MessageResponse>
+    suspend fun getColorProducts(token: String, versionProductId: Int): ResultWrapper<ColorResponse>
+    suspend fun addColorProducts(token: String, addColorProductRequest: AddColorProductRequest): ResultWrapper<MessageResponse>
+    suspend fun editColorProduct(token: String, id: Int): ResultWrapper<EditColorResponse>
+    suspend fun updateColorProduct(token: String, updateColorRequest: UpdateColorRequest): ResultWrapper<MessageResponse>
 }

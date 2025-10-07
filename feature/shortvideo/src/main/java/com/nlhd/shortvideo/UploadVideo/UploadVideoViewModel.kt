@@ -29,10 +29,17 @@ class UploadVideoViewModel(
     ))
     val state = _state.asStateFlow()
 
+    private var _size = MutableStateFlow(0.0)
+    val size = _size.asStateFlow()
+
     private var _addVideoState = MutableStateFlow<UploadVideoState>(UploadVideoState.Idle)
     val addVideoState = _addVideoState.asStateFlow()
 
     private var _isPlaying = MutableStateFlow(false)
+
+    fun setSize(size: Double) {
+        _size.update { size }
+    }
 
     fun getExoPlayer() = exoPlayer
 
