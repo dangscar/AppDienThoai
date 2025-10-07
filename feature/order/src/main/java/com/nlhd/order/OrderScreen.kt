@@ -105,6 +105,14 @@ fun OrderScreen(
                     }
                 }
                 is LoadState.NotLoading -> {
+                    if (orders.itemCount == 0) {
+                        item {
+                            Text("Chưa có đơn hàng nào", style = AppTheme.typography.headlineMedium.copy(
+                                color = Color.Black,
+                                fontWeight = FontWeight.Normal
+                            ))
+                        }
+                    }
                     items(orders.itemCount) { index->
                         orders[index]?.let {
                            CardOrder(it)

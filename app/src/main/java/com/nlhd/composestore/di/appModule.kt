@@ -36,8 +36,9 @@ import com.nlhd.shortvideo.VideoViewModel
 import com.nlhd.user.EditProfileViewModel
 import com.nlhd.shortvideo.LikedVideo.LikedVideoViewModel
 import com.nlhd.shortvideo.MyVideos.MyVideoViewModel
-import com.nlhd.user.LoginViewModel
+import com.nlhd.user.Login.LoginViewModel
 import com.nlhd.user.ProfileViewModel
+import com.nlhd.user.SignUp.SignUpViewModel
 import com.nlhd.user.UploadAvatar.UploadAvatarViewModel
 import com.nlhd.user.UserViewModel
 import org.koin.android.ext.koin.androidContext
@@ -50,6 +51,7 @@ val appModule = module {
     viewModel { HomeViewModel(get()) }
     viewModel { DetailViewModel(get(), get()) }
     viewModel { LoginViewModel(get()) }
+    viewModel { SignUpViewModel(get()) }
     viewModel { ProfileViewModel(get()) }
     viewModel { UserViewModel(get()) }
     viewModel { CartViewModel(

@@ -6,5 +6,6 @@ data class AuthenticationUseCase(
     val profileAdmin: ProfileAdmin,
     val logout: Logout,
     val updateProfile: UpdateProfile,
-    val uploadAvatar: UploadAvatar
+    val uploadAvatar: UploadAvatar,
+    val signUp: SignUp
 )

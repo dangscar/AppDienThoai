@@ -8,6 +8,8 @@ import com.nlhd.domain.entity.logout.LogoutResponse
 import com.nlhd.domain.entity.profile.ProfileResponse
 import com.nlhd.domain.entity.profile.UpdateProfileReponse
 import com.nlhd.domain.entity.profile.UpdateProfileRequest
+import com.nlhd.domain.entity.signup.SignUpRequest
+import com.nlhd.domain.entity.signup.SignUpResponse
 import com.nlhd.domain.resultWrapper.ResultWrapper
 
 interface AuthenticationRepository {
@@ -18,4 +20,5 @@ interface AuthenticationRepository {
 
     suspend fun updateProfile(token: String, updateProfileRequest: UpdateProfileRequest): ResultWrapper<UpdateProfileReponse>
     suspend fun uploadAvatar(token: String, context: Context, uri: Uri): ResultWrapper<MessageResponse>
+    suspend fun signUp(signUpRequest: SignUpRequest): ResultWrapper<SignUpResponse>
 }

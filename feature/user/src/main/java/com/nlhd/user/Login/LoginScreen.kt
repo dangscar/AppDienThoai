@@ -1,13 +1,10 @@
-package com.nlhd.user
+package com.nlhd.user.Login
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,43 +15,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Font
 import org.koin.androidx.compose.koinViewModel
-import com.nlhd.core.R
-import com.nlhd.core.utils.containerButtonLightGray
-import com.nlhd.core.utils.containerLogin
 import com.nlhd.core.utils.containerTextFieldLogin
-import com.nlhd.core.utils.containerTopBar
 import com.nlhd.core.utils.contentPrice
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -63,7 +47,8 @@ import com.nlhd.core.utils.contentPrice
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = koinViewModel(),
-    onLoginSuccess: (String) -> Unit
+    onLoginSuccess: (String) -> Unit,
+    onSignUp: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -180,6 +165,7 @@ fun LoginScreen(
                     ))
                 }
                 LoginState.Loading -> {
+                    Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
                     Box(modifier = Modifier
                         .fillMaxWidth(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
@@ -212,11 +198,21 @@ fun LoginScreen(
                 ),
                 )
                 Spacer(modifier = Modifier.width(AppTheme.dimens.small))
-                Text("Đăng ký", style = AppTheme.typography.labelMedium.copy(
-                    fontFamily = Font.fontFamily,
-                    fontWeight = FontWeight.Bold,
-                    color = contentPrice
-                ))
+                Text(
+                    "Đăng ký",
+                    style = AppTheme.typography.labelMedium.copy(
+                        fontFamily = Font.fontFamily,
+                        fontWeight = FontWeight.Bold,
+                        color = contentPrice
+                    ),
+                    modifier = Modifier.pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                onSignUp()
+                            }
+                        )
+                    }
+                )
             }
         }
     }

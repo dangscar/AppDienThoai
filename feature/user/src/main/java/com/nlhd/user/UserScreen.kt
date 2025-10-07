@@ -1,26 +1,17 @@
 package com.nlhd.user
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import com.nlhd.domain.entity.profile.User
 import com.nlhd.keystore.KeyStoreManager
+import com.nlhd.user.Login.LoginScreen
+import com.nlhd.user.SignUp.SignUpScreen
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
@@ -31,7 +22,7 @@ object LoginScreen
 object ProfileScreen
 
 @Serializable
-object Admin
+object SignUpScreen
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
@@ -58,17 +49,20 @@ fun UserScreen(
 
     NavHost(
         navController = navController,
-        startDestination = if (state.value is UserState.Success) ProfileScreen else LoginScreen
+        startDestination = if (state.value is UserState.Success) ProfileScreen else LoginScreen //
     ) {
         composable<LoginScreen> {
             LoginScreen(
-                onLoginSuccess = { role->
+                onLoginSuccess = { role ->
                     if (role == "admin") {
                         onNavigateAdmin()
                     } else {
                         navController.navigate(ProfileScreen)
                     }
 
+                },
+                onSignUp = {
+                    navController.navigate(SignUpScreen)
                 }
             )
         }
@@ -85,5 +79,19 @@ fun UserScreen(
                 onClickMyVideo = onClickMyVideo
             )
         }
+
+        composable<SignUpScreen> {
+            SignUpScreen(
+                onSignUpSuccess = {
+                    navController.navigate(ProfileScreen) {
+                        popUpTo(LoginScreen) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
     }
 }

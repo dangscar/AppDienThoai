@@ -12,6 +12,7 @@ import com.nlhd.domain.usecase.authentication.Login
 import com.nlhd.domain.usecase.authentication.Logout
 import com.nlhd.domain.usecase.authentication.Profile
 import com.nlhd.domain.usecase.authentication.ProfileAdmin
+import com.nlhd.domain.usecase.authentication.SignUp
 import com.nlhd.domain.usecase.authentication.UpdateProfile
 import com.nlhd.domain.usecase.authentication.UploadAvatar
 import com.nlhd.domain.usecase.cart.AddCart
@@ -78,7 +79,8 @@ val domainModule = module {
             logout = Logout(get()),
             profileAdmin = ProfileAdmin(get()),
             updateProfile = UpdateProfile(get()),
-            uploadAvatar = UploadAvatar(get())
+            uploadAvatar = UploadAvatar(get()),
+            signUp = SignUp(get())
         )
     }
 

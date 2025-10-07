@@ -11,12 +11,16 @@ import com.nlhd.data.model.logout.LogoutResponseDto
 import com.nlhd.data.model.profile.ProfileResponseDto
 import com.nlhd.data.model.profile.UpdateProfileRequestDto
 import com.nlhd.data.model.profile.UpdateProfileResponseDto
+import com.nlhd.data.model.signup.SignUpRequestDto
+import com.nlhd.data.model.signup.SignUpResponseDto
 import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.login.LoginResponse
 import com.nlhd.domain.entity.logout.LogoutResponse
 import com.nlhd.domain.entity.profile.ProfileResponse
 import com.nlhd.domain.entity.profile.UpdateProfileReponse
 import com.nlhd.domain.entity.profile.UpdateProfileRequest
+import com.nlhd.domain.entity.signup.SignUpRequest
+import com.nlhd.domain.entity.signup.SignUpResponse
 import com.nlhd.domain.repository.AuthenticationRepository
 import com.nlhd.domain.resultWrapper.ResultWrapper
 import io.ktor.client.HttpClient
@@ -163,6 +167,28 @@ class AuthenticationRepositoryImp(
         }
 
 
+    }
+
+    override suspend fun signUp(signUpRequest: SignUpRequest): ResultWrapper<SignUpResponse> {
+        return try {
+            val responseDto = ktor.post(Utils.BASE_URL+"/api/register") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    SignUpRequestDto(
+                        email = signUpRequest.email,
+                        name = signUpRequest.name,
+                        password = signUpRequest.password,
+                        password_confirmation = signUpRequest.passwordConfirmation
+                    )
+                )
+            }.body<SignUpResponseDto>()
+
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+
+        }
     }
 
 
