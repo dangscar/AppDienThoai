@@ -18,7 +18,7 @@ fun ManageCategoryScreen(modifier: Modifier = Modifier) {
                 .padding(innerPadding),
         ) {
             Text(
-                "Danh mục",
+                "Danh mục123",
                 style = AppTheme.typography.titleMedium,
                 modifier = Modifier.padding(AppTheme.dimens.small2)
             )
