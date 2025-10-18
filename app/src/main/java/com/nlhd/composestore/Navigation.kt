@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -450,6 +451,7 @@ fun CustomerScreen(
     activity: Activity
 ) {
     val navController = rememberNavController()
+    val softwareKeyboardController = LocalSoftwareKeyboardController.current
     NavHost(
         startDestination = General,
         navController = navController,
@@ -582,6 +584,7 @@ fun CustomerScreen(
             SearchScreen(
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
+                        softwareKeyboardController?.hide()
                         navController.popBackStack()
                     }
                 },
@@ -865,6 +868,7 @@ fun CustomerScreen(
             SearchScreen(
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
+                        softwareKeyboardController?.hide()
                         navController.popBackStack()
                     }
                 },

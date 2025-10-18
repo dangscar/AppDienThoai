@@ -164,7 +164,7 @@ fun ContentCommon(
     val context = LocalContext.current
     val activity = LocalContext.current as ComponentActivity
     val keyboardController = LocalSoftwareKeyboardController.current
-    val contentCommonViewModel: ContentCommonViewModel = koinViewModel()
+    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(key = pageF)
     val widthScreen = LocalConfiguration.current.screenWidthDp.dp/2
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val angle by infiniteTransition.animateFloat(
@@ -403,13 +403,19 @@ fun ContentCommon(
                             value = currentPosition,
                             enabled = !isScrolling,
                             onValueChange = {
-                                exoPlayer.playWhenReady = false
-                                videoViewModel.onValueChange(it)
-                                exoPlayer.seekTo(it.toLong())
+                                if (isPlaying) {
+                                    exoPlayer.playWhenReady = false
+                                    videoViewModel.onValueChange(it)
+                                    exoPlayer.seekTo(it.toLong())
+                                }
+
                             },
                             onValueChangeFinished = {
-                                exoPlayer.playWhenReady = true
-                                videoViewModel.onValueFinish()
+                                if (isPlaying) {
+                                    exoPlayer.playWhenReady = true
+                                    videoViewModel.onValueFinish()
+                                }
+
                             },
                             modifier = Modifier
                                 .graphicsLayer {
@@ -728,6 +734,7 @@ fun ContentCommon(
                                     sheetState.hide()
                                     videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
                                 }
+
                             },
                         ) {
                             BottomSheetComment(

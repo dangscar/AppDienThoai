@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.nlhd.domain.entity.manageCategory.CategoryResponse
 import com.nlhd.domain.entity.product.Product
+import com.nlhd.domain.resultWrapper.ResultWrapper
+import com.nlhd.domain.usecase.manageCategory.ManageCategoryUseCase
 import com.nlhd.domain.usecase.product.ProductUseCase
 import com.nlhd.keystore.HistorySearchManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,7 +26,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val productUseCase: ProductUseCase
+    private val productUseCase: ProductUseCase,
+    private val manageCategoryUseCase: ManageCategoryUseCase
 ): ViewModel() {
 
     private var _query = MutableStateFlow("")
@@ -37,6 +41,28 @@ class SearchViewModel(
         .cachedIn(viewModelScope)
         .debounce(500)
         .distinctUntilChanged()
+
+    private var _categorySearchState = MutableStateFlow<CategorySearchState>(CategorySearchState.Loading)
+    val categorySearchState = _categorySearchState.asStateFlow()
+
+    fun getCategory() = viewModelScope.launch {
+        _categorySearchState.value = CategorySearchState.Loading
+        manageCategoryUseCase.getCategory().let { result ->
+            when(result) {
+                is ResultWrapper.Failure -> {
+                    _categorySearchState.update { CategorySearchState.Error(result.exception.message.toString()) }
+                }
+                is ResultWrapper.Success<*> -> {
+                    _categorySearchState.update { CategorySearchState.Success(result.value as CategoryResponse) }
+                }
+            }
+        }
+
+    }
+
+    init {
+        getCategory()
+    }
 
     fun onSearchClick() {
         viewModelScope.launch {
@@ -64,4 +90,10 @@ class SearchViewModel(
     fun clearHistory(context: Context) = viewModelScope.launch {
         HistorySearchManager.clearHistory(context)
     }
+}
+
+sealed class CategorySearchState {
+    object Loading: CategorySearchState()
+    data class Success(val data: CategoryResponse): CategorySearchState()
+    data class Error(val message: String): CategorySearchState()
 }

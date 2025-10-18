@@ -118,9 +118,9 @@ class EditProductViewModel(
 
         }
     }
-    fun getCategory(token: String) {
+    fun getCategory() {
         viewModelScope.launch {
-            manageCategoryUseCase.getCategory(token).let { result ->
+            manageCategoryUseCase.getCategory().let { result ->
                 when (result) {
                     is ResultWrapper.Failure -> {
                         _manageCategoryState.update { ManageCategoryState.Error(result.exception.message.toString()) }

@@ -16,5 +16,6 @@ data class ShortVideoUseCase(
     val getVideosFavorite: GetFavoriteVideos,
     val getMyVideos: GetMyVideos,
     val deleteVideo: DeleteVideo,
-    val updateCaption: UpdateCaption
+    val updateCaption: UpdateCaption,
+    val getFollowingVideos: GetFollowingVideos
 )

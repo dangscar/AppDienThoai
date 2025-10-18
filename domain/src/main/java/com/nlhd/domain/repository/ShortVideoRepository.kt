@@ -27,4 +27,5 @@ interface ShortVideoRepository {
     fun getMyVideos(token: String, search: String): Flow<PagingData<Video>>
     suspend fun deleteVideo(token: String, videoId: Int): ResultWrapper<MessageResponse>
     suspend fun updateCaptionVideo(token: String, videoId: Int, caption: String?): ResultWrapper<MessageResponse>
+    fun getFollowingVideos(token: String): Flow<PagingData<Video>>
 }

@@ -16,10 +16,9 @@ import io.ktor.http.contentType
 class ManageCategoryRepositoryImp(
     private val ktor: HttpClient
 ): ManageCategoryRepository {
-    override suspend fun getCategory(token: String): ResultWrapper<CategoryResponse> {
+    override suspend fun getCategory(): ResultWrapper<CategoryResponse> {
         return try {
             val response = ktor.get(Utils.BASE_URL+"/api/category") {
-                header("Authorization", "Bearer $token")
                 contentType(ContentType.Application.Json)
             }.body<CategoryResponseDto>()
             val responseDomain = response.toDomain(response)

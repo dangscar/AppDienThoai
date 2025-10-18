@@ -22,6 +22,7 @@ class ShortVideoViewModel(
 ): ViewModel() {
 
     private val tokenFlow = MutableStateFlow<String?>(null)
+    private val followingTokenFlow = MutableStateFlow<String?>(null)
     private var _isHidden = MutableStateFlow(false)
     val isHidden = _isHidden.asStateFlow()
 
@@ -31,6 +32,10 @@ class ShortVideoViewModel(
         // tránh rebuild khi token không đổi
         if (tokenFlow.value != token) tokenFlow.value = token
     }
+    fun setFollowingToken(token: String) {
+        // tránh rebuild khi token không đổi
+        if (followingTokenFlow.value != token) followingTokenFlow.value = token
+    }
     @OptIn(ExperimentalCoroutinesApi::class)
     val videosFlow: Flow<PagingData<Video>> =
         tokenFlow
@@ -38,6 +43,16 @@ class ShortVideoViewModel(
             .distinctUntilChanged()
             .flatMapLatest { t ->
                 shortVideoUseCase.getVideos.invoke(t) // trả về Flow<PagingData<Video>>
+            }
+            .cachedIn(viewModelScope)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val followingVideosFlow: Flow<PagingData<Video>> =
+        followingTokenFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .flatMapLatest { t ->
+                shortVideoUseCase.getFollowingVideos(t) // trả về Flow<PagingData<Video>>
             }
             .cachedIn(viewModelScope)
 

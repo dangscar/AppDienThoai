@@ -95,7 +95,7 @@ fun EditProductScreen(
 
     LaunchedEffect(keyStore.value) {
         if (keyStore.value.isNotEmpty()) {
-            viewModel.getCategory(keyStore.value)
+            viewModel.getCategory()
         }
     }
 

@@ -1,5 +1,9 @@
 package com.nlhd.search
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ContextualFlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +16,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -25,12 +32,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlhd.core.theme.AppTheme
+import com.nlhd.core.utils.contentPrice
 import com.nlhd.search.components.HistorySearchCard
 import com.nlhd.search.components.SearchTopBar
 import org.koin.androidx.compose.koinViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel(),
@@ -40,6 +48,7 @@ fun SearchScreen(
     val context = LocalContext.current
     val query = viewModel.query.collectAsStateWithLifecycle()
     val histories = viewModel.getHistory(context).collectAsStateWithLifecycle(initialValue = emptyList())
+    val categories by viewModel.categorySearchState.collectAsStateWithLifecycle()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -74,27 +83,96 @@ fun SearchScreen(
                 )
             }
 
+            when (categories) {
+                is CategorySearchState.Error -> {
+                    item {
+                        Box(modifier = Modifier
+                            .fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Text((categories as CategorySearchState.Error).message, style = AppTheme.typography.titleMedium)
+                        }
+                    }
+                }
+                CategorySearchState.Loading -> {
+                    item {
+                        Box(modifier = Modifier
+                            .fillMaxWidth(),
+                            contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(
+                                color = contentPrice
+                            )
+                        }
+                    }
+                }
+                is CategorySearchState.Success -> {
+                    val categories = (categories as CategorySearchState.Success).data.categories
+                    item {
+                        Text(
+                            "Danh mục",
+                            style = AppTheme.typography.titleMedium,
+                            modifier = Modifier.padding(AppTheme.dimens.small2)
+                        )
+                    }
+
+                    item {
+                        ContextualFlowRow(
+                            itemCount = categories.size,
+                            horizontalArrangement = Arrangement.Start,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { index->
+                            val category = categories[index]
+                            Card(
+                                onClick = {
+                                    onClickSearchSuccess(category.name)
+                                },
+                                modifier = Modifier.fillMaxWidth(fraction = 0.5f).padding(AppTheme.dimens.small),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                elevation = CardDefaults.cardElevation(defaultElevation = AppTheme.dimens.small),
+                                shape = RoundedCornerShape(AppTheme.dimens.small)
+                            ) {
+                                Text(
+                                    category.name,
+                                    style = AppTheme.typography.headlineLarge.copy(
+                                        color = Color.Black,
+                                        fontWeight = FontWeight.SemiBold
+                                    ),
+                                    modifier = Modifier.padding(vertical = AppTheme.dimens.medium3, horizontal = AppTheme.dimens.medium)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Preview
 @Composable
 private fun TestComp() {
-    Card(
-        onClick = {},
-        modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small2),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = AppTheme.dimens.small2),
-        shape = RoundedCornerShape(AppTheme.dimens.small)
+    ContextualFlowRow(
+        itemCount = 4,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Text(
-            "Apple",
-            style = AppTheme.typography.headlineLarge.copy(
-                color = Color.Black,
-                fontWeight = FontWeight.SemiBold
-            ),
-            modifier = Modifier.padding(vertical = AppTheme.dimens.medium3, horizontal = AppTheme.dimens.medium)
-        )
+        Card(
+            onClick = {},
+            modifier = Modifier.fillMaxWidth(fraction = 0.5f).padding(AppTheme.dimens.small2),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = AppTheme.dimens.small2),
+            shape = RoundedCornerShape(AppTheme.dimens.small)
+        ) {
+            Text(
+                "Samsung",
+                style = AppTheme.typography.headlineLarge.copy(
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                modifier = Modifier.padding(vertical = AppTheme.dimens.medium3, horizontal = AppTheme.dimens.medium)
+            )
+        }
     }
+
 }

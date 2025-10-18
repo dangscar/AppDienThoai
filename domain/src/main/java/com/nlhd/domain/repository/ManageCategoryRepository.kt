@@ -4,5 +4,5 @@ import com.nlhd.domain.entity.manageCategory.CategoryResponse
 import com.nlhd.domain.resultWrapper.ResultWrapper
 
 interface ManageCategoryRepository {
-    suspend fun getCategory(token: String): ResultWrapper<CategoryResponse>
+    suspend fun getCategory(): ResultWrapper<CategoryResponse>
 }

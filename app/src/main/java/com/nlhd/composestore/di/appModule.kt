@@ -66,7 +66,8 @@ val appModule = module {
     viewModel { AddressViewModel(get()) }
 
     viewModel { SearchViewModel(
-        productUseCase = get()
+        productUseCase = get(),
+        manageCategoryUseCase = get()
     ) }
 
     viewModel {

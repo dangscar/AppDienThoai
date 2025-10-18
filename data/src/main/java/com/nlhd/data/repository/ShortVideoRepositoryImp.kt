@@ -15,6 +15,7 @@ import com.nlhd.data.model.shortVideo.ProfileShortVideo.Info.InfoProfileResponse
 import com.nlhd.data.model.shortVideo.UpdateCaptionVideo.UpdateCaptionRequest
 import com.nlhd.data.remote.GetCommentsPagingSource
 import com.nlhd.data.remote.GetFavoriteVideosPagingSource
+import com.nlhd.data.remote.GetFollowingVideosPagingSource
 import com.nlhd.data.remote.GetLikedVideosPagingSource
 import com.nlhd.data.remote.GetMyVideoPagingSource
 import com.nlhd.data.remote.GetVideoByUserPagingSource
@@ -359,5 +360,17 @@ class ShortVideoRepositoryImp(
         } catch (e: Exception) {
             ResultWrapper.Failure(e)
         }
+    }
+
+    override fun getFollowingVideos(token: String): Flow<PagingData<Video>> {
+        return Pager(
+            config = PagingConfig(pageSize = 15, prefetchDistance = 5),
+            pagingSourceFactory = {
+                GetFollowingVideosPagingSource(
+                    ktor = ktor,
+                    token = token
+                )
+            }
+        ).flow
     }
 }
