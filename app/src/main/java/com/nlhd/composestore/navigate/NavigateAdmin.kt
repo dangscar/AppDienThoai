@@ -24,3 +24,5 @@ data class LoadVersionProduct(
 data class AddVersionProduct(
     val productId: Int
 )
+@Serializable
+object ManageCategory

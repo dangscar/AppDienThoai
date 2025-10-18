@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +48,7 @@ import com.nlhd.address.AddressScreen
 import com.nlhd.address.EditAddressScreen
 import com.nlhd.admin.AdminProfileScreen
 import com.nlhd.cart.CartScreen
+import com.nlhd.category.ManageCategoryScreen
 import com.nlhd.checkout.CheckoutScreen
 import com.nlhd.checkout.CheckoutSuccessScreen
 import com.nlhd.composestore.navigate.AddProduct
@@ -57,6 +59,7 @@ import com.nlhd.composestore.navigate.EditProduct
 import com.nlhd.composestore.navigate.EditProfile
 import com.nlhd.composestore.navigate.LoadProduct
 import com.nlhd.composestore.navigate.LoadVersionProduct
+import com.nlhd.composestore.navigate.ManageCategory
 import com.nlhd.composestore.navigate.ProfileShortVideo
 import com.nlhd.composestore.navigate.Search
 import com.nlhd.composestore.navigate.SearchShortSuccess
@@ -286,7 +289,7 @@ fun AdminScreen(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = Dashboard
+        startDestination = ManageCategory
     ) {
         composable<Dashboard> {
             Dashboard(
@@ -388,6 +391,9 @@ fun AdminScreen(
                     }
                 }
             )
+        }
+        composable<ManageCategory>{
+            ManageCategoryScreen()
         }
     }
 }
