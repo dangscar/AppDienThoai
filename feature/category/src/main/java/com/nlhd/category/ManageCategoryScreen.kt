@@ -44,7 +44,6 @@ data class Category(
     val productCount: Int, // Số lượng sản phẩm trong danh mục
     val color: Color // Màu sắc tượng trưng cho danh mục
 )
-
 // --- 2. VIEW MODEL (Data Provider) ---
 class CategoryViewModel {
     private val mockCategories = listOf(
