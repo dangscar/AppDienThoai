@@ -289,7 +289,7 @@ fun AdminScreen(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = ManageCategory
+        startDestination = Dashboard
     ) {
         composable<Dashboard> {
             Dashboard(
