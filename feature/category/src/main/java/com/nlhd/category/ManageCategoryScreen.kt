@@ -29,15 +29,23 @@ import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+
+// --- 1. DATA MODEL & LOADING STATE ---
+
+// Loading state enumeration
 enum class LoadingState {
     LOADING, SUCCESS, ERROR
 }
+
+// Data class defines a product Category
 data class Category(
     val id: Int,
-    val name: String,
-    val productCount: Int,
-    val color: Color
+    val name: String, // Tên danh mục (ví dụ: Apple iPhone)
+    val productCount: Int, // Số lượng sản phẩm trong danh mục
+    val color: Color // Màu sắc tượng trưng cho danh mục
 )
+
+// --- 2. VIEW MODEL (Data Provider) ---
 class CategoryViewModel {
     private val mockCategories = listOf(
         Category(1, "Apple iPhone", 152, Color(0xFFE8F5E9)),
@@ -53,26 +61,36 @@ class CategoryViewModel {
 
     private val _loadingState = MutableStateFlow(LoadingState.LOADING)
     val loadingState: StateFlow<LoadingState> = _loadingState
+
+    // Simulated data loading function (replace with actual API call later)
     suspend fun loadCategories() {
         _loadingState.update { LoadingState.LOADING }
-        delay(1500)
-        if (Math.random() > 0.1) {
+        delay(1500) // Simulate network delay
+
+        // Simulate success/error response
+        if (Math.random() > 0.1) { // 90% chance of success
             _categories.update { mockCategories }
             _loadingState.update { LoadingState.SUCCESS }
-        } else {
+        } else { // 10% chance of failure (simulates network timeout/error)
             _loadingState.update { LoadingState.ERROR }
         }
     }
 }
+
+// Mock ViewModel for Preview
 val mockViewModel = CategoryViewModel()
+
+
+// --- 3. MAIN UI (Composable Screen) ---
+// Add @OptIn to suppress the Experimental Material3 API warning
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier: Modifier = Modifier) {
-
+    // Fetch data and state
     val categories by viewModel.categories.collectAsState()
     val state by viewModel.loadingState.collectAsState()
 
-
+    // Trigger data loading when the screen is first composed
     LaunchedEffect(Unit) {
         viewModel.loadCategories()
     }
@@ -101,7 +119,7 @@ fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier:
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(innerPadding)
-                .background(Color(0xFFF5F5F5)),
+                .background(Color(0xFFF5F5F5)), // Light background color
         ) {
             Text(
                 "Danh sách các danh mục sản phẩm",
@@ -109,8 +127,11 @@ fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier:
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
             )
+
+            // Conditional rendering based on loading state
             when (state) {
                 LoadingState.LOADING -> {
+                    // Show a progress indicator while loading
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -119,6 +140,7 @@ fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier:
                     }
                 }
                 LoadingState.ERROR -> {
+                    // Show an error message and a retry button
                     ErrorView(
                         message = "Lỗi tải dữ liệu. Hãy kiểm tra kết nối mạng của bạn và IP server.",
                         onRetry = {
@@ -127,6 +149,7 @@ fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier:
                     )
                 }
                 LoadingState.SUCCESS -> {
+                    // LazyColumn to display the list of categories
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -134,6 +157,7 @@ fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier:
                     ) {
                         items(categories) { category ->
                             CategoryManagementItem(category = category) {
+                                // Handle event when user taps on the category (e.g., Edit)
                                 println("User wants to edit category: ${category.name}")
                             }
                         }
@@ -143,9 +167,11 @@ fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier:
         }
     }
 }
+
+// Composable for displaying connection error
 @Composable
 fun ErrorView(message: String, onRetry: suspend () -> Unit) {
-    val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope() // Lấy CoroutineScope
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -161,7 +187,7 @@ fun ErrorView(message: String, onRetry: suspend () -> Unit) {
         )
         Button(
             onClick = {
-
+                // Khởi chạy Coroutine để gọi hàm suspend
                 scope.launch {
                     onRetry()
                 }
@@ -172,6 +198,9 @@ fun ErrorView(message: String, onRetry: suspend () -> Unit) {
     }
 }
 
+// --- 4. CATEGORY ITEM DISPLAY COMPONENT ---
+// Add @OptIn to suppress the Experimental Material3 API warning
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryManagementItem(category: Category, onClick: () -> Unit) {
     Card(
@@ -191,7 +220,7 @@ fun CategoryManagementItem(category: Category, onClick: () -> Unit) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
+            // Symbolic color box/square
             Box(
                 modifier = Modifier
                     .size(56.dp)
@@ -209,7 +238,7 @@ fun CategoryManagementItem(category: Category, onClick: () -> Unit) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-
+            // Category details (Name and product count)
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -226,8 +255,9 @@ fun CategoryManagementItem(category: Category, onClick: () -> Unit) {
                 )
             }
 
-
+            // Arrow icon indicating edit action
             Icon(
+                // Icons.Filled.ArrowForward is used instead of Icons.Filled.ArrowForwardIos
                 imageVector = Icons.Filled.ArrowForward,
                 contentDescription = "Edit arrow",
                 modifier = Modifier.size(20.dp),
@@ -237,6 +267,7 @@ fun CategoryManagementItem(category: Category, onClick: () -> Unit) {
     }
 }
 
+// --- 5. PREVIEW ---
 @Preview(showBackground = true)
 @Composable
 fun PreviewManageCategoryScreen() {
