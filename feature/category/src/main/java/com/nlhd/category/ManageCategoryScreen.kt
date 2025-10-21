@@ -94,7 +94,6 @@ fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier:
     LaunchedEffect(Unit) {
         viewModel.loadCategories()
     }
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
