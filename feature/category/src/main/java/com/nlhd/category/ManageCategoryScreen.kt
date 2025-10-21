@@ -143,8 +143,6 @@ fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier:
         }
     }
 }
-
-// Composable for displaying connection error
 @Composable
 fun ErrorView(message: String, onRetry: suspend () -> Unit) {
     val scope = rememberCoroutineScope()
