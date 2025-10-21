@@ -54,7 +54,6 @@ class CategoryViewModel {
         Category(5, "Vivo", 40, Color(0xFFF3E5F5)),
         Category(6, "Laptop & Tablet", 85, Color(0xFFECEFF1))
     )
-
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories
 
