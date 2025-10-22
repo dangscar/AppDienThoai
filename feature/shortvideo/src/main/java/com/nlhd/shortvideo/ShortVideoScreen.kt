@@ -45,10 +45,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.keystore.KeyStoreManager
@@ -96,6 +101,7 @@ fun ShortVideoScreen(
     }
     val scope = rememberCoroutineScope()
 
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Black,
@@ -180,6 +186,16 @@ fun ShortVideoScreen(
                 }
             }
             LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LottieAnimation(
+                        composition,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.size(AppTheme.dimens.large)
+                    )
+                }
 
             }
             is LoadState.NotLoading -> {
@@ -258,7 +274,7 @@ fun ShortVideoScreen(
                                     contentDescription = null,
                                     tint = Color.White,
                                     modifier = Modifier
-                                        .size(AppTheme.dimens.medium)
+                                        .size(AppTheme.dimens.iconBottomBar)
                                         .pointerInput(Unit) {
                                             detectTapGestures(onTap = {
                                                 onClickSearch()

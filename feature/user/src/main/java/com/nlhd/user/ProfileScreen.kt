@@ -61,7 +61,6 @@ import com.nlhd.user.components.CardInfo
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -156,11 +155,9 @@ fun ProfileScreen(
                             ) {
                                 Text(profileResponse.user.name, style = AppTheme.typography.headlineLarge.copy(
                                     fontWeight = FontWeight.ExtraBold,
-                                    fontFamily = Font.fontFamily
                                 ))
                                 Text(profileResponse.user.email, style = AppTheme.typography.bodyMedium.copy(
                                     fontWeight = FontWeight.ExtraLight,
-                                    fontFamily = Font.fontFamily,
                                     color = Color.Gray
                                 ),
                                     textAlign = TextAlign.Center

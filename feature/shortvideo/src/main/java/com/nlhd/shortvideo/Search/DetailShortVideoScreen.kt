@@ -1,26 +1,41 @@
 package com.nlhd.shortvideo.Search
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +51,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -47,6 +64,7 @@ import com.nlhd.core.theme.AppTheme
 import com.nlhd.domain.entity.shortVideo.GetVideos.Video
 import com.nlhd.keystore.KeyStoreManager
 import com.nlhd.shortvideo.ContentCommon
+import com.nlhd.shortvideo.components.InputText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,9 +106,10 @@ fun TopBarDetailVideoScreen(
                     .fillMaxWidth()
                     .border(
                         AppTheme.dimens.border,
-                        Color.White,
+                        Color(0x57FFFFFF),
                         RoundedCornerShape(AppTheme.dimens.small2)
-                    ).padding(AppTheme.dimens.small)
+                    )
+                    .padding(AppTheme.dimens.small)
                 ,
                 singleLine = true,
                 textStyle = TextStyle(color = Color.White),
@@ -116,7 +135,8 @@ fun TopBarDetailVideoScreen(
                                     top.linkTo(parent.top)
                                     bottom.linkTo(parent.bottom)
                                     end.linkTo(text.start)
-                                }.padding(AppTheme.dimens.paddingAdd),
+                                }
+                                .padding(AppTheme.dimens.paddingAdd),
                             tint = Color.White
                         )
 
@@ -132,7 +152,7 @@ fun TopBarDetailVideoScreen(
                                     top.linkTo(parent.top)
                                     bottom.linkTo(parent.bottom)
                                     end.linkTo(line.start)
-                                    width =Dimension.fillToConstraints
+                                    width = Dimension.fillToConstraints
                                 }
                                 .padding(
                                     end = AppTheme.dimens.small2,
@@ -161,7 +181,7 @@ fun TopBarDetailVideoScreen(
                         )
 
                         Text(
-                            "Search",
+                            "Tìm kiếm",
                             color = Color.White,
                             style = AppTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                             maxLines = 1,
@@ -199,6 +219,7 @@ fun TopBarDetailVideoScreen(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailShortVideoScreen (
     isTopBar: Boolean = true,
@@ -220,9 +241,53 @@ fun DetailShortVideoScreen (
     var isHidden by remember {
         mutableStateOf(false)
     }
+    var viewer by remember {
+        mutableStateOf("0")
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Black,
+        bottomBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.Black),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = Color(0xFF484646))
+                        .height(AppTheme.dimens.border)
+                )
+                Spacer(modifier = Modifier.height(AppTheme.dimens.border*2))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.medium),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Lượt xem: $viewer",
+                        style = AppTheme.typography.labelMedium.copy(
+                            color = Color.White,
+                            fontWeight = FontWeight.Normal
+                        ),
+                        modifier = Modifier,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.width(AppTheme.dimens.border))
+                    Icon(
+                        imageVector = Icons.Outlined.PlayArrow,
+                        contentDescription = null,
+                        modifier = Modifier.size(AppTheme.dimens.small3),
+                        tint = Color.White
+                    )
+                }
+
+            }
+        }
     ) { innerPadding ->
         if (!isHidden) {
             TopBarDetailVideoScreen(
@@ -251,7 +316,38 @@ fun DetailShortVideoScreen (
             },
             onClickSeeProduct = onClickSeeProduct,
             onClickProfile = onClickProfile,
+            onViewer = {
+                viewer = it
+            }
         )
 
+
+    }
+}
+
+@Preview
+@Composable
+private fun TestApp() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Color.Black)
+
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color(0xFF484646))
+                .height(AppTheme.dimens.border)
+        )
+        Spacer(modifier = Modifier.height(AppTheme.dimens.border*2))
+        Text(
+            "Lượt xem: 32.1k",
+            style = AppTheme.typography.labelMedium.copy(
+                color = Color.White,
+                fontWeight = FontWeight.Normal
+            ),
+            modifier = Modifier.padding(AppTheme.dimens.small3)
+        )
     }
 }

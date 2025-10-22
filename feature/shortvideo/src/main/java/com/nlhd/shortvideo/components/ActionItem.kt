@@ -30,26 +30,19 @@ fun ActionItem(
     color: Color = Color.White,
     isScrolling: Boolean,
     modifierIcon: Modifier = Modifier,
-    modifierSpacer: Modifier = Modifier,
+    clicked: Boolean,
+    scale: Float,
+    onScale: (Boolean) -> Unit,
     onClick: () -> Unit,
 ) {
-    var clicked by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (clicked) 0.85f else 1f,
-        animationSpec = tween(durationMillis = 150),
-        label = "scaleAnim",
-        finishedListener = {
-            if (clicked) {
-                clicked = false
-            }
-        }
-    )
+
+
     Column(
         modifier = Modifier
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     if (!isScrolling) {
-                        clicked = true
+                        onScale(true)
                         onClick()
                     }
                 })

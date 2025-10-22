@@ -70,7 +70,6 @@ import com.nlhd.user.components.InputNumber
 import com.nlhd.user.components.InputText
 import org.koin.androidx.compose.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
@@ -136,7 +135,6 @@ fun EditProfileScreen(
                     "By clicking Save, you acknowledge that you have read the Privacy Policy",
                     style = AppTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Normal,
-                        fontFamily = Font.fontFamily,
                         color = Color.Black
                     ),
                     overflow = TextOverflow.Ellipsis,

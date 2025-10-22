@@ -35,7 +35,6 @@ import com.nlhd.core.utils.colorDivide
 import com.nlhd.core.utils.containerTopBar
 import java.text.NumberFormat
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CardPaymentMethod(
     title: String,
@@ -76,7 +75,6 @@ fun CardPaymentMethod(
                     }
                     Text(title, style = AppTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Light,
-                        fontFamily = Font.fontFamily,
                         textAlign = TextAlign.Center,
                         color = Color.Black
                     ),

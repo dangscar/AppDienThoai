@@ -25,7 +25,6 @@ import com.nlhd.core.utils.Font
 import com.nlhd.core.utils.colorDivide
 import java.text.NumberFormat
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CardOrderSummary(
     title: String,
@@ -61,7 +60,6 @@ fun CardOrderSummary(
             ) {
                 Text("Số lượng sản phẩm:", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -69,7 +67,6 @@ fun CardOrderSummary(
                 )
                 Text("$quantity sản phẩm", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -84,7 +81,6 @@ fun CardOrderSummary(
             ) {
                 Text("Ngày đặt hàng:", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -92,7 +88,6 @@ fun CardOrderSummary(
                 )
                 Text(date, style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -108,7 +103,6 @@ fun CardOrderSummary(
             ) {
                 Text("Tổng số tiền cần thanh toán:", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -117,7 +111,6 @@ fun CardOrderSummary(
                 val priceFormat = NumberFormat.getNumberInstance().format(totalAmount)
                 Text("${priceFormat}đ", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),

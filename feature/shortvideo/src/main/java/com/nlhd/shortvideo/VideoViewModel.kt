@@ -1,5 +1,6 @@
 package com.nlhd.shortvideo
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,9 +38,6 @@ class VideoViewModel(
     private val _duration = MutableStateFlow(0f)
     val duration = _duration.asStateFlow()
 
-    private val _imageStatus = MutableStateFlow(ImageStatus())
-    val imageStatus = _imageStatus.asStateFlow()
-
     private var _stateFollow = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
     val stateFollow = _stateFollow.asStateFlow()
 
@@ -62,6 +60,26 @@ class VideoViewModel(
 
     private var _aspectRatio = MutableStateFlow<Float>(9f/16f)
     val aspectRatio = _aspectRatio.asStateFlow()
+
+    private var _getFollowUserState = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
+    val getFollowUserState = _getFollowUserState.asStateFlow()
+
+    fun setFollowUserState(state: ShortVideoState) {
+        _getFollowUserState.update { state }
+    }
+    fun getFollowUser(token: String, userId: String) = viewModelScope.launch {
+        shortVideoUseCase.getFollowUser.invoke(token, userId).let { result ->
+            when (result) {
+                is ResultWrapper.Failure -> {
+                    _getFollowUserState.update { ShortVideoState.Error(result.exception.message.toString()) }
+                }
+                is ResultWrapper.Success<*> -> {
+                    _getFollowUserState.update { ShortVideoState.Success(result.value as MessageResponse) }
+                    Log.d("TAG", "getFollowUser: ${(result.value as MessageResponse).message}")
+                }
+            }
+        }
+    }
 
     fun setAspectRatio(width: Int, height: Int) { _aspectRatio.update { width.toFloat()/height.toFloat() } }
 
@@ -101,6 +119,9 @@ class VideoViewModel(
 
     fun setLike(like : Color) = _actionButton.update { it.copy(like = like) }
 
+    fun setFollowState(state: ShortVideoState) {
+        _stateFollow.update { state }
+    }
     fun setFollow(follow: Follow) = _actionButton.update { it.copy(avatar = follow) }
 
     fun favorite(token: String, videoId: String) = viewModelScope.launch {
@@ -112,6 +133,7 @@ class VideoViewModel(
                 is ResultWrapper.Success<*> -> {
                     _stateFavorite.update { ShortVideoState.Success(result.value as MessageResponse) }
                 }
+
             }
         }
     }
@@ -139,12 +161,6 @@ class VideoViewModel(
                     _stateFollow.update { ShortVideoState.Success(result.value as MessageResponse) }
                 }
             }
-        }
-    }
-
-    fun onImageStatus(list: List<String>, index: Int) {
-        _imageStatus.update {
-            it.copy(list = list, selectedIndex = index)
         }
     }
 
@@ -274,7 +290,7 @@ sealed class DisplayText {
 }
 
 data class ActionButton(
-    val avatar: Follow = Follow.UnFollow,
+    val avatar: Follow = Follow.Follow,
     val like: Color = Color.White,
     val comment: ShowHide = ShowHide.Hide,
     val favorite: Color = Color.White,

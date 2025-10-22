@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material3.CircularProgressIndicator
@@ -15,12 +16,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.domain.entity.product.Product
@@ -28,7 +35,6 @@ import com.nlhd.search.components.CardProduct
 import com.nlhd.search.components.SearchTopBar
 import org.koin.androidx.compose.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun SearchSuccessScreen(
     viewModel: SearchViewModel = koinViewModel(),
@@ -39,6 +45,7 @@ fun SearchSuccessScreen(
     viewModel.setQuery(search)
     val query = viewModel.query.collectAsStateWithLifecycle()
     val products = viewModel.products.collectAsLazyPagingItems()
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
     LaunchedEffect(Unit) {
         viewModel.onSearchClick()
     }
@@ -68,11 +75,14 @@ fun SearchSuccessScreen(
                 }
             }
             LoadState.Loading -> {
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        color = contentPrice
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LottieAnimation(
+                        composition,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.size(AppTheme.dimens.large)
                     )
                 }
             }
@@ -98,8 +108,15 @@ fun SearchSuccessScreen(
                     }
                     item {
                         if (products.loadState.append is LoadState.Loading) {
-                            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator()
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                LottieAnimation(
+                                    composition,
+                                    iterations = LottieConstants.IterateForever,
+                                    modifier = Modifier.size(AppTheme.dimens.large)
+                                )
                             }
                         }
 

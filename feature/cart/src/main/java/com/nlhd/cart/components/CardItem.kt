@@ -46,7 +46,6 @@ import com.nlhd.domain.entity.cart.CartItem
 import java.text.NumberFormat
 
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CartItem(
     cartItem: CartItem,
@@ -92,7 +91,6 @@ fun CartItem(
                         .padding(AppTheme.dimens.small2),
                     style = AppTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Normal,
-                        fontFamily = Font.fontFamily,
                         color = Color.Black
                     ),
                     textAlign = TextAlign.Start,
@@ -114,7 +112,6 @@ fun CartItem(
                             "Mua ngay",
                             style = AppTheme.typography.labelSmall.copy(
                                 color = Color(0xFFFD2656),
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.Bold
                             ),
                             modifier = Modifier.padding(
@@ -134,7 +131,6 @@ fun CartItem(
                             "COD",
                             style = AppTheme.typography.labelSmall.copy(
                                 color = Color(0xFFFD2656),
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.Bold
                             ),
                             modifier = Modifier.padding(
@@ -154,7 +150,6 @@ fun CartItem(
                     Text("${priceFormat}đ", maxLines = 1, style = AppTheme.typography.headlineMedium.copy(
                         color = Color(0xFFFD2656),
                         fontWeight = FontWeight.SemiBold),
-                        fontFamily = Font.fontFamily,
                         modifier = Modifier.padding(AppTheme.dimens.small2)
                     )
                     Row(
@@ -176,7 +171,6 @@ fun CartItem(
                         }
                         Text("${cartItem.quantity}", style = AppTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Normal,
-                            fontFamily = Font.fontFamily,
                             textAlign = TextAlign.Center
                         ), maxLines = 1,
                             modifier = Modifier.padding(AppTheme.dimens.small)

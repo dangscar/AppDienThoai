@@ -40,6 +40,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +55,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Font
@@ -64,7 +69,6 @@ import com.nlhd.domain.entity.product.Product
 import com.nlhd.home.component.CardProduct
 import org.koin.androidx.compose.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -78,6 +82,7 @@ fun HomeScreen(
 
     val isRefreshing = products.loadState.refresh is LoadState.Loading
     val refreshState = rememberPullToRefreshState()
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
 
 
     PullToRefreshBox(
@@ -234,9 +239,14 @@ fun HomeScreen(
                     }
                 }
                 LoadState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            color = contentPrice
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LottieAnimation(
+                            composition,
+                            iterations = LottieConstants.IterateForever,
+                            modifier = Modifier.size(AppTheme.dimens.large)
                         )
                     }
                 }
@@ -260,8 +270,15 @@ fun HomeScreen(
                         }
                         item {
                             if (products.loadState.append is LoadState.Loading) {
-                                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                                    CircularProgressIndicator()
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    LottieAnimation(
+                                        composition,
+                                        iterations = LottieConstants.IterateForever,
+                                        modifier = Modifier.size(AppTheme.dimens.large)
+                                    )
                                 }
                             }
 

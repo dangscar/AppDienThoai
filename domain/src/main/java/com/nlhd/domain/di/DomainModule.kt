@@ -50,6 +50,7 @@ import com.nlhd.domain.usecase.shortvideo.Favorites
 import com.nlhd.domain.usecase.shortvideo.Follows
 import com.nlhd.domain.usecase.shortvideo.GetComments
 import com.nlhd.domain.usecase.shortvideo.GetFavoriteVideos
+import com.nlhd.domain.usecase.shortvideo.GetFollowUser
 import com.nlhd.domain.usecase.shortvideo.GetFollowingVideos
 import com.nlhd.domain.usecase.shortvideo.GetInfoProfile
 import com.nlhd.domain.usecase.shortvideo.GetLikedVideos
@@ -165,7 +166,8 @@ val domainModule = module {
             getMyVideos = GetMyVideos(get()),
             deleteVideo = DeleteVideo(get()),
             updateCaption = UpdateCaption(get()),
-            getFollowingVideos = GetFollowingVideos(get())
+            getFollowingVideos = GetFollowingVideos(get()),
+            getFollowUser = GetFollowUser(get())
         )
     }
 

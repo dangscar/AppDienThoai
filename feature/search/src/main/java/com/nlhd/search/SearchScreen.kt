@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -31,6 +32,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.search.components.HistorySearchCard
@@ -49,6 +55,7 @@ fun SearchScreen(
     val query = viewModel.query.collectAsStateWithLifecycle()
     val histories = viewModel.getHistory(context).collectAsStateWithLifecycle(initialValue = emptyList())
     val categories by viewModel.categorySearchState.collectAsStateWithLifecycle()
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -94,11 +101,14 @@ fun SearchScreen(
                 }
                 CategorySearchState.Loading -> {
                     item {
-                        Box(modifier = Modifier
-                            .fillMaxWidth(),
-                            contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
-                                color = contentPrice
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LottieAnimation(
+                                composition,
+                                iterations = LottieConstants.IterateForever,
+                                modifier = Modifier.size(AppTheme.dimens.large)
                             )
                         }
                     }

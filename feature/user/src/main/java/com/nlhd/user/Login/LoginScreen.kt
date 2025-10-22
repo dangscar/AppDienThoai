@@ -41,7 +41,6 @@ import org.koin.androidx.compose.koinViewModel
 import com.nlhd.core.utils.containerTextFieldLogin
 import com.nlhd.core.utils.contentPrice
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -91,7 +90,6 @@ fun LoginScreen(
                 singleLine = true,
                 placeholder = {
                     Text("Email", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.ExtraLight
                     ),
                         modifier = Modifier.fillMaxWidth(),
@@ -116,7 +114,6 @@ fun LoginScreen(
                 singleLine = true,
                 placeholder = {
                     Text("Mật khẩu", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.ExtraLight
                     ),
                         modifier = Modifier.fillMaxWidth(),
@@ -146,7 +143,6 @@ fun LoginScreen(
                 shape = RoundedCornerShape(AppTheme.dimens.small3)
             ) {
                 Text("Tiếp tục", style = AppTheme.typography.labelMedium.copy(
-                    fontFamily = Font.fontFamily,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 ),
@@ -159,7 +155,6 @@ fun LoginScreen(
                 is LoginState.Error -> {
                     Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
                     Text("*Đăng nhập sai thông tin, vui lòng thử lại", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.Normal,
                         color = Color.Red
                     ))
@@ -192,7 +187,6 @@ fun LoginScreen(
 
             Row {
                 Text("Bạn chưa có tài khoản?", style = AppTheme.typography.labelMedium.copy(
-                    fontFamily = Font.fontFamily,
                     fontWeight = FontWeight.Normal,
                     color = Color.Black
                 ),
@@ -201,7 +195,6 @@ fun LoginScreen(
                 Text(
                     "Đăng ký",
                     style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.Bold,
                         color = contentPrice
                     ),

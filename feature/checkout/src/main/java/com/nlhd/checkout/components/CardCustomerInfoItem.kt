@@ -25,7 +25,6 @@ import com.nlhd.core.utils.Font
 import com.nlhd.core.utils.colorDivide
 import java.text.NumberFormat
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CardCustomerInfoItem(
     title: String,
@@ -62,7 +61,6 @@ fun CardCustomerInfoItem(
             ) {
                 Text("Tên khách hàng:", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -70,7 +68,6 @@ fun CardCustomerInfoItem(
                 )
                 Text(nameCustomer, style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -85,7 +82,6 @@ fun CardCustomerInfoItem(
             ) {
                 Text("Số điện thoại:", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -93,7 +89,6 @@ fun CardCustomerInfoItem(
                 )
                 Text(phone, style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -108,7 +103,6 @@ fun CardCustomerInfoItem(
             ) {
                 Text("Địa chỉ nhận hàng:", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -116,7 +110,6 @@ fun CardCustomerInfoItem(
                 )
                 Text(address, style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -131,7 +124,6 @@ fun CardCustomerInfoItem(
             ) {
                 Text("Mô tả:", style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),
@@ -140,7 +132,6 @@ fun CardCustomerInfoItem(
                 Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
                 Text(description, style = AppTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Light,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 ),

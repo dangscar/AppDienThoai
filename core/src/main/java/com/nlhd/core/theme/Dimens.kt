@@ -64,7 +64,7 @@ val CompactMediumDimens = Dimens(
     icon = 45.dp,
     iconStory = 57.dp,
     iconAdd = 24.dp,
-    iconAction = 32.dp,
+    iconAction = 35.dp,
     paddingAdd = 7.dp
 )
 

@@ -1,5 +1,6 @@
 package com.nlhd.shortvideo.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -124,27 +125,28 @@ fun AvatarUser(
                     }
 
             )
-            /*if (!isFollow) {
-                Box(modifier = Modifier
-                    .constrainAs(plus) {
-                        bottom.linkTo(image.bottom)
-                        top.linkTo(image.bottom)
-                        end.linkTo(image.end)
-                        start.linkTo(image.start)
-                    }
-                    .border(
-                        width = AppTheme.dimens.border,
-                        color = Color.Red,
-                        shape = CircleShape
-                    )
-                    .clip(CircleShape)
-                    .background(color = Color.Red, shape = CircleShape)
-                    .pointerInput(Unit) {
+
+            Box(modifier = Modifier
+                .constrainAs(plus) {
+                    bottom.linkTo(image.bottom)
+                    top.linkTo(image.bottom)
+                    end.linkTo(image.end)
+                    start.linkTo(image.start)
+                }
+                .border(
+                    width = AppTheme.dimens.border,
+                    color = Color.Red,
+                    shape = CircleShape
+                )
+                .clip(CircleShape)
+                .background(color = Color.Red, shape = CircleShape)
+                .pointerInput(Unit) {
                     detectTapGestures(onTap = {
                         onClickAdd()
                     })
                 }
-                ) {
+            ) {
+                AnimatedVisibility(visible = !isFollow) {
                     Icon(
                         painter = painterResource(R.drawable.add),
                         contentDescription = null,
@@ -154,7 +156,8 @@ fun AvatarUser(
                             .padding(AppTheme.dimens.paddingAdd)
                     )
                 }
-            }*/
+
+            }
 
 
         }

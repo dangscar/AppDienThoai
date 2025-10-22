@@ -41,7 +41,6 @@ import com.nlhd.core.utils.containerTopBar
 import com.nlhd.domain.entity.checkout.SelectedProduct
 import java.text.NumberFormat
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CheckoutItem(
     product: SelectedProduct
@@ -74,7 +73,6 @@ fun CheckoutItem(
                         .padding(AppTheme.dimens.small2),
                     style = AppTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Normal,
-                        fontFamily = Font.fontFamily,
                         color = Color.Black
                     ),
                     textAlign = TextAlign.Start,
@@ -96,7 +94,6 @@ fun CheckoutItem(
                             "Mua ngay",
                             style = AppTheme.typography.labelSmall.copy(
                                 color = Color(0xFFFD2656),
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.Bold
                             ),
                             modifier = Modifier.padding(
@@ -116,7 +113,6 @@ fun CheckoutItem(
                             "COD",
                             style = AppTheme.typography.labelSmall.copy(
                                 color = Color(0xFFFD2656),
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.Bold
                             ),
                             modifier = Modifier.padding(
@@ -136,12 +132,10 @@ fun CheckoutItem(
                     Text("${priceFormat}đ", maxLines = 1, style = AppTheme.typography.headlineMedium.copy(
                         color = Color(0xFFFD2656),
                         fontWeight = FontWeight.SemiBold),
-                        fontFamily = Font.fontFamily,
                         modifier = Modifier.padding(AppTheme.dimens.small2)
                     )
                     Text("Số lượng: ${product.quantity}", style = AppTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Light,
-                        fontFamily = Font.fontFamily,
                         textAlign = TextAlign.Center
                     ), maxLines = 1,
                         modifier = Modifier.padding(AppTheme.dimens.small2)

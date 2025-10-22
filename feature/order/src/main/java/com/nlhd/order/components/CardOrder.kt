@@ -38,8 +38,6 @@ import com.nlhd.core.utils.Utils
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.domain.entity.order.Data
 import java.text.NumberFormat
-
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CardOrder(
     data: Data
@@ -76,7 +74,6 @@ fun CardOrder(
                             name,
                             style = AppTheme.typography.headlineMedium.copy(
                                 fontWeight = FontWeight.Normal,
-                                fontFamily = Font.fontFamily,
                                 color = Color.Black
                             ),
                             textAlign = TextAlign.Start,
@@ -89,7 +86,6 @@ fun CardOrder(
                         ) {
                             Text("x${orderDetail.quantity}", style = AppTheme.typography.headlineMedium.copy(
                                 fontWeight = FontWeight.Normal,
-                                fontFamily = Font.fontFamily,
                                 textAlign = TextAlign.Center,
                                 color = Color.Black
                             ), maxLines = 1,
@@ -97,8 +93,6 @@ fun CardOrder(
                             )
                             val priceFormat = NumberFormat.getNumberInstance().format(orderDetail.price)
                             Text("${priceFormat}đ", style = AppTheme.typography.headlineMedium.copy(
-                                fontWeight = FontWeight.Normal,
-                                fontFamily = Font.fontFamily,
                                 textAlign = TextAlign.Center,
                                 color = Color.Black
                             ), maxLines = 1,
@@ -120,7 +114,6 @@ fun CardOrder(
                     }
                 }, style = AppTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.Normal,
-                fontFamily = Font.fontFamily,
                 textAlign = TextAlign.End,
                 color = Color.Black
             ), maxLines = 1,
@@ -139,7 +132,6 @@ fun CardOrder(
             ) {
                 Text(status, style = AppTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Normal,
-                    fontFamily = Font.fontFamily,
                     textAlign = TextAlign.Center,
                     color = Color(0xFF1776B1)
                 ), maxLines = 1,
@@ -157,7 +149,6 @@ fun CardOrder(
                     Text(
                         "Chi tiết sản phẩm",
                         style = AppTheme.typography.headlineMedium.copy(
-                            fontFamily = Font.fontFamily,
                             color = Color.White,
                             fontWeight = FontWeight.SemiBold
                         ),

@@ -32,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +55,10 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Utils
@@ -71,6 +76,7 @@ fun BottomSheetComment(
     onClickProfile: (Int) -> Unit
 ) {
 
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -133,8 +139,10 @@ fun BottomSheetComment(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        color = contentPrice
+                    LottieAnimation(
+                        composition,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.size(AppTheme.dimens.large)
                     )
                 }
 
@@ -145,7 +153,10 @@ fun BottomSheetComment(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("Không có bình luận", style = AppTheme.typography.headlineMedium)
+                        Text("Không có bình luận", style = AppTheme.typography.headlineMedium.copy(
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold
+                        ))
                     }
                 } else {
                     LazyColumn(

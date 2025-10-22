@@ -64,6 +64,22 @@ class ShortVideoRepositoryImp(
         ).flow
     }
 
+    override suspend fun getFollowUser(
+        token: String,
+        userId: String
+    ): ResultWrapper<MessageResponse> {
+        return try {
+            val responseDto = ktor.get(Utils.BASE_URL+"/api/follows/${userId}") {
+                header("Authorization", "Bearer $token")
+                contentType(ContentType.Application.Json)
+            }.body<MessageResponseDto>()
+            val response = responseDto.toDomain(responseDto)
+            ResultWrapper.Success(response)
+        } catch (e: Exception) {
+            ResultWrapper.Failure(e)
+        }
+    }
+
     override suspend fun follows(
         token: String,
         userId: String

@@ -55,6 +55,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Utils
@@ -95,6 +99,7 @@ fun ProfileShortVideoScreen(
             viewModel.getInfoProfile(token = keyStore, userId = userId)
         }
     }
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
 
     NavHost(
         navController = navController,
@@ -129,9 +134,14 @@ fun ProfileShortVideoScreen(
                         }
                         ProfileShortVideoState.Loading -> {
                             item {
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                    CircularProgressIndicator(
-                                        color = contentPrice
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    LottieAnimation(
+                                        composition,
+                                        iterations = LottieConstants.IterateForever,
+                                        modifier = Modifier.size(AppTheme.dimens.large)
                                     )
                                 }
                             }
@@ -350,9 +360,14 @@ fun ProfileShortVideoScreen(
                                         Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
                                     }
                                     FollowActionState.Loading -> {
-                                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                            CircularProgressIndicator(
-                                                color = contentPrice
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            LottieAnimation(
+                                                composition,
+                                                iterations = LottieConstants.IterateForever,
+                                                modifier = Modifier.size(AppTheme.dimens.large)
                                             )
                                         }
                                     }

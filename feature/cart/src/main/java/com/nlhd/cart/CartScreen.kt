@@ -80,7 +80,6 @@ import java.text.NumberFormat
 var currentToast: Toast? = null
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CartScreen(
     cartViewModel: CartViewModel = koinViewModel(),
@@ -229,7 +228,6 @@ fun CartScreen(
                         Text(
                             "Tổng thanh toán",
                             style = AppTheme.typography.headlineMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = Color.Black,
                                 fontWeight = FontWeight.Normal
                             )
@@ -239,7 +237,6 @@ fun CartScreen(
                         Text(
                             "${priceFormat}đ",
                             style = AppTheme.typography.headlineMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = contentPrice,
                                 fontWeight = FontWeight.Bold
                             )
@@ -306,7 +303,6 @@ fun CartScreen(
                         Text(
                             "Mua ngay",
                             style = AppTheme.typography.headlineMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = Color.White,
                                 fontWeight = FontWeight.SemiBold
                             ),
@@ -341,9 +337,7 @@ fun CartScreen(
                     Box(modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding), contentAlignment = Alignment.Center) {
-                        Text("Vui lòng đăng nhập tài khoản", style = AppTheme.typography.titleMedium.copy(
-                            fontFamily = Font.fontFamily
-                        ))
+                        Text("Vui lòng đăng nhập tài khoản", style = AppTheme.typography.titleMedium)
                     }
                 } else {
                     cartViewModel.setTotalPrice(cartResponse.totalCost)
@@ -363,7 +357,6 @@ fun CartScreen(
                                     .padding(AppTheme.dimens.small3),
                                 style = AppTheme.typography.headlineMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontFamily = Font.fontFamily,
                                     color = Color.Black
                                 ),
                                 textAlign = TextAlign.Center
@@ -486,9 +479,7 @@ fun CartScreen(
                             .fillMaxWidth()
                             .fillMaxHeight(0.6f)
                             .padding(innerPadding), contentAlignment = Alignment.Center) {
-                            Text(error, style = AppTheme.typography.titleMedium.copy(
-                                fontFamily = Font.fontFamily
-                            ))
+                            Text(error, style = AppTheme.typography.titleMedium)
                         }
                     }
                     AddressState.Loading -> {

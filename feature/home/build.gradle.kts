@@ -78,4 +78,7 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-swiperefresh:0.27.0")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
+
+    //Lottie
+    implementation("com.airbnb.android:lottie-compose:6.6.6")
 }

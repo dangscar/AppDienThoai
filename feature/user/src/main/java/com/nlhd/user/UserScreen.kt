@@ -24,7 +24,6 @@ object ProfileScreen
 @Serializable
 object SignUpScreen
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun UserScreen(
     userViewModel: UserViewModel = koinViewModel(),

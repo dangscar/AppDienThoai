@@ -48,6 +48,10 @@ import androidx.navigation.toRoute
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Utils
@@ -81,6 +85,7 @@ fun SearchShortSuccessScreen(
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
     val query by viewModel.query.collectAsStateWithLifecycle()
     val videos = viewModel.videos.collectAsLazyPagingItems()
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
     LaunchedEffect(keyStore.value) {
         if (keyStore.value != "") {
             viewModel.setToken(keyStore.value)
@@ -117,11 +122,14 @@ fun SearchShortSuccessScreen(
                         }
                     }
                     LoadState.Loading -> {
-                        Box(modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
-                                color = contentPrice
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LottieAnimation(
+                                composition,
+                                iterations = LottieConstants.IterateForever,
+                                modifier = Modifier.size(AppTheme.dimens.large)
                             )
                         }
                     }

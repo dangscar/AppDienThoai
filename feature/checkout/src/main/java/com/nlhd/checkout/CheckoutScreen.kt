@@ -124,8 +124,8 @@ fun getPaymentDataRequest(price: String, product: String): String {
     """.trimIndent()
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CheckoutScreen(
     activity: Activity,
@@ -472,7 +472,6 @@ private fun TestComp() {
             "Lưu ý: Vui lòng kiểm tra kỹ thông tin trước khi mua hàng",
             style = AppTheme.typography.labelMedium.copy(
                 fontWeight = FontWeight.SemiBold,
-                fontFamily = Font.fontFamily,
                 color = contentPrice
             ),
             maxLines = 1,

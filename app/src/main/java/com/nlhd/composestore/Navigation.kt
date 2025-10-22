@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -168,7 +170,7 @@ fun BottomBar(
     Column {
         Divider(
             thickness = AppTheme.dimens.extraSmall,
-            color = containerSearch
+            color = Color(0xFF484646)
         )
         Row(
             modifier = Modifier
@@ -250,12 +252,13 @@ fun Navigation(
     }
     val isAdmin = (state.value) is NavigationState.Success
     val isLoading = (state.value) is NavigationState.Loading
-    val navigate = if (isAdmin) {
+    /*val navigate = if (isAdmin) {
         AdminScreen
     } else if (isLoading) {
         LoadingScreen
     }
-    else CustomerScreen
+    else CustomerScreen*/
+    val navigate = CustomerScreen
     NavHost(
         navController = navController,
         startDestination = navigate

@@ -116,7 +116,6 @@ fun AddressScreen(
                     "By clicking Save, you acknowledge that you have read the Privacy Policy",
                     style = AppTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Normal,
-                        fontFamily = Font.fontFamily,
                         color = Color.Black
                     ),
                     overflow = TextOverflow.Ellipsis,

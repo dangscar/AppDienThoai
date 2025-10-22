@@ -47,9 +47,11 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -60,6 +62,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -108,6 +111,7 @@ import com.nlhd.shortvideo.components.BottomSheet
 import com.nlhd.shortvideo.components.BottomSheetComment
 import com.nlhd.shortvideo.components.BottomSheetGeneral
 import com.nlhd.shortvideo.components.BottomSheetShare
+import com.nlhd.shortvideo.components.InputText
 import com.nlhd.shortvideo.components.TimeFormat
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -159,7 +163,8 @@ fun ContentCommon(
     onSearch: ((String) -> Unit)? = null,
     onHiddenText: ((Boolean) -> Unit)? = null,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
-    onClickProfile: (Int) -> Unit
+    onClickProfile: (Int) -> Unit,
+    onViewer: ((String)-> Unit)? = null
 ) {
     val context = LocalContext.current
     val activity = LocalContext.current as ComponentActivity
@@ -186,6 +191,47 @@ fun ContentCommon(
 
     val scope = rememberCoroutineScope()
 
+    val colorInfiniteTransition = rememberInfiniteTransition()
+    val colorInfinite by colorInfiniteTransition.animateColor(
+        initialValue = Color.Gray,
+        targetValue = Color.Transparent,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 500), // Thời gian nhấp nháy
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val density = LocalDensity.current
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+
+    var sheetHeight by remember { mutableStateOf(0.dp) }
+    val sheetVisible =  if(sheetHeight / screenHeight >= 0.0f) (sheetHeight / screenHeight).toFloat() else 0f  //Giá trị của bottomSheet hiển thị 0.6f
+
+    var clickedLike by remember { mutableStateOf(false) }
+    val scaleLike by animateFloatAsState(
+        targetValue = if (clickedLike) 0.85f else 1f,
+        animationSpec = tween(durationMillis = 150),
+        label = "scaleAnim",
+        finishedListener = {
+            if (clickedLike) {
+                clickedLike = false
+            }
+        }
+    )
+    var clickedFav by remember { mutableStateOf(false) }
+    val scaleFav by animateFloatAsState(
+        targetValue = if (clickedFav) 0.85f else 1f,
+        animationSpec = tween(durationMillis = 150),
+        label = "scaleAnim",
+        finishedListener = {
+            if (clickedFav) {
+                clickedFav = false
+            }
+        }
+    )
+
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
         VerticalPager(
             state = pagerState,
@@ -197,15 +243,18 @@ fun ContentCommon(
                 ),
                 decayAnimationSpec = exponentialDecay(0.9f)
             ),
-            key = { page-> videos[page]?.id ?: page }
+            key = { page-> videos[page]?.id ?: page },
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
         ) { page->
 
+            key("$pageF $page") {
+
+            }
             val videoViewModel: VideoViewModel = koinViewModel(key = "$pageF $page")
             val state by videoViewModel.videoState.collectAsStateWithLifecycle()
             val displayText by videoViewModel.displayText.collectAsStateWithLifecycle()
             val video = videos[page]!!
             val actionButton by videoViewModel.actionButton.collectAsStateWithLifecycle()
-            //val imageStatus by videoViewModel.imageStatus.collectAsStateWithLifecycle()
             val currentPosition by videoViewModel.currentPosition.collectAsStateWithLifecycle()
             val duration by videoViewModel.duration.collectAsStateWithLifecycle()
             val aspectRatio by videoViewModel.aspectRatio.collectAsStateWithLifecycle()
@@ -218,6 +267,7 @@ fun ContentCommon(
                     contentCommonViewModel.getOrCreatePlayer(page, videoUrl, context)
                 )
             }
+            videoViewModel.getFollowUser(token, video.user.id.toString())
 
 
             if (isAutoScroll) {
@@ -307,10 +357,18 @@ fun ContentCommon(
                     if (onSearch != null) {
                         onSearch(video.caption)
                     }
+                    onViewer?.invoke(video.views)
                 } else {
                     exoPlayer.seekTo(0)
                     exoPlayer.playWhenReady = false
                 }
+            }
+
+            LaunchedEffect(pagerState.settledPage) {
+                val runtime = Runtime.getRuntime()
+                val used = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
+                val max = runtime.maxMemory() / 1024 / 1024
+                Log.d("AAA", "Heap usage: ${used}MB / ${max}MB")
             }
 
             val paddingBottom = paddingValues.calculateBottomPadding()
@@ -370,15 +428,6 @@ fun ContentCommon(
                         .zIndex(1f),
                     contentAlignment = Alignment.BottomStart
                 ) {
-                    val colorInfiniteTransition = rememberInfiniteTransition()
-                    val colorInfinite by colorInfiniteTransition.animateColor(
-                        initialValue = Color.Gray,
-                        targetValue = Color.Transparent,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(durationMillis = 500), // Thời gian nhấp nháy
-                            repeatMode = RepeatMode.Reverse
-                        ), label = ""
-                    )
                     val color = if (state == VideoState.IDLE && pagerState.settledPage == page && isPlaying) colorInfinite else Color.Transparent
                     Column {
 
@@ -518,14 +567,6 @@ fun ContentCommon(
 
                 }*/
 
-                val configuration = LocalConfiguration.current
-                val screenHeight = configuration.screenHeightDp.dp
-                val density = LocalDensity.current
-                val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
-
-                var sheetHeight by remember { mutableStateOf(0.dp) }
-                val sheetVisible =  if(sheetHeight / screenHeight >= 0.0f) (sheetHeight / screenHeight).toFloat() else 0f  //Giá trị của bottomSheet hiển thị 0.6f
-
                 val minScale = aspectRatio // nhỏ nhất khi sheet chiếm 60%
                 val maxScale = 1f    // scale gốc
 
@@ -616,24 +657,59 @@ fun ContentCommon(
 
 
                     val stateFollow by videoViewModel.stateFollow.collectAsStateWithLifecycle()
+                    val getFollowUserState by videoViewModel.getFollowUserState.collectAsStateWithLifecycle()
+
+                    when (getFollowUserState) {
+                        is ShortVideoState.Error -> {}
+                        ShortVideoState.Idle -> {}
+                        ShortVideoState.Loading -> {}
+                        is ShortVideoState.Success -> {
+                            val message = (getFollowUserState as ShortVideoState.Success).data.message
+                            when(message) {
+                                "Đã follow" -> {
+                                    videoViewModel.setFollow(Follow.Follow)
+                                }
+                                "Chưa follow" -> {
+                                    videoViewModel.setFollow(Follow.UnFollow)
+
+                                }
+                                "Không thể follow chính mình" -> {
+                                    videoViewModel.setFollow(Follow.Follow)
+                                }
+                            }
+                        }
+                    }
+
                     when (stateFollow) {
                         is ShortVideoState.Error -> {
 
                         }
                         ShortVideoState.Idle -> {
-                            if (video.isFollowing && video.canFollow || !video.isFollowing && !video.canFollow)  {
-                                videoViewModel.setFollow(Follow.Follow)
-                            } else {
-                                videoViewModel.setFollow(Follow.UnFollow)
-                            }
+
                         }
                         ShortVideoState.Loading -> {
 
                         }
                         is ShortVideoState.Success -> {
-                            videoViewModel.setFollow(Follow.Follow)
+                            if (getFollowUserState is ShortVideoState.Success) {
+                                val message = (getFollowUserState as ShortVideoState.Success).data.message
+                                when(message) {
+                                    "Chưa follow" -> {
+                                        videoViewModel.setFollow(Follow.Follow)
+                                    }
+
+                                }
+
+                            }
+                            LaunchedEffect(Unit) {
+                                videoViewModel.setFollowState(ShortVideoState.Idle)
+                                videoViewModel.setFollowUserState(ShortVideoState.Idle)
+                                //videoViewModel.getFollowUser(token, video.user.id.toString())
+                            }
+
                         }
                     }
+
 
 
                     AvatarUser(
@@ -647,7 +723,7 @@ fun ContentCommon(
                             if (!isScrolling && isPlaying) {
                                 onClickProfile(video.user.id)
                             }
- 
+
                         },
                         onClickAdd = {
                             if (!isScrolling && isPlaying) {
@@ -681,13 +757,13 @@ fun ContentCommon(
                         }
                     }
 
-                    ActionItem(video.likes, R.drawable.ic_heart, color =actionButton.like, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+                    ActionItem(video.likes, R.drawable.ic_heart, color =actionButton.like, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3+AppTheme.dimens.border), clicked = clickedLike, scale = scaleLike, onScale = {clickedLike = it}) {
                         if (isPlaying && !isScrolling) {
                             videoViewModel.like(token, video.id.toString())
                         }
                     }
 
-                    ActionItem(video.comments, R.drawable.ic_chat, isScrolling = isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.iconAction), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+                    ActionItem(video.comments, R.drawable.ic_chat, isScrolling = isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.iconAction), clicked = false, scale = 1f, onScale = {}) {
                         if (isPlaying && !isScrolling) {
                             videoViewModel.onActionButton(Perform.Comment())
                         }
@@ -758,6 +834,7 @@ fun ContentCommon(
                     }
 
 
+
                     val stateFavorite by videoViewModel.stateFavorite.collectAsStateWithLifecycle()
                     val colorYellow = Color(0xFFFABA32)
                     when (stateFavorite) {
@@ -782,13 +859,13 @@ fun ContentCommon(
                             }
                         }
                     }
-                    ActionItem(video.favorites, R.drawable.ic_bookmark, color = actionButton.favorite, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium3), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+                    ActionItem(video.favorites, R.drawable.ic_bookmark, color = actionButton.favorite, isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.medium2+AppTheme.dimens.small), clicked = clickedFav, scale = scaleFav, onScale = {clickedFav = it}) {
                         if (isPlaying && !isScrolling) {
                             videoViewModel.favorite(token, video.id.toString())
                         }
                     }
 
-                    ActionItem(video.shares, R.drawable.ic_share, isScrolling = isScrolling, modifierIcon = Modifier.size(AppTheme.dimens.iconAction), modifierSpacer = Modifier.height(AppTheme.dimens.border)) {
+                    ActionItem(video.shares, R.drawable.ic_share, isScrolling = isScrolling, clicked = false, scale = 1f, onScale = {}) {
                         if (isPlaying) {
                             videoViewModel.onActionButton(Perform.Share())
                         }
@@ -841,7 +918,7 @@ fun ContentCommon(
                         }
                     }
 
-                    val angleOperator = if (pagerState.settledPage == page && isPlaying && !isScrolling) angle else 0f
+                    //val angleOperator = if (pagerState.settledPage == page && isPlaying && !isScrolling) angle else 0f
                     AsyncImage(
                         contentScale = ContentScale.Crop,
                         model = if (video.user.avatarUrl == null || video.user.avatarUrl == "null" || video.user.avatarUrl == "") null else "${Utils.BASE_URL}/" + video.user.avatarUrl,
@@ -850,7 +927,7 @@ fun ContentCommon(
                             .size(AppTheme.dimens.icon)
                             .padding(AppTheme.dimens.border)
                             .clip(CircleShape)
-                            .rotate(angleOperator)
+                            /*.rotate(angleOperator)*/
                     )
                     Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
                 }
@@ -1020,7 +1097,7 @@ fun ContentCommon(
                                 .padding(AppTheme.dimens.small)
                         )
                         Spacer(modifier = Modifier.width(AppTheme.dimens.small))
-                        val marque = if (pagerState.settledPage == page && isPlaying && !isScrolling) {
+                        /*val marque = if (pagerState.settledPage == page && isPlaying && !isScrolling) {
                             Modifier.basicMarquee(
                                 iterations = Int.MAX_VALUE,
                                 animationMode = MarqueeAnimationMode.Immediately,
@@ -1030,14 +1107,13 @@ fun ContentCommon(
                             )
                         } else {
                             Modifier
-                        }
+                        }*/
                         Text(
                             text = "${video.user.name} - Hiện tại chưa cập nhật được nhạc nền",
                             style = AppTheme.typography.labelMedium.copy(
                                 color = Color(0xFFFFFFFF)
                             ),
-                            maxLines = 1,
-                            modifier = marque
+                            maxLines = 1
                         )
                     }
 

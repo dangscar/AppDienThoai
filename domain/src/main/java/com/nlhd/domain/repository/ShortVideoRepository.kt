@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ShortVideoRepository {
     fun getVideos(token: String): Flow<PagingData<Video>>
+    suspend fun getFollowUser(token: String, userId: String): ResultWrapper<MessageResponse>
     suspend fun follows(token: String, userId: String): ResultWrapper<MessageResponse>
     suspend fun likes (token: String, videoId: String): ResultWrapper<MessageResponse>
     suspend fun favorites (token: String, videoId: String): ResultWrapper<MessageResponse>

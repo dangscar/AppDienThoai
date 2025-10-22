@@ -37,7 +37,6 @@ import com.nlhd.domain.entity.product.Product
 import com.nlhd.home.R
 import java.text.NumberFormat
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CardProduct(
     product: Product,
@@ -66,7 +65,6 @@ fun CardProduct(
             Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
             Text(product.name, style = AppTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.Normal,
-                fontFamily = Font.fontFamily,
                 textAlign = TextAlign.Center
             ), maxLines = 2)
 
@@ -74,7 +72,6 @@ fun CardProduct(
             Text("${formattedPrice}đ", maxLines = 1, style = AppTheme.typography.headlineMedium.copy(
                 color = Color(0xFFFD2656),
                 fontWeight = FontWeight.SemiBold),
-                fontFamily = Font.fontFamily,
             )
             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
             Row(
@@ -91,7 +88,6 @@ fun CardProduct(
                         "Mua ngay",
                         style = AppTheme.typography.labelSmall.copy(
                         color = Color(0xFFFD2656),
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.Bold
                     ),
                         modifier = Modifier.padding(
@@ -111,7 +107,6 @@ fun CardProduct(
                         "COD",
                         style = AppTheme.typography.labelSmall.copy(
                             color = Color(0xFFFD2656),
-                            fontFamily = Font.fontFamily,
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.padding(
@@ -124,7 +119,6 @@ fun CardProduct(
             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
             Text(description, maxLines = 2, style = AppTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.Normal,
-                fontFamily = Font.fontFamily
             ))
             Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
             Row(

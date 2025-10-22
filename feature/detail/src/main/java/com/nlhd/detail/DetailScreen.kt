@@ -86,7 +86,6 @@ import com.nlhd.domain.entity.checkout.ProductCheckout
 import java.text.NumberFormat
 
 var currentToast: Toast? = null
-@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
@@ -177,7 +176,6 @@ fun DetailScreen(
                                     style = AppTheme.typography.labelMedium.copy(
                                         fontWeight = FontWeight.Normal,
                                         color = Color.Black,
-                                        fontFamily = Font.fontFamily
                                     ),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -276,7 +274,6 @@ fun DetailScreen(
                                 Text(
                                     "Thêm vào giỏ",
                                     style = AppTheme.typography.headlineMedium.copy(
-                                        fontFamily = Font.fontFamily,
                                         color = Color.Black,
                                         fontWeight = FontWeight.SemiBold
                                     ),
@@ -338,7 +335,6 @@ fun DetailScreen(
                                 Text(
                                     "Mua ngay",
                                     style = AppTheme.typography.headlineMedium.copy(
-                                        fontFamily = Font.fontFamily,
                                         color = Color.White,
                                         fontWeight = FontWeight.SemiBold
                                     ),
@@ -354,7 +350,6 @@ fun DetailScreen(
                             Text(
                                 "Hết hàng",
                                 style = AppTheme.typography.titleMedium.copy(
-                                    fontFamily = Font.fontFamily,
                                     color = contentPrice,
                                 ),
                                 modifier = Modifier.fillMaxWidth(),
@@ -420,7 +415,6 @@ fun DetailScreen(
                                 "Giá: ₫$priceFormat",
                                 style = AppTheme.typography.titleMedium.copy(
                                     color = contentPrice,
-                                    fontFamily = Font.fontFamily,
                                     fontWeight = FontWeight.SemiBold
                                 )
                             )
@@ -440,7 +434,6 @@ fun DetailScreen(
                                         "Mua ngay",
                                         style = AppTheme.typography.labelSmall.copy(
                                             color = Color(0xFFFD2656),
-                                            fontFamily = Font.fontFamily,
                                             fontWeight = FontWeight.Bold
                                         ),
                                         modifier = Modifier.padding(
@@ -463,7 +456,6 @@ fun DetailScreen(
                                         "COD",
                                         style = AppTheme.typography.labelSmall.copy(
                                             color = Color(0xFFFD2656),
-                                            fontFamily = Font.fontFamily,
                                             fontWeight = FontWeight.Bold
                                         ),
                                         modifier = Modifier.padding(
@@ -477,20 +469,16 @@ fun DetailScreen(
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
 
                             Text(product.name, style = AppTheme.typography.headlineLarge.copy(
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.SemiBold
                             ))
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                             val statusResponse = if (colorsSelected.isEmpty()) colors[0].status else colorsSelected[0].status
                             val status = if (statusResponse == "in-stock") "Còn hàng" else "Hết hàng"
-                            Text("Tình trạng hàng: $status", style = AppTheme.typography.labelMedium.copy(
-                                fontFamily = Font.fontFamily
-                            ))
+                            Text("Tình trạng hàng: $status", style = AppTheme.typography.labelMedium)
 
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
                             // Phiên bản RAM/ROM
                             Text("Phiên bản", style = AppTheme.typography.headlineMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.Bold
                             ))
 
@@ -522,7 +510,6 @@ fun DetailScreen(
 
                             // Màu sắc
                             Text("Màu sắc", style = AppTheme.typography.headlineMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.Bold
                             ))
 
@@ -562,7 +549,6 @@ fun DetailScreen(
                                                     .background(color = containerButtonLightGray),
                                             )
                                             Text(color.name, style = AppTheme.typography.bodySmall.copy(
-                                                fontFamily = Font.fontFamily,
                                                 color = Color.Black
                                             ),
                                                 modifier = Modifier.padding(AppTheme.dimens.small)
@@ -578,44 +564,36 @@ fun DetailScreen(
 
                             // Mô tả
                             Text("Mô tả sản phẩm", style = AppTheme.typography.headlineMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.Bold
                             ))
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                             Text(product.description, style = AppTheme.typography.bodyMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = Color.Black
                             ))
 
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small3))
 
                             Text("Thông tin sản phẩm", style = AppTheme.typography.headlineMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 fontWeight = FontWeight.Bold
                             ))
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                             Text("-Kích thước màn hình: ${product.screenSize}inch", style = AppTheme.typography.bodyMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = Color.Black
                             ))
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                             Text("-Hệ điều hành: ${product.os}", style = AppTheme.typography.bodyMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = Color.Black
                             ))
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                             Text("-Vi xử lý: ${product.cpu}", style = AppTheme.typography.bodyMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = Color.Black
                             ))
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                             Text("-Camera: ${product.camera}", style = AppTheme.typography.bodyMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = Color.Black
                             ))
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                             Text("-Dung lượng pin: ${product.battery}mah", style = AppTheme.typography.bodyMedium.copy(
-                                fontFamily = Font.fontFamily,
                                 color = Color.Black
                             ))
                             Spacer(modifier = Modifier.height(AppTheme.dimens.small))

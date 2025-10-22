@@ -41,7 +41,6 @@ import com.nlhd.core.utils.contentPrice
 import com.nlhd.user.Login.LoginState
 import org.koin.androidx.compose.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -88,7 +87,6 @@ fun SignUpScreen(
                 singleLine = true,
                 placeholder = {
                     Text("Name", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.ExtraLight
                     ),
                         modifier = Modifier.fillMaxWidth(),
@@ -113,7 +111,6 @@ fun SignUpScreen(
                 singleLine = true,
                 placeholder = {
                     Text("Email", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.ExtraLight
                     ),
                         modifier = Modifier.fillMaxWidth(),
@@ -138,7 +135,6 @@ fun SignUpScreen(
                 singleLine = true,
                 placeholder = {
                     Text("Password", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.ExtraLight
                     ),
                         modifier = Modifier.fillMaxWidth(),
@@ -164,7 +160,6 @@ fun SignUpScreen(
                 singleLine = true,
                 placeholder = {
                     Text("Password Confirmation", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.ExtraLight
                     ),
                         modifier = Modifier.fillMaxWidth(),
@@ -195,7 +190,6 @@ fun SignUpScreen(
                 shape = RoundedCornerShape(AppTheme.dimens.small3)
             ) {
                 Text("Tiếp tục", style = AppTheme.typography.labelMedium.copy(
-                    fontFamily = Font.fontFamily,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 ),
@@ -208,7 +202,6 @@ fun SignUpScreen(
                 is SignUpState.Error -> {
                     Spacer(modifier = Modifier.height(AppTheme.dimens.medium))
                     Text("*Có lỗi xảy ra, vui lòng thử lại", style = AppTheme.typography.labelMedium.copy(
-                        fontFamily = Font.fontFamily,
                         fontWeight = FontWeight.Normal,
                         color = Color.Red
                     ))
@@ -235,14 +228,12 @@ fun SignUpScreen(
 
             Row {
                 Text("Bạn đã có tài khoản?", style = AppTheme.typography.labelMedium.copy(
-                    fontFamily = Font.fontFamily,
                     fontWeight = FontWeight.Normal,
                     color = Color.Black
                 ),
                 )
                 Spacer(modifier = Modifier.width(AppTheme.dimens.small))
                 Text("Đăng nhập", style = AppTheme.typography.labelMedium.copy(
-                    fontFamily = Font.fontFamily,
                     fontWeight = FontWeight.Bold,
                     color = contentPrice
                 ))

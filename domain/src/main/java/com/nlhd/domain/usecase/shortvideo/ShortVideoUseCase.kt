@@ -2,6 +2,7 @@ package com.nlhd.domain.usecase.shortvideo
 
 data class ShortVideoUseCase(
     val getVideos: GetVideos,
+    val getFollowUser: GetFollowUser,
     val follows: Follows,
     val likes: Likes,
     val favorites: Favorites,
