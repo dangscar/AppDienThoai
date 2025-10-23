@@ -73,7 +73,8 @@ fun BottomSheetComment(
     content: String,
     onValueChange: (String) -> Unit,
     onClickCloseBottomSheet: () -> Unit,
-    onClickProfile: (Int) -> Unit
+    onClickProfile: (Int) -> Unit,
+    onClick: () -> Unit
 ) {
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
@@ -190,7 +191,10 @@ fun BottomSheetComment(
         InputText(
             onSendComment = onSendComment,
             content = content,
-            onValueChange = onValueChange
+            onValueChange = onValueChange,
+            onClick = {
+                onClick()
+            }
         )
     }
 
@@ -259,10 +263,12 @@ fun CommentItem(
 
 @Composable
 fun InputText(
+    isReadOnly: Boolean = true,
     isFocus: Boolean = false,
     onSendComment: () -> Unit,
     content: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    onClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -283,6 +289,7 @@ fun InputText(
             color = containerSearch
         )
         BasicTextField(
+            readOnly = isReadOnly,
             value = content,
             onValueChange = onValueChange,
             modifier = Modifier
@@ -305,6 +312,11 @@ fun InputText(
                 ConstraintLayout(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .pointerInput(Unit) {
+                            detectTapGestures(onTap = {
+                                onClick?.invoke()
+                            })
+                        }
                         .background(
                             color = Color(0xFFEEEAEA),
                             shape = RoundedCornerShape(AppTheme.dimens.medium2)

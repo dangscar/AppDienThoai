@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,9 +52,9 @@ fun SearchTopBar(
         title = {
             Row(
                 modifier = Modifier
-                    .border(width = AppTheme.dimens.border, shape = RoundedCornerShape(AppTheme.dimens.small2), color = containerTopBar)
+                    .border(width = AppTheme.dimens.border, shape = RoundedCornerShape(AppTheme.dimens.small2), color = Color.White)
                     .clip(RoundedCornerShape(AppTheme.dimens.small2))
-                    .background(Color.White)
+                    .background(Color(0xFFF2F2F2))
                     .fillMaxWidth(), // nền trắng như ảnh ,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -61,7 +62,9 @@ fun SearchTopBar(
                     value = query,
                     onValueChange = onQueryChange,
                     singleLine = true,
-                    textStyle = AppTheme.typography.headlineMedium,
+                    textStyle = AppTheme.typography.headlineMedium.copy(
+                        color = Color(0xF5868686)
+                    ),
                     cursorBrush = SolidColor(containerTopBar),
                     visualTransformation = VisualTransformation.None,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
@@ -71,19 +74,19 @@ fun SearchTopBar(
                         }
                     ),
                     modifier = Modifier
-                        .padding(horizontal = AppTheme.dimens.small3, vertical = AppTheme.dimens.small2)
+                        .padding(horizontal = AppTheme.dimens.small2, vertical = AppTheme.dimens.small2)
                     // chừa chỗ cho nút kính lúp
                     ,
                     decorationBox = { innerTextField ->
                         if (query.isEmpty()) {
                             Text(
                                 text = "Bạn muốn tìm gì?",
-                                style = AppTheme.typography.headlineMedium,
-                                color = Color.Black
+                                style = AppTheme.typography.labelMedium.copy(
+                                    color = Color(0xF5868686)
+                                ),
                             )
-                        } else {
-                            innerTextField()
                         }
+                        innerTextField()
                     }
                 )
             }
@@ -97,7 +100,7 @@ fun SearchTopBar(
                 androidx.compose.material3.Icon(
                     imageVector = Icons.Rounded.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFFFF2D6C),
+                    tint = Color.Black,
                 )
             }
         },
@@ -105,8 +108,9 @@ fun SearchTopBar(
             TextButton(
                 onClick = onSearch
             ) {
-                Text("Search", style = AppTheme.typography.headlineMedium.copy(
-                    color = containerTopBar
+                Text("Tìm kiếm", style = AppTheme.typography.headlineMedium.copy(
+                    color = containerTopBar,
+                    fontWeight = FontWeight.Medium
                 ))
             }
 

@@ -111,7 +111,7 @@ fun ProfileShortVideoScreen(
                 containerColor = Color.White,
                 topBar = {
                     TopBarProfileShortVideo(
-                        title = "Creator",
+                        title = "Tác giả đăng tải",
                         onClickBack = onClickBack
                     )
                 }

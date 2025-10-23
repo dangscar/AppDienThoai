@@ -228,7 +228,6 @@ fun BottomBarItem(
         Text(navigation.title, style = AppTheme.typography.labelSmall.copy(
             color = iconColor,
             fontWeight = FontWeight.SemiBold,
-            fontFamily = Font.fontFamily
         ))
     }
 }

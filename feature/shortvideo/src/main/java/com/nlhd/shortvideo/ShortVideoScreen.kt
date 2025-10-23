@@ -17,12 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -47,6 +49,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -93,9 +97,7 @@ fun ShortVideoScreen(
     }
     val isHidden by viewModel.isHidden.collectAsStateWithLifecycle()
 
-    val titleHorizontal by remember {
-        mutableStateOf(listOf("Following", "For You"))
-    }
+    val titleHorizontal = listOf("Gợi ý người dùng", "Đang theo dõi", "Dành cho bạn")
     val pageStateHorizontal = rememberPagerState(initialPage = titleHorizontal.size-1) {
         titleHorizontal.size
     }
@@ -201,16 +203,48 @@ fun ShortVideoScreen(
             is LoadState.NotLoading -> {
 
                 if (!isHidden) {
-                    Row(
+                    ConstraintLayout(
                         modifier = Modifier
                             .fillMaxWidth()
                             .zIndex(1f)
                             .padding(innerPadding)
-                            .padding(AppTheme.dimens.small3),
-                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TabRow(
-                            selectedTabIndex = pageStateHorizontal.settledPage+1,
+                        val (reload, tabs, search) = createRefs()
+
+                        Box(
+                            contentAlignment = Alignment.CenterStart,
+                            modifier = Modifier
+                                .constrainAs(reload) {
+                                    top.linkTo(parent.top)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(tabs.start)
+                                }
+                                .padding(bottom = AppTheme.dimens.small2, start = AppTheme.dimens.small2)
+                        ){
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_reload),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(AppTheme.dimens.medium2)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onTap = {
+                                                onClickBack()
+                                            }
+                                        )
+                                    }
+                            )
+                        }
+
+                        ScrollableTabRow(
+                            modifier = Modifier.constrainAs(tabs) {
+                                top.linkTo(parent.top)
+                                start.linkTo(reload.end)
+                                end.linkTo(search.start)
+                                width = Dimension.fillToConstraints
+                            },
+                            selectedTabIndex = pageStateHorizontal.settledPage,
                             containerColor = Color.Transparent,
                             divider = {
 
@@ -218,31 +252,11 @@ fun ShortVideoScreen(
                             indicator = { tabPositions ->
                                 TabRowDefaults.PrimaryIndicator(
                                     modifier = Modifier
-                                        .tabIndicatorOffset(tabPositions[pageStateHorizontal.currentPage+1]),
+                                        .tabIndicatorOffset(tabPositions[pageStateHorizontal.currentPage]),
                                     color = Color.White,
                                 )
                             }
                         ) {
-                            Box(
-                                contentAlignment = Alignment.CenterStart,
-                                modifier = Modifier.padding(bottom = AppTheme.dimens.small2)
-                            ){
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_reload),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .size(AppTheme.dimens.medium2)
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(
-                                                onTap = {
-                                                    onClickBack()
-                                                }
-                                            )
-                                        }
-                                )
-                            }
-
                             titleHorizontal.forEachIndexed { ind, text->
                                 Tab(
                                     selected = ind == pageStateHorizontal.settledPage,
@@ -257,32 +271,39 @@ fun ShortVideoScreen(
                                 ) {
                                     Text(
                                         text = text,
-                                        style = AppTheme.typography.titleMedium.copy(color = if (ind == pageStateHorizontal.settledPage) Color.White else Color(
-                                            0xB3FAFAFA
-                                        )
+                                        style = AppTheme.typography.titleMedium.copy(
+                                            color = if (ind == pageStateHorizontal.settledPage) Color.White else Color(0xB3FAFAFA),
+                                            fontWeight = FontWeight.SemiBold
                                         ),
-                                        modifier = Modifier,
+                                        modifier = Modifier.padding(horizontal = AppTheme.dimens.small),
                                     )
                                 }
                             }
-                            Box(
-                                contentAlignment = Alignment.CenterEnd,
-                                modifier = Modifier.padding(bottom = AppTheme.dimens.small2)
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.search),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .size(AppTheme.dimens.iconBottomBar)
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(onTap = {
-                                                onClickSearch()
-                                            })
-                                        }
-                                )
-                            }
+                        }
 
+
+                        Box(
+                            contentAlignment = Alignment.CenterEnd,
+                            modifier = Modifier
+                                .constrainAs(search) {
+                                    top.linkTo(parent.top)
+                                    end.linkTo(parent.end)
+                                    start.linkTo(tabs.end)
+                                }
+                                .padding(bottom = AppTheme.dimens.small2, end = AppTheme.dimens.small2)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.search),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(AppTheme.dimens.iconBottomBar)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(onTap = {
+                                            onClickSearch()
+                                        })
+                                    }
+                            )
                         }
                     }
                 }
@@ -291,10 +312,13 @@ fun ShortVideoScreen(
                     HorizontalPager(state = pageStateHorizontal) {
                         when (it) {
                             0 -> {
+
+                            }
+                            1 -> {
                                 ContentCommon(
                                     token = keyStore.value,
                                     pageF = "Page1",
-                                    isPlaying = pageStateHorizontal.settledPage == 0,
+                                    isPlaying = pageStateHorizontal.settledPage == 1,
                                     pagerState = followingPagerState,
                                     paddingValues = innerPadding,
                                     videos = followingVideos,
@@ -309,7 +333,7 @@ fun ShortVideoScreen(
                                 ContentCommon(
                                     token = keyStore.value,
                                     pageF = "Page2",
-                                    isPlaying = pageStateHorizontal.settledPage == 1,
+                                    isPlaying = pageStateHorizontal.settledPage == 2,
                                     pagerState = pagerState,
                                     paddingValues = innerPadding,
                                     videos = videos,

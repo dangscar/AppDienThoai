@@ -27,6 +27,7 @@ import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,6 +35,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -786,14 +788,17 @@ fun ContentCommon(
                     }
 
 
+
                     if (actionButton.comment == ShowHide.Show) {
                         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
                         val commentsFlow = remember(video.id) { videoViewModel.commentsFlow(token, video.id.toString()) }
                         val comments = commentsFlow.collectAsLazyPagingItems()
 
                         if (addCommentState is ShortVideoState.Success) {
                             comments.refresh()
                         }
+
                         LaunchedEffect(sheetState) {
                             snapshotFlow { runCatching { sheetState.requireOffset() }.getOrNull() }
                                 .filterNotNull()
@@ -828,12 +833,53 @@ fun ContentCommon(
                                 },
                                 onClickProfile = { userId->
                                     onClickProfile(userId)
+                                },
+                                onClick = {
+                                    scope.launch {
+                                        sheetState.hide()
+                                        videoViewModel.onActionButton(Perform.Comment(ShowHide.Hide))
+                                        videoViewModel.onActionButton(Perform.CommentPush(ShowHide.Show))
+                                    }
                                 }
                             )
                         }
                     }
 
+                    if (actionButton.commentPush == ShowHide.Show) {
+                        BottomSheet(
+                            sheetState = rememberModalBottomSheetState(),
+                            onDismissRequest = {
+                                videoViewModel.onActionButton(Perform.CommentPush(ShowHide.Hide))
+                            },
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.2f),
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    "Gửi đến @${video.user.name}",
+                                    style = AppTheme.typography.titleMedium.copy(
+                                        Color.Black,
+                                        fontWeight = FontWeight.SemiBold
+                                    ),
+                                    modifier = Modifier.padding(AppTheme.dimens.small2)
+                                )
+                                Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                                InputText(
+                                    isReadOnly = false,
+                                    isFocus = true,
+                                    onSendComment = {
+                                        videoViewModel.addComment(token, video.id)
+                                        videoViewModel.onActionButton(Perform.CommentPush(ShowHide.Hide))
+                                        videoViewModel.onActionButton(Perform.Comment(ShowHide.Show))
+                                    },
+                                    content = contentComment,
+                                    onValueChange = videoViewModel::setContentComment
+                                )
+                            }
 
+                        }
+                    }
 
                     val stateFavorite by videoViewModel.stateFavorite.collectAsStateWithLifecycle()
                     val colorYellow = Color(0xFFFABA32)

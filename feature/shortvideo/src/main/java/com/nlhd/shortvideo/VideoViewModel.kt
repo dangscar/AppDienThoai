@@ -275,6 +275,18 @@ class VideoViewModel(
                     }
                 }
             }
+
+            is Perform.CommentPush -> {
+                if (_actionButton.value.commentPush == ShowHide.Show) {
+                    _actionButton.update {
+                        it.copy(commentPush = ShowHide.Hide)
+                    }
+                } else {
+                    _actionButton.update {
+                        it.copy(commentPush = ShowHide.Show)
+                    }
+                }
+            }
         }
     }
 
@@ -293,6 +305,7 @@ data class ActionButton(
     val avatar: Follow = Follow.Follow,
     val like: Color = Color.White,
     val comment: ShowHide = ShowHide.Hide,
+    val commentPush: ShowHide = ShowHide.Hide,
     val favorite: Color = Color.White,
     val share: ShowHide = ShowHide.Hide,
     val change: ChangeSlider = ChangeSlider.NOT_CHANGE,
@@ -302,6 +315,7 @@ sealed class Perform {
     data class Avatar(val avatar: ShowHide = ShowHide.Hide): Perform()
     data class Like(val color: Color = Color.White): Perform()
     data class Comment(val comment: ShowHide = ShowHide.Hide): Perform()
+    data class CommentPush(val commentPush: ShowHide = ShowHide.Hide): Perform()
     data class Favorite(val color: Color = Color.White): Perform()
     data class Share(val share: ShowHide = ShowHide.Hide): Perform()
     data class Change(val change: ChangeSlider = ChangeSlider.NOT_CHANGE): Perform()
