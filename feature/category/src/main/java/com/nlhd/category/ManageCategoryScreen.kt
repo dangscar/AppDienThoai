@@ -26,6 +26,7 @@ data class Category(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun ManageCategoryScreen() {
     var categories by remember {
         mutableStateOf(
