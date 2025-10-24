@@ -48,7 +48,6 @@ import com.nlhd.address.AddressScreen
 import com.nlhd.address.EditAddressScreen
 import com.nlhd.admin.AdminProfileScreen
 import com.nlhd.cart.CartScreen
-import com.nlhd.category.ManageCategoryScreen
 import com.nlhd.checkout.CheckoutScreen
 import com.nlhd.checkout.CheckoutSuccessScreen
 import com.nlhd.composestore.navigate.AddProduct
@@ -99,7 +98,7 @@ import com.nlhd.user.UploadAvatar.UploadAvatarScreen
 import com.nlhd.user.UserScreen
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
-
+import com.nlhd.category.ManageCategoryScreen
 @Serializable
 object AdminScreen
 
@@ -120,7 +119,9 @@ sealed class Navigation(
     object AddVideo: Navigation("addVideo", "Upload", R.drawable.add)
     object Order: Navigation("seach", "Đơn hàng", R.drawable.ic_notification)
     object User : Navigation("user", "Người dùng", R.drawable.ic_profile)
+    object Category : Navigate()
 }
+
 
 @Serializable
 object General
@@ -276,8 +277,35 @@ fun Navigation(
                    }
                }
            )
+        
         }
+        
+        composable<Dashboard> {
+            Dashboard(
+                onClickNavigate = {
+                    when (it) {
+                        Navigate.Product -> {
+                            navController.navigate(LoadProduct)
+                        }
+                        Navigate.Order -> {
 
+                        }
+                        Navigate.Customer -> {
+
+                        }
+                        Navigate.Balance -> {
+
+                        }
+                        Navigate.Profile -> {
+                            navController.navigate(Admin)
+                        }
+                        Navigate.Category -> {  
+                            navController.navigate(ManageCategory)
+                        }
+                    }
+                }
+            )
+        }
     }
 }
 

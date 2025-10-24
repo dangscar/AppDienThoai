@@ -53,7 +53,7 @@ fun ManageCategoryScreen() {
                 },
                 navigationIcon = {
                     IconButton(onClick = { /* Navigate back */ }) {
-                        Icon(Icons.Default.ArrowBack, "Quay lại")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Quay lại")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
