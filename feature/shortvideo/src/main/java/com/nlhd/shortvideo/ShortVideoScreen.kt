@@ -1,6 +1,7 @@
 package com.nlhd.shortvideo
 
 import android.annotation.SuppressLint
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -43,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -104,59 +106,12 @@ fun ShortVideoScreen(
     val scope = rememberCoroutineScope()
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
+
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Black,
         topBar = {
-            if (!isHidden) {
-                /*TopAppBar(
-                    title = {
-                        Text(
-                            "Short Videos",
-                            style = AppTheme.typography.headlineMedium.copy(
-                                color = Color.White,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent
-                    ),
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                onClickBack()
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = com.nlhd.core.R.drawable.ic_reload),
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier
-                                    .size(AppTheme.dimens.medium2)
-                                    .padding(AppTheme.dimens.border)
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = onClickSearch
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.search),
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier
-                                    .size(AppTheme.dimens.medium2)
-                            )
-                        }
-
-
-                    }
-                )*/
-
-
-            }
         }
     ) {
 
@@ -202,109 +157,111 @@ fun ShortVideoScreen(
             }
             is LoadState.NotLoading -> {
 
-                if (!isHidden) {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .zIndex(1f)
-                            .padding(innerPadding)
-                    ) {
-                        val (reload, tabs, search) = createRefs()
-
-                        Box(
-                            contentAlignment = Alignment.CenterStart,
-                            modifier = Modifier
-                                .constrainAs(reload) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(tabs.start)
-                                }
-                                .padding(bottom = AppTheme.dimens.small2, start = AppTheme.dimens.small2)
-                        ){
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_reload),
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier
-                                    .size(AppTheme.dimens.medium2)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(
-                                            onTap = {
-                                                onClickBack()
-                                            }
-                                        )
-                                    }
-                            )
+                val alpha = if (isHidden) 0f else 1f
+                ConstraintLayout(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .graphicsLayer {
+                            this.alpha = alpha
                         }
+                        .zIndex(1f)
+                        .padding(innerPadding)
+                ) {
+                    val (reload, tabs, search) = createRefs()
 
-                        ScrollableTabRow(
-                            modifier = Modifier.constrainAs(tabs) {
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
+                        modifier = Modifier
+                            .constrainAs(reload) {
                                 top.linkTo(parent.top)
-                                start.linkTo(reload.end)
-                                end.linkTo(search.start)
-                                width = Dimension.fillToConstraints
-                            },
-                            selectedTabIndex = pageStateHorizontal.settledPage,
-                            containerColor = Color.Transparent,
-                            divider = {
-
-                            },
-                            indicator = { tabPositions ->
-                                TabRowDefaults.PrimaryIndicator(
-                                    modifier = Modifier
-                                        .tabIndicatorOffset(tabPositions[pageStateHorizontal.currentPage]),
-                                    color = Color.White,
-                                )
+                                start.linkTo(parent.start)
+                                end.linkTo(tabs.start)
                             }
-                        ) {
-                            titleHorizontal.forEachIndexed { ind, text->
-                                Tab(
-                                    selected = ind == pageStateHorizontal.settledPage,
-                                    onClick = {
-                                        scope.launch {
-                                            pageStateHorizontal.animateScrollToPage(ind)
+                            .padding(bottom = AppTheme.dimens.small2, start = AppTheme.dimens.small2)
+                    ){
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_reload),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(AppTheme.dimens.medium2)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            onClickBack()
                                         }
-                                    },
-                                    selectedContentColor = Color.Transparent,
-                                    unselectedContentColor = Color.Transparent,
-                                    modifier = Modifier.padding(bottom = AppTheme.dimens.small2)
-                                ) {
-                                    Text(
-                                        text = text,
-                                        style = AppTheme.typography.titleMedium.copy(
-                                            color = if (ind == pageStateHorizontal.settledPage) Color.White else Color(0xB3FAFAFA),
-                                            fontWeight = FontWeight.SemiBold
-                                        ),
-                                        modifier = Modifier.padding(horizontal = AppTheme.dimens.small),
                                     )
                                 }
-                            }
-                        }
+                        )
+                    }
 
+                    ScrollableTabRow(
+                        modifier = Modifier.constrainAs(tabs) {
+                            top.linkTo(parent.top)
+                            start.linkTo(reload.end)
+                            end.linkTo(search.start)
+                            width = Dimension.fillToConstraints
+                        },
+                        selectedTabIndex = pageStateHorizontal.settledPage,
+                        containerColor = Color.Transparent,
+                        divider = {
 
-                        Box(
-                            contentAlignment = Alignment.CenterEnd,
-                            modifier = Modifier
-                                .constrainAs(search) {
-                                    top.linkTo(parent.top)
-                                    end.linkTo(parent.end)
-                                    start.linkTo(tabs.end)
-                                }
-                                .padding(bottom = AppTheme.dimens.small2, end = AppTheme.dimens.small2)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.search),
-                                contentDescription = null,
-                                tint = Color.White,
+                        },
+                        indicator = { tabPositions ->
+                            TabRowDefaults.PrimaryIndicator(
                                 modifier = Modifier
-                                    .size(AppTheme.dimens.iconBottomBar)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(onTap = {
-                                            onClickSearch()
-                                        })
-                                    }
+                                    .tabIndicatorOffset(tabPositions[pageStateHorizontal.currentPage]),
+                                color = Color.White,
                             )
                         }
+                    ) {
+                        titleHorizontal.forEachIndexed { ind, text->
+                            Tab(
+                                selected = ind == pageStateHorizontal.settledPage,
+                                onClick = {
+                                    scope.launch {
+                                        pageStateHorizontal.animateScrollToPage(ind)
+                                    }
+                                },
+                                selectedContentColor = Color.Transparent,
+                                unselectedContentColor = Color.Transparent,
+                                modifier = Modifier.padding(bottom = AppTheme.dimens.small2)
+                            ) {
+                                Text(
+                                    text = text,
+                                    style = AppTheme.typography.titleMedium.copy(
+                                        color = if (ind == pageStateHorizontal.settledPage) Color.White else Color(0xB3FAFAFA),
+                                        fontWeight = FontWeight.SemiBold
+                                    ),
+                                    modifier = Modifier.padding(horizontal = AppTheme.dimens.small),
+                                )
+                            }
+                        }
+                    }
+
+
+                    Box(
+                        contentAlignment = Alignment.CenterEnd,
+                        modifier = Modifier
+                            .constrainAs(search) {
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end)
+                                start.linkTo(tabs.end)
+                            }
+                            .padding(bottom = AppTheme.dimens.small2, end = AppTheme.dimens.small2)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.search),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(AppTheme.dimens.iconBottomBar)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onTap = {
+                                        onClickSearch()
+                                    })
+                                }
+                        )
                     }
                 }
 
@@ -317,7 +274,7 @@ fun ShortVideoScreen(
                             1 -> {
                                 ContentCommon(
                                     token = keyStore.value,
-                                    pageF = "Page1",
+                                    pageF = "Following",
                                     isPlaying = pageStateHorizontal.settledPage == 1,
                                     pagerState = followingPagerState,
                                     paddingValues = innerPadding,
@@ -332,7 +289,7 @@ fun ShortVideoScreen(
                             else -> {
                                 ContentCommon(
                                     token = keyStore.value,
-                                    pageF = "Page2",
+                                    pageF = "ForYou",
                                     isPlaying = pageStateHorizontal.settledPage == 2,
                                     pagerState = pagerState,
                                     paddingValues = innerPadding,

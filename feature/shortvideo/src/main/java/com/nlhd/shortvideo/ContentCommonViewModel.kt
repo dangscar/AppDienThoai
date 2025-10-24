@@ -1,6 +1,8 @@
 package com.nlhd.shortvideo
 
 import android.content.Context
+import android.graphics.SurfaceTexture
+import android.view.TextureView
 import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.AudioAttributes
@@ -32,9 +34,10 @@ class ContentCommonViewModel(
         }
     }
 
-    private val MAX_PLAYERS = 3 // Giới hạn số ExoPlayer cùng tồn tại
-    private val playerMap = mutableMapOf<Int, ExoPlayer>()
-    val preparedMap = mutableSetOf<Int>()
+    private val MAX_PLAYERS = 8 // Giới hạn số ExoPlayer cùng tồn tại
+    private val playerMap = mutableMapOf<String, ExoPlayer>()
+    private val textureMap = mutableMapOf<String, TextureView>()
+
     private var pageDefault = 0
     private var isFirst = false
 
@@ -64,8 +67,10 @@ class ContentCommonViewModel(
         .setEnableAudioTrackPlaybackParams(true)
 
     @OptIn(UnstableApi::class)
-    fun getOrCreatePlayer(page: Int, videoUrl: String, context: Context): ExoPlayer {
-        // Nếu player đã tồn tại, trả về nó
+    fun getOrCreatePlayer(pageF: String, page: Int, videoUrl: String, context: Context): ExoPlayer {
+        val key = "$pageF $page" // Khóa dạng "ForYou 1" hoặc "Following 2"
+
+        // Xác định hướng cuộn
         if (pageDefault < page) {
             pageDefault = page
             isFirst = true
@@ -73,36 +78,81 @@ class ContentCommonViewModel(
             pageDefault = page
             isFirst = false
         }
-        
-        playerMap[page]?.let { return it }
 
-        // Nếu số lượng player vượt quá giới hạn, giải phóng player cũ nhất
+        // Nếu đã tồn tại → trả về luôn
+        playerMap[key]?.let { return it }
+
+        // Nếu vượt giới hạn MAX_PLAYERS → tìm player xa nhất để release
         if (playerMap.size >= MAX_PLAYERS) {
             val victim = playerMap.keys
-                .filter { it != page }                               // loại trừ vị trí chuẩn bị thêm
-                .maxByOrNull { kotlin.math.abs(it - page) }          // xa nhất so với page hiện tại
+                .filter { it != key }
+                .maxByOrNull { existingKey ->
+                    // Lấy số page từ key cũ để so sánh khoảng cách
+                    val oldPage = existingKey.substringAfterLast(" ").toIntOrNull() ?: 0
+                    kotlin.math.abs(oldPage - page)
+                }
 
-            victim?.let { key ->
-                playerMap.remove(key)?.release()
+            victim?.let { victimKey ->
+                playerMap.remove(victimKey)?.release()
             }
         }
 
-
-
-        val exoPlayer = ExoPlayer
-            .Builder(context)
+        // Tạo mới player
+        val exoPlayer = ExoPlayer.Builder(context)
             .setMediaSourceFactory(defaultMediaSourceFactory)
             .setLoadControl(loadControl())
             .setTrackSelector(trackSelector(context))
             .build()
 
-
-        playerMap[page] = exoPlayer
+        playerMap[key] = exoPlayer
 
         exoPlayer.setMediaItem(MediaItem.fromUri(videoUrl))
         exoPlayer.prepare()
 
         return exoPlayer
+    }
+
+
+    fun resetTextureViewToPosition(
+        pageF: String,
+        page: Int,
+        context: Context,
+        exoPlayer: ExoPlayer
+    ): TextureView {
+        val key = "$pageF $page"
+
+        // Lưu lại position và trạng thái
+        val position = exoPlayer.currentPosition
+        val wasPlaying = exoPlayer.isPlaying
+
+        // Giải phóng view cũ nếu có
+        textureMap[key]?.let {
+            it.surfaceTextureListener = null
+            it.surfaceTexture?.release()
+            textureMap.remove(key)
+        }
+
+        // Tạo view mới
+        val textureView = TextureView(context).apply {
+            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                override fun onSurfaceTextureAvailable(st: SurfaceTexture, width: Int, height: Int) {
+                    exoPlayer.setVideoTextureView(this@apply)
+                    exoPlayer.seekTo(position)   // 👈 Seek lại đúng vị trí trước đó
+                    if (wasPlaying) exoPlayer.play()
+                }
+
+                override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
+                    // KHÔNG release SurfaceTexture ở đây để giữ frame hiện tại
+                    return true
+                }
+
+                override fun onSurfaceTextureSizeChanged(st: SurfaceTexture, width: Int, height: Int) {}
+                override fun onSurfaceTextureUpdated(st: SurfaceTexture) {}
+            }
+        }
+
+        textureMap[key] = textureView
+        return textureView
     }
 
     fun releaseAll() {

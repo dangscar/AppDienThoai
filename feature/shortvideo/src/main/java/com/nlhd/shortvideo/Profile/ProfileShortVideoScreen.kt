@@ -498,6 +498,7 @@ fun ProfileShortVideoScreen(
         ) {
             val position = it.toRoute<DetailShortVideoProfile>().position
             DetailShortVideoScreen(
+                pageF = "Profile",
                 isTopBar = false,
                 position = position,
                 onClickBack = {

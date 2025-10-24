@@ -1,5 +1,6 @@
 package com.nlhd.shortvideo.MyVideos
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -333,6 +334,8 @@ fun MyVideoScreen(
                         }
                     }
                     is MyVideoState.Success -> {
+                        val message = (deleteVideoState as MyVideoState.Success).data.message
+                        //Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                         videos.refresh()
                         viewModel.setDeleteVideoState(MyVideoState.Idle)
                     }
@@ -366,6 +369,7 @@ fun MyVideoScreen(
         composable<DetailMyVideos> {
             val position = it.toRoute<DetailMyVideos>().position
             DetailShortVideoScreen(
+                pageF = "MyVideo",
                 position = position,
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {

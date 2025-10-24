@@ -1,6 +1,7 @@
 package com.nlhd.shortvideo.Search
 
 import android.annotation.SuppressLint
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
@@ -57,6 +58,7 @@ import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Utils
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.keystore.KeyStoreManager
+import com.nlhd.shortvideo.ContentCommonViewModel
 import kotlinx.serialization.Serializable
 
 import org.koin.androidx.compose.koinViewModel
@@ -235,6 +237,7 @@ fun SearchShortSuccessScreen(
         composable<DetailShortVideo> {
             val position = it.toRoute<DetailShortVideo>().position
             DetailShortVideoScreen(
+                pageF = "Search$position",
                 position = position,
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {

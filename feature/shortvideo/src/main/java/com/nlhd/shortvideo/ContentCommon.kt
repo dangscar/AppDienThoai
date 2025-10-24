@@ -1,6 +1,7 @@
 package com.nlhd.shortvideo
 
 import android.annotation.SuppressLint
+import android.graphics.SurfaceTexture
 import android.os.Build
 import android.util.Log
 import android.view.SurfaceView
@@ -171,10 +172,10 @@ fun ContentCommon(
     val context = LocalContext.current
     val activity = LocalContext.current as ComponentActivity
     val keyboardController = LocalSoftwareKeyboardController.current
-    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(key = pageF)
+    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(viewModelStoreOwner = activity)
     val widthScreen = LocalConfiguration.current.screenWidthDp.dp/2
     val infiniteTransition = rememberInfiniteTransition(label = "")
-    val angle by infiniteTransition.animateFloat(
+    /*val angle by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         label = "",
@@ -182,7 +183,7 @@ fun ContentCommon(
             animation = tween(7000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         )
-    )
+    )*/
     val lifeCycleOwner = LocalLifecycleOwner.current
 
     val isScrolling by remember {
@@ -206,10 +207,6 @@ fun ContentCommon(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val density = LocalDensity.current
-    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
-
-    var sheetHeight by remember { mutableStateOf(0.dp) }
-    val sheetVisible =  if(sheetHeight / screenHeight >= 0.0f) (sheetHeight / screenHeight).toFloat() else 0f  //Giá trị của bottomSheet hiển thị 0.6f
 
     var clickedLike by remember { mutableStateOf(false) }
     val scaleLike by animateFloatAsState(
@@ -246,7 +243,8 @@ fun ContentCommon(
                 decayAnimationSpec = exponentialDecay(0.9f)
             ),
             key = { page-> videos[page]?.id ?: page },
-            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+            beyondViewportPageCount = 1
         ) { page->
 
             key("$pageF $page") {
@@ -266,7 +264,7 @@ fun ContentCommon(
             val videoUrl = "${Utils.BASE_URL}/" + video.videoUrl
             val exoPlayer by remember {
                 mutableStateOf(
-                    contentCommonViewModel.getOrCreatePlayer(page, videoUrl, context)
+                    contentCommonViewModel.getOrCreatePlayer(pageF,page, videoUrl, context)
                 )
             }
             videoViewModel.getFollowUser(token, video.user.id.toString())
@@ -572,6 +570,11 @@ fun ContentCommon(
                 val minScale = aspectRatio // nhỏ nhất khi sheet chiếm 60%
                 val maxScale = 1f    // scale gốc
 
+                val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+
+                var sheetHeight by remember(page) { mutableStateOf(0.dp) }
+                val sheetVisible =  if(sheetHeight / screenHeight >= 0.0f) (sheetHeight / screenHeight).toFloat() else 0f  //Giá trị của bottomSheet hiển thị 0.6f
+
 // Tính tỉ lệ dựa vào sheetVisible
                 val targetScale = (maxScale - (sheetVisible.coerceAtMost(0.6f) / 0.6f) * (maxScale - minScale))
 
@@ -595,9 +598,7 @@ fun ContentCommon(
 
                 AndroidView(factory = {
                     TextureView(it).apply {
-                        // khi attach vào ExoPlayer
                         exoPlayer.setVideoTextureView(this)
-
                     }
                 }, modifier = Modifier
                     .fillMaxSize()
@@ -630,13 +631,13 @@ fun ContentCommon(
                             }
                         )
                     },
-                    update = {
-                        if (pagerState.settledPage == page) {
-                            exoPlayer.setVideoTextureView(it)
+                    update = { view->
+                        /*if (pagerState.settledPage == page) {
+
                         } else {
                             exoPlayer.setVideoTextureView(null)
 
-                        }
+                        }*/
 
                     }
                 )

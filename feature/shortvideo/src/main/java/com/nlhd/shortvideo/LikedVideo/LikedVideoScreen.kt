@@ -217,6 +217,7 @@ fun LikedVideoScreen(
         composable<DetailLikedVideo> {
             val position = it.toRoute<DetailLikedVideo>().position
             DetailShortVideoScreen(
+                pageF = "Liked",
                 isTopBar = false,
                 position = position,
                 onClickBack = {
@@ -240,6 +241,7 @@ fun LikedVideoScreen(
         composable<DetailFavoriteVideo> {
             val position = it.toRoute<DetailFavoriteVideo>().position
             DetailShortVideoScreen(
+                pageF = "Favorite",
                 isTopBar = false,
                 position = position,
                 onClickBack = {

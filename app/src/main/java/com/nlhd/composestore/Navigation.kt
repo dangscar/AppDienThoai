@@ -3,6 +3,7 @@ package com.nlhd.composestore
 import android.app.Activity
 import android.os.Build
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
@@ -100,6 +101,7 @@ import com.nlhd.manage_product.VersionProductScreen.LoadVersionProductScreen
 import com.nlhd.order.OrderScreen
 import com.nlhd.search.SearchScreen
 import com.nlhd.search.SearchSuccessScreen
+import com.nlhd.shortvideo.ContentCommonViewModel
 import com.nlhd.shortvideo.Profile.ProfileShortVideoScreen
 import com.nlhd.shortvideo.Search.SearchShortSuccessScreen
 import com.nlhd.shortvideo.ShortVideoScreen
@@ -454,6 +456,9 @@ fun CustomerScreen(
 ) {
     val navController = rememberNavController()
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
+
+    val activity = LocalContext.current as ComponentActivity
+    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(viewModelStoreOwner = activity)
     NavHost(
         startDestination = General,
         navController = navController,
@@ -870,6 +875,7 @@ fun CustomerScreen(
             SearchScreen(
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
+                        contentCommonViewModel.releaseAll()
                         softwareKeyboardController?.hide()
                         navController.popBackStack()
                     }
@@ -1077,6 +1083,8 @@ fun GeneralScreen(
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry.value?.destination
 
+    val activity = LocalContext.current as ComponentActivity
+    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(viewModelStoreOwner = activity)
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = containerTextFieldLogin,
@@ -1106,6 +1114,7 @@ fun GeneralScreen(
                 ShortVideoScreen(
                     innerPadding = innerPadding,
                     onClickBack = {
+                        contentCommonViewModel.releaseAll()
                         navController.navigate(Navigation.Video.route) {
                             popUpTo(Navigation.Video.route) { inclusive = true } // 👈 xoá cả entry Video
                             launchSingleTop = true
@@ -1129,6 +1138,7 @@ fun GeneralScreen(
                         onClickEditProfile = onClickEditProfile,
                         onClickAddVideo = onClickAddVideo,
                         onClickBack = {
+                            contentCommonViewModel.releaseAll()
                             navController.navigate(Navigation.Home.route) {
                                 popUpTo(0) { inclusive = true }
                                 launchSingleTop = true

@@ -222,6 +222,7 @@ fun TopBarDetailVideoScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailShortVideoScreen (
+    pageF: String,
     isTopBar: Boolean = true,
     position: Int,
     videos: LazyPagingItems<Video>,
@@ -236,7 +237,7 @@ fun DetailShortVideoScreen (
         videos.itemCount
     }
     var search by remember {
-        mutableStateOf("Find related content")
+        mutableStateOf("Tìm nội dung liên quan")
     }
     var isHidden by remember {
         mutableStateOf(false)
@@ -303,12 +304,15 @@ fun DetailShortVideoScreen (
 
         ContentCommon(
             token = keyStore.value,
-            pageF = "Page",
+            pageF = pageF,
             isPlaying = true,
             pagerState = pageState,
             paddingValues = innerPadding,
             videos = videos,
             onSearch = {
+                if (it == "") {
+                    return@ContentCommon
+                }
                 search = it
             },
             onHiddenText = {
