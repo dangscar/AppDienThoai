@@ -7,268 +7,330 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.LaunchedEffect
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 
-// --- 1. DATA MODEL & LOADING STATE ---
-
-// Loading state enumeration
-enum class LoadingState {
-    LOADING, SUCCESS, ERROR
-}
-
-// Data class defines a product Category
 data class Category(
     val id: Int,
-    val name: String, // Tên danh mục (ví dụ: Apple iPhone)
-    val productCount: Int, // Số lượng sản phẩm trong danh mục
-    val color: Color // Màu sắc tượng trưng cho danh mục
+    val name: String,
+    val productCount: Int,
+    val isActive: Boolean = true
 )
-// --- 2. VIEW MODEL (Data Provider) ---
-class CategoryViewModel {
-    private val mockCategories = listOf(
-        Category(1, "Apple iPhone", 152, Color(0xFFE8F5E9)),
-        Category(2, "Samsung Galaxy", 98, Color(0xFFE1F5FE)),
-        Category(3, "Xiaomi/Redmi", 210, Color(0xFFFFFDE7)),
-        Category(4, "Oppo", 65, Color(0xFFFBE9E7)),
-        Category(5, "Vivo", 40, Color(0xFFF3E5F5)),
-        Category(6, "Laptop & Tablet", 85, Color(0xFFECEFF1))
-    )
-    private val _categories = MutableStateFlow<List<Category>>(emptyList())
-    val categories: StateFlow<List<Category>> = _categories
 
-    private val _loadingState = MutableStateFlow(LoadingState.LOADING)
-    val loadingState: StateFlow<LoadingState> = _loadingState
-
-    // Simulated data loading function (replace with actual API call later)
-    suspend fun loadCategories() {
-        _loadingState.update { LoadingState.LOADING }
-        delay(1500) // Simulate network delay
-
-        // Simulate success/error response
-        if (Math.random() > 0.1) { // 90% chance of success
-            _categories.update { mockCategories }
-            _loadingState.update { LoadingState.SUCCESS }
-        } else { // 10% chance of failure (simulates network timeout/error)
-            _loadingState.update { LoadingState.ERROR }
-        }
-    }
-}
-
-// Mock ViewModel for Preview
-val mockViewModel = CategoryViewModel()
-
-
-// --- 3. MAIN UI (Composable Screen) ---
-// Add @OptIn to suppress the Experimental Material3 API warning
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageCategoryScreen(viewModel: CategoryViewModel = mockViewModel, modifier: Modifier = Modifier) {
-    // Fetch data and state
-    val categories by viewModel.categories.collectAsState()
-    val state by viewModel.loadingState.collectAsState()
-
-    // Trigger data loading when the screen is first composed
-    LaunchedEffect(Unit) {
-        viewModel.loadCategories()
+fun ManageCategoryScreen() {
+    var categories by remember {
+        mutableStateOf(
+            listOf(
+                Category(1, "Samsung", 25, true),
+                Category(2, "iPhone", 30, true),
+                Category(3, "Xiaomi", 20, true),
+                Category(4, "OPPO", 15, true),
+                Category(5, "Vivo", 10, false)
+            )
+        )
     }
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf<Category?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+
     Scaffold(
-        modifier = modifier.fillMaxSize(),
         topBar = {
-            // Category management header bar
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
-                        "Quản Lý Danh Mục",
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        "Quản lý danh mục",
+                        fontWeight = FontWeight.Bold
                     )
                 },
-                actions = {
-                    IconButton(onClick = { println("Thêm danh mục mới") }) {
-                        Icon(Icons.Filled.Add, contentDescription = "Thêm danh mục")
+                navigationIcon = {
+                    IconButton(onClick = { /* Navigate back */ }) {
+                        Icon(Icons.Default.ArrowBack, "Quay lại")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    selectedCategory = null
+                    showDialog = true
+                },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Default.Add, "Thêm danh mục", tint = Color.White)
+            }
         }
-    ) { innerPadding ->
+    ) { padding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
-                .background(Color(0xFFF5F5F5)), // Light background color
+                .fillMaxSize()
+                .padding(padding)
+                .background(Color(0xFFF5F5F5))
         ) {
-            Text(
-                "Danh sách các danh mục sản phẩm",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+            // Search bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                placeholder = { Text("Tìm kiếm danh mục...") },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, "Tìm kiếm")
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                )
             )
 
-            // Conditional rendering based on loading state
-            when (state) {
-                LoadingState.LOADING -> {
-                    // Show a progress indicator while loading
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+            // Statistics Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    StatItem("Tổng danh mục", categories.size.toString(), Color(0xFF2196F3))
+                    StatItem("Đang hoạt động", categories.count { it.isActive }.toString(), Color(0xFF4CAF50))
+                    StatItem("Tổng sản phẩm", categories.sumOf { it.productCount }.toString(), Color(0xFFFF9800))
                 }
-                LoadingState.ERROR -> {
-                    // Show an error message and a retry button
-                    ErrorView(
-                        message = "Lỗi tải dữ liệu. Hãy kiểm tra kết nối mạng của bạn và IP server.",
-                        onRetry = {
-                            viewModel.loadCategories()
+            }
+
+            // Category List
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                val filteredCategories = categories.filter {
+                    it.name.contains(searchQuery, ignoreCase = true)
+                }
+
+                items(filteredCategories) { category ->
+                    CategoryItem(
+                        category = category,
+                        onEdit = {
+                            selectedCategory = category
+                            showDialog = true
+                        },
+                        onDelete = {
+                            categories = categories.filter { it.id != category.id }
+                        },
+                        onToggleStatus = {
+                            categories = categories.map {
+                                if (it.id == category.id) it.copy(isActive = !it.isActive)
+                                else it
+                            }
                         }
                     )
                 }
-                LoadingState.SUCCESS -> {
-                    // LazyColumn to display the list of categories
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(categories) { category ->
-                            CategoryManagementItem(category = category) {
-                                // Handle event when user taps on the category (e.g., Edit)
-                                println("User wants to edit category: ${category.name}")
-                            }
-                        }
+            }
+        }
+    }
+
+    // Add/Edit Dialog
+    if (showDialog) {
+        CategoryDialog(
+            category = selectedCategory,
+            onDismiss = { showDialog = false },
+            onSave = { name ->
+                if (selectedCategory != null) {
+                    // Edit
+                    categories = categories.map {
+                        if (it.id == selectedCategory!!.id) it.copy(name = name)
+                        else it
                     }
+                } else {
+                    // Add new
+                    val newId = (categories.maxOfOrNull { it.id } ?: 0) + 1
+                    categories = categories + Category(newId, name, 0, true)
                 }
+                showDialog = false
             }
-        }
-    }
-}
-
-// Composable for displaying connection error
-@Composable
-fun ErrorView(message: String, onRetry: suspend () -> Unit) {
-    val scope = rememberCoroutineScope() // Lấy CoroutineScope
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = message,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
         )
-        Button(
-            onClick = {
-                // Khởi chạy Coroutine để gọi hàm suspend
-                scope.launch {
-                    onRetry()
-                }
-            }
-        ) {
-            Text("Thử lại")
-        }
     }
 }
 
-// --- 4. CATEGORY ITEM DISPLAY COMPONENT ---
-// Add @OptIn to suppress the Experimental Material3 API warning
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryManagementItem(category: Category, onClick: () -> Unit) {
+fun StatItem(label: String, value: String, color: Color) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = value,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = Color.Gray
+        )
+    }
+}
+
+@Composable
+fun CategoryItem(
+    category: Category,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onToggleStatus: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Symbolic color box/square
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(category.color),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = category.name.take(1),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.DarkGray
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Category details (Name and product count)
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = category.name,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "SL Sản phẩm: ${category.productCount}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.secondary
+                    text = "${category.productCount} sản phẩm",
+                    fontSize = 14.sp,
+                    color = Color.Gray
                 )
             }
 
-            // Arrow icon indicating edit action
-            Icon(
-                // Icons.Filled.ArrowForward is used instead of Icons.Filled.ArrowForwardIos
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "Edit arrow",
-                modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Status badge
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = if (category.isActive) Color(0xFF4CAF50).copy(alpha = 0.1f)
+                    else Color(0xFFFF5252).copy(alpha = 0.1f)
+                ) {
+                    Text(
+                        text = if (category.isActive) "Hoạt động" else "Tắt",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        color = if (category.isActive) Color(0xFF4CAF50) else Color(0xFFFF5252),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Menu button
+                Box {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, "Menu")
+                    }
+
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Chỉnh sửa") },
+                            onClick = {
+                                showMenu = false
+                                onEdit()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Edit, null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(if (category.isActive) "Tắt" else "Bật") },
+                            onClick = {
+                                showMenu = false
+                                onToggleStatus()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    if (category.isActive) Icons.Default.Close
+                                    else Icons.Default.Check,
+                                    null
+                                )
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Xóa", color = Color.Red) },
+                            onClick = {
+                                showMenu = false
+                                onDelete()
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Delete, null, tint = Color.Red)
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
-// --- 5. PREVIEW ---
-@Preview(showBackground = true)
 @Composable
-fun PreviewManageCategoryScreen() {
-    MaterialTheme {
-        ManageCategoryScreen(viewModel = mockViewModel)
-    }
+fun CategoryDialog(
+    category: Category?,
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    var name by remember { mutableStateOf(category?.name ?: "") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(if (category == null) "Thêm danh mục mới" else "Chỉnh sửa danh mục")
+        },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Tên danh mục") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (name.isNotBlank()) onSave(name)
+                },
+                enabled = name.isNotBlank()
+            ) {
+                Text("Lưu")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Hủy")
+            }
+        }
+    )
 }
