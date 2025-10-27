@@ -881,6 +881,7 @@ fun CustomerScreen(
                     }
                 },
                 onClickSearchSuccess = {
+                    contentCommonViewModel.releaseAll()
                     navController.navigate(SearchShortSuccess(it))
                 }
             )

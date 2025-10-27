@@ -36,7 +36,6 @@ class ContentCommonViewModel(
 
     private val MAX_PLAYERS = 8 // Giới hạn số ExoPlayer cùng tồn tại
     private val playerMap = mutableMapOf<String, ExoPlayer>()
-    private val textureMap = mutableMapOf<String, TextureView>()
 
     private var pageDefault = 0
     private var isFirst = false
@@ -113,51 +112,10 @@ class ContentCommonViewModel(
     }
 
 
-    fun resetTextureViewToPosition(
-        pageF: String,
-        page: Int,
-        context: Context,
-        exoPlayer: ExoPlayer
-    ): TextureView {
-        val key = "$pageF $page"
-
-        // Lưu lại position và trạng thái
-        val position = exoPlayer.currentPosition
-        val wasPlaying = exoPlayer.isPlaying
-
-        // Giải phóng view cũ nếu có
-        textureMap[key]?.let {
-            it.surfaceTextureListener = null
-            it.surfaceTexture?.release()
-            textureMap.remove(key)
-        }
-
-        // Tạo view mới
-        val textureView = TextureView(context).apply {
-            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                override fun onSurfaceTextureAvailable(st: SurfaceTexture, width: Int, height: Int) {
-                    exoPlayer.setVideoTextureView(this@apply)
-                    exoPlayer.seekTo(position)   // 👈 Seek lại đúng vị trí trước đó
-                    if (wasPlaying) exoPlayer.play()
-                }
-
-                override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
-                    // KHÔNG release SurfaceTexture ở đây để giữ frame hiện tại
-                    return true
-                }
-
-                override fun onSurfaceTextureSizeChanged(st: SurfaceTexture, width: Int, height: Int) {}
-                override fun onSurfaceTextureUpdated(st: SurfaceTexture) {}
-            }
-        }
-
-        textureMap[key] = textureView
-        return textureView
-    }
-
-    fun releaseAll() {
+    fun releaseAll(): Boolean {
         playerMap.values.forEach { it.release() }
         playerMap.clear()
+        return true
     }
 
     override fun onCleared() {

@@ -107,6 +107,8 @@ fun ShortVideoScreen(
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
 
+    val activity = LocalContext.current as ComponentActivity
+    val contentCommonViewModel: ContentCommonViewModel = koinViewModel(viewModelStoreOwner = activity)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -219,9 +221,12 @@ fun ShortVideoScreen(
                             Tab(
                                 selected = ind == pageStateHorizontal.settledPage,
                                 onClick = {
-                                    scope.launch {
-                                        pageStateHorizontal.animateScrollToPage(ind)
+                                    if (contentCommonViewModel.releaseAll()) {
+                                        scope.launch {
+                                            pageStateHorizontal.scrollToPage(ind)
+                                        }
                                     }
+
                                 },
                                 selectedContentColor = Color.Transparent,
                                 unselectedContentColor = Color.Transparent,
@@ -266,7 +271,10 @@ fun ShortVideoScreen(
                 }
 
                 CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-                    HorizontalPager(state = pageStateHorizontal) {
+                    HorizontalPager(
+                        state = pageStateHorizontal,
+                        userScrollEnabled = false
+                    ) {
                         when (it) {
                             0 -> {
 

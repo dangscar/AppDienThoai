@@ -120,6 +120,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import kotlin.math.abs
 
 @Composable
 fun Circle(
@@ -171,7 +172,6 @@ fun ContentCommon(
 ) {
     val context = LocalContext.current
     val activity = LocalContext.current as ComponentActivity
-    val keyboardController = LocalSoftwareKeyboardController.current
     val contentCommonViewModel: ContentCommonViewModel = koinViewModel(viewModelStoreOwner = activity)
     val widthScreen = LocalConfiguration.current.screenWidthDp.dp/2
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -364,12 +364,12 @@ fun ContentCommon(
                 }
             }
 
-            LaunchedEffect(pagerState.settledPage) {
+            /*LaunchedEffect(pagerState.settledPage) {
                 val runtime = Runtime.getRuntime()
                 val used = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
                 val max = runtime.maxMemory() / 1024 / 1024
                 Log.d("AAA", "Heap usage: ${used}MB / ${max}MB")
-            }
+            }*/
 
             val paddingBottom = paddingValues.calculateBottomPadding()
 
@@ -597,9 +597,7 @@ fun ContentCommon(
 
 
                 AndroidView(factory = {
-                    TextureView(it).apply {
-                        exoPlayer.setVideoTextureView(this)
-                    }
+                    TextureView(it)
                 }, modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
@@ -631,13 +629,17 @@ fun ContentCommon(
                             }
                         )
                     },
-                    update = { view->
-                        /*if (pagerState.settledPage == page) {
+                    update = { textureView ->
 
+                        // 👇 Tính khoảng cách giữa trang hiện tại và trang đang render
+                        val distance = abs(pagerState.settledPage - page)
+
+                        // 👇 Nếu trang nằm trong vùng hiển thị (hiện tại ± beyondCount)
+                        if (distance <= 1) {
+                            exoPlayer.setVideoTextureView(textureView)
                         } else {
                             exoPlayer.setVideoTextureView(null)
-
-                        }*/
+                        }
 
                     }
                 )
