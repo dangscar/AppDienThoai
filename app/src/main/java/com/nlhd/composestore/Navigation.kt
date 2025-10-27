@@ -329,7 +329,7 @@ fun AdminScreen(
                         }
 
                         Navigate.Category -> {
-
+                            navController.navigate(ManageCategory)
                         }
                     }
                 }
