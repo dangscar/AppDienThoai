@@ -5,5 +5,6 @@ enum class Navigate {
     Order,
     Customer,
     Balance,
-    Profile
+    Profile,
+    Category
 }

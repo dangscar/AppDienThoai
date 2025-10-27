@@ -39,3 +39,5 @@ data class AddColorProduct(
 data class EditColorProduct(
     val id: Int
 )
+@Serializable
+object ManageCategory

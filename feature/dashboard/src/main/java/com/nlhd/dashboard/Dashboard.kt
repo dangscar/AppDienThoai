@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -128,6 +130,7 @@ fun Dashboard(
                     }
                 }
                 is DashboardState.Success -> {
+
                     val data = (state.value as DashboardState.Success).data
                     Text(
                         "Thông tin chung",
@@ -136,6 +139,20 @@ fun Dashboard(
                         ),
                         modifier = Modifier.padding(AppTheme.dimens.small2)
                     )
+                    Button(
+                        onClick = {
+                            onClickNavigate(Navigate.Category)
+                        }
+                    ) {
+                        Text(
+                            "Xem danh mục",
+                            style = AppTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            ),
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
                     FlowRow(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -185,17 +202,16 @@ fun Dashboard(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
-                                        IconButton(
-                                            onClick = {}
-                                        ) {
-                                            Icon(painter = painterResource(card.icon), contentDescription = null, tint = Color.White)
-                                        }
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                                        Icon(painter = painterResource(card.icon), contentDescription = null, tint = Color.White,
+                                            modifier = Modifier
+                                                .size(AppTheme.dimens.iconBottomBar)
+                                        )
                                         Text(card.count.toString(), style = AppTheme.typography.headlineLarge.copy(
                                             fontWeight = FontWeight.Bold,
                                             color = Color.White
                                         ))
                                     }
+                                    Spacer(modifier = Modifier.height(AppTheme.dimens.small))
                                     Text(card.title, style = AppTheme.typography.bodyMedium.copy(
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold,
@@ -232,7 +248,7 @@ fun Dashboard(
                             barChartData = BarChartData(bars = barChartData),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(AppTheme.dimens.small2)
+                                .padding(horizontal = AppTheme.dimens.medium2)
                                 .height(AppTheme.dimens.extraLarge),
                         )
                     }

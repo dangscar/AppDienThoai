@@ -1,5 +1,6 @@
 package com.nlhd.composestore
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import android.util.Log
@@ -113,6 +114,8 @@ import com.nlhd.user.UploadAvatar.UploadAvatarScreen
 import com.nlhd.user.UserScreen
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
+import com.nlhd.category.ManageCategoryScreen
+import com.nlhd.composestore.navigate.ManageCategory
 
 @Serializable
 object AdminScreen
@@ -163,6 +166,7 @@ object Admin
 
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun BottomBar(
     currentDestination: NavDestination?,
@@ -253,13 +257,12 @@ fun Navigation(
     }
     val isAdmin = (state.value) is NavigationState.Success
     val isLoading = (state.value) is NavigationState.Loading
-    /*val navigate = if (isAdmin) {
+    val navigate = if (isAdmin) {
         AdminScreen
     } else if (isLoading) {
         LoadingScreen
     }
-    else CustomerScreen*/
-    val navigate = CustomerScreen
+    else CustomerScreen
     NavHost(
         navController = navController,
         startDestination = navigate
@@ -323,6 +326,10 @@ fun AdminScreen(
                         }
                         Navigate.Profile -> {
                             navController.navigate(Admin)
+                        }
+
+                        Navigate.Category -> {
+
                         }
                     }
                 }
@@ -406,6 +413,16 @@ fun AdminScreen(
                 }
             )
         }
+
+        composable<ManageCategory> {
+            ManageCategoryScreen(
+                onClickBack = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
         composable<LoadColorProduct> {
             val id = it.toRoute<LoadColorProduct>().id
             LoadColorProductScreen(
@@ -448,6 +465,7 @@ fun AdminScreen(
     }
 }
 
+@SuppressLint("ContextCastToActivity")
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CustomerScreen(
@@ -1063,6 +1081,7 @@ fun CustomerScreen(
     }
 }
 
+@SuppressLint("ContextCastToActivity")
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
