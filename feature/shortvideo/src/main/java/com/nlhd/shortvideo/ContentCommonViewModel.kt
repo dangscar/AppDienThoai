@@ -34,7 +34,7 @@ class ContentCommonViewModel(
         }
     }
 
-    private val MAX_PLAYERS = 8 // Giới hạn số ExoPlayer cùng tồn tại
+    private val MAX_PLAYERS = 4 // Giới hạn số ExoPlayer cùng tồn tại
     private val playerMap = mutableMapOf<String, ExoPlayer>()
 
     private var pageDefault = 0
@@ -77,7 +77,7 @@ class ContentCommonViewModel(
             pageDefault = page
             isFirst = false
         }
-
+        //Log.d("AAA", playerMap.toString())
         // Nếu đã tồn tại → trả về luôn
         playerMap[key]?.let { return it }
 
@@ -111,10 +111,28 @@ class ContentCommonViewModel(
         return exoPlayer
     }
 
+    fun pauseAll() {
+        playerMap.values.forEach { it.pause() }
+    }
 
     fun releaseAll(): Boolean {
         playerMap.values.forEach { it.release() }
         playerMap.clear()
+        return true
+    }
+
+    fun playVisiblePlayer(pageF: String, visibleIndex: Int): Boolean {
+        val targetKey = "$pageF $visibleIndex"
+
+        playerMap.forEach { (key, player) ->
+            if (key == targetKey) {
+                player.playWhenReady = true
+                player.play()
+            } else {
+                player.playWhenReady = false
+                player.pause()
+            }
+        }
         return true
     }
 

@@ -116,6 +116,8 @@ import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 import com.nlhd.category.ManageCategoryScreen
 import com.nlhd.composestore.navigate.ManageCategory
+import com.nlhd.shortvideo.UploadVideo.UploadVideoMainScreen
+import kotlinx.coroutines.delay
 
 @Serializable
 object AdminScreen
@@ -133,9 +135,9 @@ sealed class Navigation(
     val icon: Int
 ) {
     object Home : Navigation("home", "Trang chủ", R.drawable.ic_home)
-    object Video: Navigation("video", "Short Video", R.drawable.ic_video)
-    object AddVideo: Navigation("addVideo", "Upload", R.drawable.add)
-    object Order: Navigation("seach", "Đơn hàng", R.drawable.ic_notification)
+    object Shop: Navigation("shop", "Shop", R.drawable.ic_shop)
+    object AddVideo: Navigation("addVideo", "Thêm video", R.drawable.ic_addvideo)
+    object Order: Navigation("order", "Đơn hàng", R.drawable.ic_artical)
     object User : Navigation("user", "Người dùng", R.drawable.ic_profile)
 }
 
@@ -176,16 +178,18 @@ fun BottomBar(
     Column {
         Divider(
             thickness = AppTheme.dimens.extraSmall,
-            color = Color(0xFF484646)
+            //color = Color(0xED484646)
+            color = Color(0x4ACECBCB)
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(color = if (currentDestination?.hierarchy?.any { it.route == Navigation.Home.route } == true) Color.Black else Color.Transparent)
                 .windowInsetsPadding(WindowInsets.navigationBars),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val route = listOf(Navigation.Home, Navigation.Video ,Navigation.Order, Navigation.User)
+            val route = listOf(Navigation.Home, Navigation.Shop, Navigation.AddVideo ,Navigation.Order, Navigation.User)
             route.forEach { navigation ->
                 BottomBarItem(
                     navigation = navigation,
@@ -198,7 +202,8 @@ fun BottomBar(
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    },
+                    isShortVideo = currentDestination?.hierarchy?.any { it.route == Navigation.Home.route } == true
                 )
             }
 
@@ -212,10 +217,21 @@ fun BottomBar(
 fun BottomBarItem(
     navigation: Navigation,
     isSelected: Boolean,
+    isShortVideo: Boolean,
     onClick: () -> Unit
 ) {
 
-    val iconColor = if (isSelected) containerTopBar else Color.Gray
+    val iconColor = if (isSelected) {
+        if (isShortVideo) {
+            Color.White
+        } else {
+            Color.Black
+        }
+
+    } else {
+        Color.Gray
+    }
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -256,27 +272,14 @@ fun Navigation(
         }
     }
     val isAdmin = (state.value) is NavigationState.Success
-    val isLoading = (state.value) is NavigationState.Loading
     val navigate = if (isAdmin) {
         AdminScreen
-    } else if (isLoading) {
-        LoadingScreen
     }
     else CustomerScreen
     NavHost(
         navController = navController,
         startDestination = navigate
     ) {
-        composable<LoadingScreen> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column {
-                    CircularProgressIndicator(
-                        color = contentPrice,
-                    )
-                }
-
-            }
-        }
         composable<CustomerScreen> {
             CustomerScreen(
                 onNavigateAdmin = {
@@ -899,8 +902,10 @@ fun CustomerScreen(
                     }
                 },
                 onClickSearchSuccess = {
-                    contentCommonViewModel.releaseAll()
-                    navController.navigate(SearchShortSuccess(it))
+                    if (contentCommonViewModel.releaseAll()) {
+                        navController.navigate(SearchShortSuccess(it))
+                    }
+
                 }
             )
         }
@@ -935,6 +940,7 @@ fun CustomerScreen(
                 search = it.toRoute<SearchShortSuccess>().search,
                 onClickBack = {
                     if (navController.previousBackStackEntry != null) {
+                        contentCommonViewModel.releaseAll()
                         navController.popBackStack()
                     }
                 },
@@ -1107,7 +1113,7 @@ fun GeneralScreen(
     val contentCommonViewModel: ContentCommonViewModel = koinViewModel(viewModelStoreOwner = activity)
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = containerTextFieldLogin,
+        containerColor = Color.White,
         contentColor = Color.Black,
         bottomBar = {
             BottomBar(
@@ -1122,21 +1128,12 @@ fun GeneralScreen(
             startDestination = Navigation.Home.route
         ) {
             composable(Navigation.Home.route) {
-                HomeScreen(
-                    innerPadding = innerPadding,
-                    onClick = onClick,
-                    onClickCart = onClickCart,
-                    onClickSearch = onClickSearch
-                )
-            }
-
-            composable(Navigation.Video.route) {
                 ShortVideoScreen(
                     innerPadding = innerPadding,
                     onClickBack = {
                         contentCommonViewModel.releaseAll()
-                        navController.navigate(Navigation.Video.route) {
-                            popUpTo(Navigation.Video.route) { inclusive = true } // 👈 xoá cả entry Video
+                        navController.navigate(Navigation.Home.route) {
+                            popUpTo(Navigation.Home.route) { inclusive = true } // 👈 xoá cả entry Video
                             launchSingleTop = true
                         }
                     },
@@ -1144,11 +1141,34 @@ fun GeneralScreen(
                     onClickSearch = onClickSearchShortVideo,
                     onClickProfile = onClickProfile,
                 )
+            }
+
+            composable(Navigation.Shop.route) {
+                HomeScreen(
+                    innerPadding = innerPadding,
+                    onClick = onClick,
+                    onClickCart = onClickCart,
+                    onClickSearch = onClickSearch
+                )
 
             }
 
+            composable(Navigation.AddVideo.route) {
+                UploadVideoMainScreen(
+                    paddingValues = innerPadding,
+                    onClickBack = {
+                        navController.navigate(Navigation.Home.route) {
+                            popUpTo(0) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+
             composable(Navigation.Order.route) {
-                OrderScreen()
+                OrderScreen(
+                    paddingValues = innerPadding
+                )
             }
 
             composable(Navigation.User.route) {

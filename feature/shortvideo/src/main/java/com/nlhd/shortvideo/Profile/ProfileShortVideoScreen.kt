@@ -106,12 +106,13 @@ fun ProfileShortVideoScreen(
         startDestination = ListShortVideoProfile
     ) {
         composable<ListShortVideoProfile> {
+            val name = if (state is ProfileShortVideoState.Success) (state as ProfileShortVideoState.Success).data.name else ""
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 containerColor = Color.White,
                 topBar = {
                     TopBarProfileShortVideo(
-                        title = "Tác giả đăng tải",
+                        title = name,
                         onClickBack = onClickBack
                     )
                 }
@@ -171,17 +172,6 @@ fun ProfileShortVideoScreen(
                                         verticalArrangement = Arrangement.SpaceBetween,
                                         horizontalAlignment = Alignment.Start
                                     ) {
-                                        Text(
-                                            user.name,
-                                            style = AppTheme.typography.headlineLarge.copy(
-                                                color = Color.Black,
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            modifier = Modifier.padding(horizontal = AppTheme.dimens.small2),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
 
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
@@ -419,6 +409,11 @@ fun ProfileShortVideoScreen(
                                     }
                                 }
 
+                                Text("Danh sách video", style = AppTheme.typography.headlineMedium.copy(
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.SemiBold
+                                ))
+                                Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
 
                             }
 
@@ -429,11 +424,8 @@ fun ProfileShortVideoScreen(
                     item {
                         val width = LocalConfiguration.current.screenWidthDp.dp/3
                         val height = LocalConfiguration.current.screenWidthDp.dp/2.25f
-                        Text("Danh sách video", style = AppTheme.typography.headlineMedium.copy(
-                            color = Color.Black,
-                            fontWeight = FontWeight.SemiBold
-                        ))
-                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+
+
                         ContextualFlowRow(
                             modifier = Modifier.fillMaxWidth(),
                             itemCount = videos.itemCount,
@@ -452,7 +444,7 @@ fun ProfileShortVideoScreen(
                                 contentAlignment = Alignment.BottomStart
                             ){
                                 videos[index]?.let { video ->
-                                    val image = if (video.thumbnailUrl == "") R.drawable.anhden else  "${Utils.BASE_URL}/" + video.thumbnailUrl
+                                    val image = if (video.thumbnailUrl == "null" || video.thumbnailUrl == null || video.thumbnailUrl == "") R.drawable.anhden else  "${Utils.BASE_URL}/" + video.thumbnailUrl
                                     AsyncImage(
                                         model = image,
                                         contentDescription = null,

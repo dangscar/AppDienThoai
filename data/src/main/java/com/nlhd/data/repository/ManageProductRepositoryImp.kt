@@ -398,11 +398,13 @@ class ManageProductRepositoryImp(
                 }.body<MessageResponseDto>()
 
                 val response = responseDto.toDomain(responseDto)
+                Log.d("AAA", responseDto.message.toString())
                 ResultWrapper.Success(response)
             }
 
 
         } catch (e: Exception) {
+            Log.d("AAA", e.message.toString())
             ResultWrapper.Failure(e)
         }
     }

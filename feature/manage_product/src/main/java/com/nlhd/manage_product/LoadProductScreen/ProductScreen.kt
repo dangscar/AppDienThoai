@@ -102,7 +102,7 @@ fun ProductScreen(
                     placeholder = { Text("Tìm kiếm") },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.ic_search),
+                            painter = painterResource(R.drawable.ic_search_short),
                             contentDescription = "Search",
                             modifier = Modifier.size(AppTheme.dimens.medium2)
                         )
@@ -171,7 +171,8 @@ fun ProductScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(0.85f)
                                 ) {
                                     AsyncImage(
                                         model = "${Utils.BASE_URL}/"+image,
@@ -216,6 +217,7 @@ fun ProductScreen(
                                     color = Color.Blue
                                 ),
                                     modifier = Modifier
+                                        .weight(0.15f)
                                         .padding(AppTheme.dimens.small2)
                                         .pointerInput(Unit) {
                                             detectTapGestures(

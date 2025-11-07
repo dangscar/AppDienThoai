@@ -2,6 +2,7 @@ package com.nlhd.order
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,87 +41,75 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderScreen(
+    paddingValues: PaddingValues,
     viewModel: OrderViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
     val orders = viewModel.getOrders(keyStore.value).collectAsLazyPagingItems()
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("My orders", style = AppTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    ),
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        maxLines = 1
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
-                ),
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(paddingValues),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        stickyHeader {
+            Text("My orders", style = AppTheme.typography.headlineLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            ),
+                modifier = Modifier.fillMaxWidth().background(color = Color.White).padding(AppTheme.dimens.small3),
+                textAlign = TextAlign.Center,
+                maxLines = 1
             )
-        },
-        containerColor = Color.White
-    ) { innerPadding->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (orders.loadState.refresh) {
-                is LoadState.Error -> {
+        }
+        when (orders.loadState.refresh) {
+            is LoadState.Error -> {
+                item {
+                    Text("Chưa có đơn hàng nào", style = AppTheme.typography.headlineMedium.copy(
+                        color = Color.Black,
+                        fontWeight = FontWeight.Normal
+                    ))
+                    Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                    Button(
+                        onClick = {
+                            orders.retry()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = contentPrice
+                        )
+                    ) {
+                        Text("Retry", style = AppTheme.typography.headlineMedium.copy(
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        ))
+                    }
+                }
+            }
+            LoadState.Loading -> {
+                item {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            color = contentPrice
+                        )
+                    }
+                }
+            }
+            is LoadState.NotLoading -> {
+                if (orders.itemCount == 0) {
                     item {
                         Text("Chưa có đơn hàng nào", style = AppTheme.typography.headlineMedium.copy(
                             color = Color.Black,
                             fontWeight = FontWeight.Normal
                         ))
-                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                        Button(
-                            onClick = {
-                                orders.retry()
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = contentPrice
-                            )
-                        ) {
-                            Text("Retry", style = AppTheme.typography.headlineMedium.copy(
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            ))
-                        }
                     }
                 }
-                LoadState.Loading -> {
-                    item {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
-                                color = contentPrice
-                            )
-                        }
-                    }
-                }
-                is LoadState.NotLoading -> {
-                    if (orders.itemCount == 0) {
-                        item {
-                            Text("Chưa có đơn hàng nào", style = AppTheme.typography.headlineMedium.copy(
-                                color = Color.Black,
-                                fontWeight = FontWeight.Normal
-                            ))
-                        }
-                    }
-                    items(orders.itemCount) { index->
-                        orders[index]?.let {
-                           CardOrder(it)
-                        }
+                items(orders.itemCount) { index->
+                    orders[index]?.let {
+                        CardOrder(it)
                     }
                 }
             }
-
         }
 
     }

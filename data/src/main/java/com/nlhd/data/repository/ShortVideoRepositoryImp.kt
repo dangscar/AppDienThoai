@@ -11,6 +11,8 @@ import com.nlhd.core.utils.Utils
 import com.nlhd.data.mapper.toDomain
 import com.nlhd.data.model.Message.MessageResponseDto
 import com.nlhd.data.model.shortVideo.Comments.AddComment.AddCommentRequestDto
+import com.nlhd.data.model.shortVideo.LikeShortVideo.FavoriteResponseDto
+import com.nlhd.data.model.shortVideo.LikeShortVideo.LikeResponseDto
 import com.nlhd.data.model.shortVideo.ProfileShortVideo.Info.InfoProfileResponseDto
 import com.nlhd.data.model.shortVideo.UpdateCaptionVideo.UpdateCaptionRequest
 import com.nlhd.data.remote.GetCommentsPagingSource
@@ -25,6 +27,8 @@ import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.shortVideo.Comments.AddComment.AddCommentRequest
 import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
 import com.nlhd.domain.entity.shortVideo.GetVideos.Video
+import com.nlhd.domain.entity.shortVideo.LikeShortVideo.FavoriteResponse
+import com.nlhd.domain.entity.shortVideo.LikeShortVideo.LikeResponse
 import com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.InfoProfileResponse
 import com.nlhd.domain.entity.shortVideo.UploadVideo.UploadVideo
 import com.nlhd.domain.repository.ShortVideoRepository
@@ -99,12 +103,12 @@ class ShortVideoRepositoryImp(
     override suspend fun likes(
         token: String,
         videoId: String
-    ): ResultWrapper<MessageResponse> {
+    ): ResultWrapper<LikeResponse> {
         return try {
             val responseDto = ktor.post(Utils.BASE_URL+"/api/likes/${videoId}") {
                 header("Authorization", "Bearer $token")
                 contentType(ContentType.Application.Json)
-            }.body<MessageResponseDto>()
+            }.body<LikeResponseDto>()
             val response = responseDto.toDomain(responseDto)
             ResultWrapper.Success(response)
         } catch (e: Exception) {
@@ -115,12 +119,12 @@ class ShortVideoRepositoryImp(
     override suspend fun favorites(
         token: String,
         videoId: String
-    ): ResultWrapper<MessageResponse> {
+    ): ResultWrapper<FavoriteResponse> {
         return try {
             val responseDto = ktor.post(Utils.BASE_URL+"/api/favorites/${videoId}") {
                 header("Authorization", "Bearer $token")
                 contentType(ContentType.Application.Json)
-            }.body<MessageResponseDto>()
+            }.body<FavoriteResponseDto>()
             val response = responseDto.toDomain(responseDto)
             ResultWrapper.Success(response)
         } catch (e: Exception) {

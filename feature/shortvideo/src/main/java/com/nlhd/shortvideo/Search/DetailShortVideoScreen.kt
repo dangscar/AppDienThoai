@@ -54,10 +54,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
@@ -109,7 +111,7 @@ fun TopBarDetailVideoScreen(
                         Color(0x57FFFFFF),
                         RoundedCornerShape(AppTheme.dimens.small2)
                     )
-                    .padding(AppTheme.dimens.small)
+                    .padding(AppTheme.dimens.small+AppTheme.dimens.border)
                 ,
                 singleLine = true,
                 textStyle = TextStyle(color = Color.White),
@@ -126,17 +128,17 @@ fun TopBarDetailVideoScreen(
                         val (icon ,text, line,search) = createRefs()
 
                         Icon(
-                            painter = painterResource(R.drawable.search),
+                            painter = painterResource(R.drawable.ic_search_short),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(AppTheme.dimens.medium2)
                                 .constrainAs(icon) {
-                                    start.linkTo(parent.start)
+                                    start.linkTo(parent.start, margin = 3.dp)
                                     top.linkTo(parent.top)
                                     bottom.linkTo(parent.bottom)
                                     end.linkTo(text.start)
                                 }
-                                .padding(AppTheme.dimens.paddingAdd),
+                                .padding(AppTheme.dimens.small),
                             tint = Color.White
                         )
 
@@ -206,7 +208,7 @@ fun TopBarDetailVideoScreen(
         } else {
 
             Text(
-                "Short Videos",
+                "Video in profile",
                 style = AppTheme.typography.headlineMedium.copy(
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold
@@ -229,7 +231,8 @@ fun DetailShortVideoScreen (
     onClickBack: () -> Unit,
     onClickSeeProduct: (Int, Int, Int) -> Unit,
     onClickProfile: (Int) -> Unit,
-    onSearch: () -> Unit
+    onSearch: () -> Unit,
+    onPageSearchSuccess: ((Int) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
@@ -256,13 +259,6 @@ fun DetailShortVideoScreen (
                     .background(color = Color.Black),
                 verticalArrangement = Arrangement.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = Color(0xFF484646))
-                        .height(AppTheme.dimens.border)
-                )
-                Spacer(modifier = Modifier.height(AppTheme.dimens.border*2))
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.medium),
                     verticalAlignment = Alignment.CenterVertically
@@ -322,7 +318,8 @@ fun DetailShortVideoScreen (
             onClickProfile = onClickProfile,
             onViewer = {
                 viewer = it
-            }
+            },
+            onPageSearchSuccess = onPageSearchSuccess
         )
 
 

@@ -520,6 +520,7 @@ fun EditColorProductScreen(
             UpdateColorProductState.Pending -> {}
             is UpdateColorProductState.Success -> {
                 Toast.makeText(context, if( (updateColorState as UpdateColorProductState.Success).data.message == "Success") "Cập nhật thành công" else "Cập nhật thất bại", Toast.LENGTH_SHORT).show()
+                Log.d("AAA", (updateColorState as UpdateColorProductState.Success).data.message)
                 onClickBack()
             }
         }

@@ -282,6 +282,8 @@ fun CartScreen(
                                         customer_info = cartResponse.customerInformation!!.id.toInt(),
                                         selected_products = jsonList
                                     )
+                                    Log.d("AAA", checkoutRequest.customer_info.toString())
+                                    Log.d("AAA", checkoutRequest.selected_products.toString())
                                     cartViewModel.checkoutPreview(keyStore.value, checkoutRequest)
                                 } else {
                                     currentToast?.cancel()

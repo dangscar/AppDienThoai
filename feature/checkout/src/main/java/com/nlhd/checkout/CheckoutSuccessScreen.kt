@@ -52,12 +52,12 @@ fun CheckoutSuccessScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Thanh toán thành công", style = AppTheme.typography.titleLarge.copy(
+                    Text("Thanh toán thành công", style = AppTheme.typography.titleMedium.copy(
                         color = Color.White,
                     ))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = containerConfirm,
+                    containerColor = contentPrice,
                     titleContentColor = Color.White
                 )
             )

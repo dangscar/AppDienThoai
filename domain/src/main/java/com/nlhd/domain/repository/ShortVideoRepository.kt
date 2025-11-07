@@ -5,6 +5,8 @@ import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.shortVideo.Comments.AddComment.AddCommentRequest
 import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
 import com.nlhd.domain.entity.shortVideo.GetVideos.Video
+import com.nlhd.domain.entity.shortVideo.LikeShortVideo.FavoriteResponse
+import com.nlhd.domain.entity.shortVideo.LikeShortVideo.LikeResponse
 import com.nlhd.domain.entity.shortVideo.ProfileShortVideo.Info.InfoProfileResponse
 import com.nlhd.domain.entity.shortVideo.UploadVideo.UploadVideo
 import com.nlhd.domain.resultWrapper.ResultWrapper
@@ -14,8 +16,8 @@ interface ShortVideoRepository {
     fun getVideos(token: String): Flow<PagingData<Video>>
     suspend fun getFollowUser(token: String, userId: String): ResultWrapper<MessageResponse>
     suspend fun follows(token: String, userId: String): ResultWrapper<MessageResponse>
-    suspend fun likes (token: String, videoId: String): ResultWrapper<MessageResponse>
-    suspend fun favorites (token: String, videoId: String): ResultWrapper<MessageResponse>
+    suspend fun likes (token: String, videoId: String): ResultWrapper<LikeResponse>
+    suspend fun favorites (token: String, videoId: String): ResultWrapper<FavoriteResponse>
     fun getComments(token: String, videoId: String): Flow<PagingData<Comment>>
     suspend fun addComment(token: String, addCommentRequest: AddCommentRequest): ResultWrapper<MessageResponse>
     fun getVideosSearch(token: String, search: String): Flow<PagingData<Video>>

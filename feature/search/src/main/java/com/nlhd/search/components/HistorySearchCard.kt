@@ -45,7 +45,7 @@ fun HistorySearchCard(
                     Icon(
                         painter = painterResource(R.drawable.ic_timer),
                         contentDescription = "Back",
-                        modifier = Modifier.size(AppTheme.dimens.iconBottomBar)
+                        modifier = Modifier.size(AppTheme.dimens.medium)
                     )
                 }
                 Text(
@@ -64,7 +64,7 @@ fun HistorySearchCard(
                 Icon(
                     painter = painterResource(R.drawable.ic_cancel),
                     contentDescription = "Cancel",
-                    modifier = Modifier.size(AppTheme.dimens.iconBottomBar)
+                    modifier = Modifier.size(AppTheme.dimens.medium)
                 )
             }
         }

@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -52,12 +54,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -126,74 +131,45 @@ fun DetailScreen(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = containerTopBar
+                    containerColor = Color.White
                 ),
                 title = {
-                    BasicTextField(
-                        value = "Bạn muốn tìm gì?",
-                        onValueChange = {},
-                        textStyle = TextStyle(color = Color.Black),
-                        singleLine = true,
-                        readOnly = true,
-                        decorationBox = {
-                            ConstraintLayout(
-                                modifier = Modifier
-                                    .background(
-                                        color = containerButtonLightGray,
-                                        RoundedCornerShape(AppTheme.dimens.small3)
-                                    )
-                                    .padding(AppTheme.dimens.small)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(
-                                            onTap = {
-                                                onClickSearch()
-                                            }
-                                        )
-                                    }
-                            ) {
-                                val (search, text) = createRefs()
-                                IconButton(
-                                    onClick = {},
-                                    modifier = Modifier
-                                        .constrainAs(search) {
-                                            top.linkTo(parent.top)
-                                            bottom.linkTo(parent.bottom)
-                                            start.linkTo(parent.start)
-                                            end.linkTo(text.start)
-                                        }
-                                        .size(AppTheme.dimens.medium3)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_search),
-                                        contentDescription = "Search",
-                                        tint = Color.Black,
-                                        modifier = Modifier.size(AppTheme.dimens.medium)
-                                    )
-                                }
-
-                                Text(
-                                    text = "Bạn muốn tìm gì?",
-                                    style = AppTheme.typography.labelMedium.copy(
-                                        fontWeight = FontWeight.Normal,
-                                        color = Color.Black,
-                                    ),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.constrainAs(text) {
-                                        top.linkTo(parent.top)
-                                        bottom.linkTo(parent.bottom)
-                                        start.linkTo(search.end)
-                                        end.linkTo(parent.end)
-                                        width = Dimension.fillToConstraints
-                                    }
-                                )
-
-                            }
-                        },
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .background(containerSearch, RoundedCornerShape(AppTheme.dimens.medium))
-                    )
+                            .pointerInput(Unit) {
+                                onClickSearch()
+                            }
+                            .border(width = AppTheme.dimens.border, shape = RoundedCornerShape(AppTheme.dimens.small2), color = Color.White)
+                            .clip(RoundedCornerShape(AppTheme.dimens.small2))
+                            .background(Color(0xFFF2F2F2))
+                            .fillMaxWidth(), // nền trắng như ảnh ,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BasicTextField(
+                            readOnly = true,
+                            value = "Sản phẩm có liên quan",
+                            onValueChange = {},
+                            singleLine = true,
+                            textStyle = AppTheme.typography.headlineMedium.copy(
+                                color = Color(0xF5868686)
+                            ),
+                            cursorBrush = SolidColor(containerTopBar),
+                            visualTransformation = VisualTransformation.None,
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+                            keyboardActions = KeyboardActions(
+                                onSearch = {
+
+                                }
+                            ),
+                            modifier = Modifier
+                                .padding(horizontal = AppTheme.dimens.small2, vertical = AppTheme.dimens.small2)
+                            // chừa chỗ cho nút kính lúp
+                            ,
+                            decorationBox = { innerTextField ->
+                                innerTextField()
+                            }
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(
@@ -202,21 +178,22 @@ fun DetailScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = Color.Black,
                             modifier = Modifier.size(AppTheme.dimens.medium2)
                         )
                     }
                 },
                 actions = {
                     IconButton(
-                        onClick = onClickCart
+                        onClick = onClickCart,
+                        modifier = Modifier.padding(AppTheme.dimens.small)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_cart),
+                            painter = painterResource(R.drawable.ic_shop),
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = contentPrice,
                             modifier = Modifier.size(
-                                AppTheme.dimens.medium3)
+                                AppTheme.dimens.medium2)
                         )
                     }
                 }
@@ -284,11 +261,13 @@ fun DetailScreen(
                             OutlinedButton(
                                 onClick = {
                                     if (getCartState.value is CartState.Success) {
+                                        val colorsSelected = colors.filter { it.id == colorState.value }
+                                        val colorId = if (colorsSelected.isEmpty()) colors[0].id else colorsSelected[0].id
                                         val cartResponse = (getCartState.value as CartState.Success).data
                                         val productsCheckout = mutableListOf<ProductCheckout>()
                                         productsCheckout.add(
                                             ProductCheckout(
-                                                color_product_id = product.id.toString(),
+                                                color_product_id = colorId.toString(),
                                                 name = product.name,
                                                 image = image,
                                                 price = price.toString(),

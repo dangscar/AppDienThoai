@@ -81,7 +81,7 @@ fun BottomSheetComment(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.6f)
+            .fillMaxHeight(0.61f)
     ) {
         Box(
             modifier = Modifier,

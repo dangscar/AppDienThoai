@@ -54,7 +54,7 @@ fun SearchTopBar(
                     onValueChange = onQueryChange,
                     singleLine = true,
                     textStyle = AppTheme.typography.headlineMedium.copy(
-                        color = Color(0xF5868686)
+                        color = Color.Black
                     ),
                     cursorBrush = SolidColor(containerTopBar),
                     visualTransformation = VisualTransformation.None,
@@ -71,8 +71,8 @@ fun SearchTopBar(
                     decorationBox = { innerTextField ->
                         if (query.isEmpty()) {
                             Text(
-                                text = "Bạn muốn tìm gì?",
-                                style = AppTheme.typography.labelMedium.copy(
+                                text = "Tìm kiếm ngẫu nhiên!",
+                                style = AppTheme.typography.headlineMedium.copy(
                                     color = Color(0xF5868686)
                                 ),
                             )

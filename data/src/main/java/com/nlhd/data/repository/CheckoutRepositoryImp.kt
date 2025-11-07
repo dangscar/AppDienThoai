@@ -26,6 +26,10 @@ class CheckoutRepositoryImp(
         checkoutOrderRequest: CheckoutOrderRequest,
     ): ResultWrapper<CheckoutOrderResponse> {
         return try {
+            Log.d("AAA", checkoutOrderRequest.customerInfoId.toString())
+            Log.d("AAA", checkoutOrderRequest.paymentMethod.toString())
+            Log.d("AAA", checkoutOrderRequest.selectedProducts.toString())
+            Log.d("AAA", checkoutOrderRequest.totalAmount.toString())
             val responseDto = ktor.post(Utils.BASE_URL+"/api/checkout/store") {
                 contentType(ContentType.Application.Json)
                 header("Authorization", "Bearer $token")

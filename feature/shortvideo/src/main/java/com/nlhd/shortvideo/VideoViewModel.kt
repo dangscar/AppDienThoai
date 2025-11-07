@@ -10,6 +10,8 @@ import androidx.paging.cachedIn
 import com.nlhd.domain.entity.Message.MessageResponse
 import com.nlhd.domain.entity.shortVideo.Comments.AddComment.AddCommentRequest
 import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
+import com.nlhd.domain.entity.shortVideo.LikeShortVideo.FavoriteResponse
+import com.nlhd.domain.entity.shortVideo.LikeShortVideo.LikeResponse
 import com.nlhd.domain.resultWrapper.ResultWrapper
 import com.nlhd.domain.usecase.shortvideo.ShortVideoUseCase
 import kotlinx.coroutines.delay
@@ -41,10 +43,10 @@ class VideoViewModel(
     private var _stateFollow = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
     val stateFollow = _stateFollow.asStateFlow()
 
-    private var _stateLike = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
+    private var _stateLike = MutableStateFlow<ShortVideoLikeState>(ShortVideoLikeState.Idle)
     val stateLike = _stateLike.asStateFlow()
 
-    private var _stateFavorite = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
+    private var _stateFavorite = MutableStateFlow<ShortVideoFavoriteState>(ShortVideoFavoriteState.Idle)
     val stateFavorite = _stateFavorite.asStateFlow()
 
     private var _contentComment = MutableStateFlow("")
@@ -63,6 +65,7 @@ class VideoViewModel(
 
     private var _getFollowUserState = MutableStateFlow<ShortVideoState>(ShortVideoState.Idle)
     val getFollowUserState = _getFollowUserState.asStateFlow()
+
 
     fun setFollowUserState(state: ShortVideoState) {
         _getFollowUserState.update { state }
@@ -102,7 +105,9 @@ class VideoViewModel(
         shortVideoUseCase.addComment.invoke(token, AddCommentRequest(_contentComment.value, videoId)).let { result ->
             when (result) {
                 is ResultWrapper.Failure -> { _addCommentState.update { ShortVideoState.Error(result.exception.message.toString()) } }
-                is ResultWrapper.Success<*> -> { _addCommentState.update { ShortVideoState.Success(result.value as MessageResponse) } }
+                is ResultWrapper.Success<*> -> {
+                    _addCommentState.update { ShortVideoState.Success(result.value as MessageResponse) }
+                }
             }
         }
     }
@@ -124,14 +129,47 @@ class VideoViewModel(
     }
     fun setFollow(follow: Follow) = _actionButton.update { it.copy(avatar = follow) }
 
+    var _actionCountState: MutableStateFlow<ActionCount> = MutableStateFlow(
+        ActionCount(
+            likeCount = "",
+            favoriteCount = "",
+            commentCount = ""
+        )
+    )
+    val actionCountState: StateFlow<ActionCount> = _actionCountState.asStateFlow()
+    fun setLikeCount(value: String) {
+        _actionCountState.update { it.copy(likeCount = value) }
+    }
+
+    fun setFavoriteCount(value: String) {
+        _actionCountState.update { it.copy(favoriteCount = value) }
+    }
+
+    fun setCommentCount(value: String) {
+
+        _actionCountState.update { it.copy(commentCount = value) }
+    }
+
     fun favorite(token: String, videoId: String) = viewModelScope.launch {
         shortVideoUseCase.favorites.invoke(token, videoId).let { result ->
             when (result) {
                 is ResultWrapper.Failure -> {
-                    _stateFavorite.update { ShortVideoState.Error(result.exception.message.toString()) }
+                    _stateFavorite.update { ShortVideoFavoriteState.Error(result.exception.message.toString()) }
                 }
                 is ResultWrapper.Success<*> -> {
-                    _stateFavorite.update { ShortVideoState.Success(result.value as MessageResponse) }
+                    val message = (result.value as FavoriteResponse).message
+                    val favoriteCount = (result.value as FavoriteResponse).favoriteCount
+                    when (message) {
+                        "Added" -> {
+                            setFavorite(Color(0xFFFABA32))
+                            setFavoriteCount(favoriteCount)
+                        }
+                        "Deleted" -> {
+                            setFavorite(Color.White)
+                            setFavoriteCount(favoriteCount)
+                        }
+                    }
+                    _stateFavorite.update { ShortVideoFavoriteState.Success(result.value as FavoriteResponse) }
                 }
 
             }
@@ -142,10 +180,22 @@ class VideoViewModel(
         shortVideoUseCase.likes.invoke(token, videoId).let { result ->
             when (result) {
                 is ResultWrapper.Failure -> {
-                    _stateLike.update { ShortVideoState.Error(result.exception.message.toString()) }
+                    _stateLike.update { ShortVideoLikeState.Error(result.exception.message.toString()) }
                 }
                 is ResultWrapper.Success<*> -> {
-                    _stateLike.update { ShortVideoState.Success(result.value as MessageResponse) }
+                    val message = (result.value as LikeResponse).message
+                    val likeCount = (result.value as LikeResponse).likeCount
+                    when (message) {
+                        "Added" -> {
+                            setLike(Color.Red)
+                            setLikeCount(likeCount)
+                        }
+                        "Deleted" -> {
+                            setLike(Color.White)
+                            setLikeCount(likeCount)
+                        }
+                    }
+                    _stateLike.update { ShortVideoLikeState.Success(result.value as LikeResponse) }
                 }
             }
         }
@@ -341,9 +391,28 @@ data class ImageStatus(
     val selectedIndex: Int = 0,
 )
 
+data class ActionCount(
+    val likeCount: String,
+    val favoriteCount: String,
+    val commentCount: String
+)
+
 sealed class ShortVideoState {
     object Idle: ShortVideoState()
     object Loading: ShortVideoState()
     data class Success(val data: MessageResponse): ShortVideoState()
     data class Error(val message: String): ShortVideoState()
+}
+
+sealed class ShortVideoLikeState {
+    object Idle: ShortVideoLikeState()
+    object Loading: ShortVideoLikeState()
+    data class Success(val data: LikeResponse): ShortVideoLikeState()
+    data class Error(val message: String): ShortVideoLikeState()
+}
+
+sealed class ShortVideoFavoriteState {
+    object Idle: ShortVideoFavoriteState()
+    data class Success(val data: FavoriteResponse): ShortVideoFavoriteState()
+    data class Error(val message: String): ShortVideoFavoriteState()
 }
