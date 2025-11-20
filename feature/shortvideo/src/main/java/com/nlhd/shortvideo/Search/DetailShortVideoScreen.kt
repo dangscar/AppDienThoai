@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -108,7 +109,8 @@ fun TopBarDetailVideoScreen(
                     .fillMaxWidth()
                     .border(
                         AppTheme.dimens.border,
-                        Color(0x57FFFFFF),
+                        //Color(0x57FFFFFF),
+                        Color.White,
                         RoundedCornerShape(AppTheme.dimens.small2)
                     )
                     .padding(AppTheme.dimens.small+AppTheme.dimens.border)
@@ -256,31 +258,33 @@ fun DetailShortVideoScreen (
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color.Black),
+                    .background(color = Color.Black)
+                    .windowInsetsPadding(WindowInsets.navigationBars),
                 verticalArrangement = Arrangement.Center
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.medium),
+                    modifier = Modifier.fillMaxWidth().padding(AppTheme.dimens.small3),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Lượt xem: $viewer",
+                        //"Lượt xem: $viewer",
+                        "Android Kotlin",
                         style = AppTheme.typography.labelMedium.copy(
                             color = Color.White,
-                            fontWeight = FontWeight.Normal
+                            fontWeight = FontWeight.SemiBold
                         ),
                         modifier = Modifier,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.width(AppTheme.dimens.border))
+                    /*Spacer(modifier = Modifier.width(AppTheme.dimens.border))
                     Icon(
                         imageVector = Icons.Outlined.PlayArrow,
                         contentDescription = null,
                         modifier = Modifier.size(AppTheme.dimens.small3),
                         tint = Color.White
-                    )
+                    )*/
                 }
 
             }

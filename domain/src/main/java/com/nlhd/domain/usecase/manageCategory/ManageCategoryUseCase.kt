@@ -1,5 +1,6 @@
 package com.nlhd.domain.usecase.manageCategory
 
 data class ManageCategoryUseCase(
-    val getCategory: GetCategory
+    val getCategory: GetCategory,
+    val addCategory: AddCategory
 )

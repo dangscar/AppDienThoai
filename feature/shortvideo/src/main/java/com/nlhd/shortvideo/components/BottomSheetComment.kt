@@ -1,5 +1,6 @@
 package com.nlhd.shortvideo.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -23,12 +24,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +47,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -62,6 +66,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
 import com.nlhd.core.utils.Utils
+import com.nlhd.core.utils.containerButtonLightGray
 import com.nlhd.core.utils.containerSearch
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.domain.entity.shortVideo.Comments.GetComments.Comment
@@ -81,7 +86,7 @@ fun BottomSheetComment(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.61f)
+            .fillMaxHeight(0.6f)
     ) {
         Box(
             modifier = Modifier,
@@ -118,19 +123,37 @@ fun BottomSheetComment(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text("Có lỗi xảy ra", style = AppTheme.typography.titleMedium)
-                    Button(
+                    Image(
+                        painter = painterResource(R.drawable.refresh),
+                        contentDescription = null,
+                        modifier = Modifier.size(AppTheme.dimens.large)
+                    )
+                    Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                    Text("Có lỗi gì đó đã xảy ra", style = AppTheme.typography.headlineMedium.copy(
+                        color = Color.Black,
+                        fontWeight = FontWeight.SemiBold
+                    ))
+                    Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                    OutlinedButton(
                         onClick = {
                             comments.retry()
                         },
+                        modifier = Modifier.fillMaxWidth(fraction = 0.5f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = contentPrice
-                        )
+                            containerColor = containerButtonLightGray,
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(AppTheme.dimens.small2),
+                        border = _root_ide_package_.androidx.compose.foundation.BorderStroke(AppTheme.dimens.extraSmall, Color.Transparent)
                     ) {
-                        Text("Retry", style = AppTheme.typography.headlineMedium.copy(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        ))
+                        Text(
+                            "Thử lại",
+                            style = AppTheme.typography.headlineMedium.copy(
+                                color = Color.Black,
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            modifier = Modifier.padding(AppTheme.dimens.small)
+                        )
                     }
                 }
 
@@ -149,6 +172,7 @@ fun BottomSheetComment(
 
             }
             is LoadState.NotLoading -> {
+
                 if (comments.itemCount == 0) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -199,6 +223,8 @@ fun BottomSheetComment(
     }
 
 
+
+
 }
 @Composable
 fun CommentItem(
@@ -231,7 +257,7 @@ fun CommentItem(
                 text = comment.user.name,
                 style = AppTheme.typography.titleMedium.copy(
                     color = Color.Black,
-                    fontWeight = FontWeight.W700
+                    fontWeight = FontWeight.Bold
                 ),
                 modifier = Modifier.padding(AppTheme.dimens.small),
                 maxLines = 1,
@@ -239,23 +265,23 @@ fun CommentItem(
             )
             Text(
                 text = comment.content,
-                style = AppTheme.typography.bodyMedium.copy(
+                style = AppTheme.typography.headlineMedium.copy(
                     color = Color.Black,
-                    fontWeight = FontWeight.Normal
+                    fontWeight = FontWeight.SemiBold
                 ),
-                modifier = Modifier.padding(AppTheme.dimens.small),
+                modifier = Modifier.padding(horizontal = AppTheme.dimens.small),
             )
             Text(
                 text = comment.createdAt,
-                style = AppTheme.typography.headlineSmall.copy(
+                style = AppTheme.typography.labelMedium.copy(
                     color = Color.Black,
-                    fontWeight = FontWeight.Light
+                    fontWeight = FontWeight.Normal
                 ),
-                modifier = Modifier.padding(AppTheme.dimens.small),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = AppTheme.dimens.small),
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.End
             )
-
         }
     }
     Spacer(modifier = Modifier.height(AppTheme.dimens.small))
@@ -270,6 +296,7 @@ fun InputText(
     onValueChange: (String) -> Unit,
     onClick: (() -> Unit)? = null
 ) {
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -325,13 +352,15 @@ fun InputText(
                 ) {
                     val (text) = createRefs()
                     Box(
-                        modifier = Modifier.constrainAs(text) {
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            top.linkTo(parent.top)
-                            bottom.linkTo(parent.bottom)
-                            width = Dimension.fillToConstraints
-                        }.padding(horizontal = AppTheme.dimens.small3),
+                        modifier = Modifier
+                            .constrainAs(text) {
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                                top.linkTo(parent.top)
+                                bottom.linkTo(parent.bottom)
+                                width = Dimension.fillToConstraints
+                            }
+                            .padding(horizontal = AppTheme.dimens.small3),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         if (content.isEmpty()) {

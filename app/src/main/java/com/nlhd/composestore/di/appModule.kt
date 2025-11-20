@@ -13,6 +13,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.nlhd.address.AddressViewModel
 import com.nlhd.admin.AdminProfileViewModel
 import com.nlhd.cart.CartViewModel
+import com.nlhd.category.ManageCategoryViewModel
 import com.nlhd.checkout.CheckoutViewModel
 import com.nlhd.composestore.NavigationViewModel
 import com.nlhd.dashboard.DashboardViewModel
@@ -163,5 +164,9 @@ val appModule = module {
 
     viewModel {
         EditColorProductViewModel(get())
+    }
+
+    viewModel {
+        ManageCategoryViewModel(get())
     }
 }

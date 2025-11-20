@@ -150,11 +150,11 @@ class VideoViewModel(
         _actionCountState.update { it.copy(commentCount = value) }
     }
 
-    fun favorite(token: String, videoId: String) = viewModelScope.launch {
+    fun favorite(token: String, videoId: String, onError: (String) -> Unit) = viewModelScope.launch {
         shortVideoUseCase.favorites.invoke(token, videoId).let { result ->
             when (result) {
                 is ResultWrapper.Failure -> {
-                    _stateFavorite.update { ShortVideoFavoriteState.Error(result.exception.message.toString()) }
+                    onError(result.exception.message.toString())
                 }
                 is ResultWrapper.Success<*> -> {
                     val message = (result.value as FavoriteResponse).message
@@ -176,11 +176,11 @@ class VideoViewModel(
         }
     }
 
-    fun like(token: String, videoId: String) = viewModelScope.launch {
+    fun like(token: String, videoId: String, onError: (String) -> Unit) = viewModelScope.launch {
         shortVideoUseCase.likes.invoke(token, videoId).let { result ->
             when (result) {
                 is ResultWrapper.Failure -> {
-                    _stateLike.update { ShortVideoLikeState.Error(result.exception.message.toString()) }
+                    onError(result.exception.message.toString())
                 }
                 is ResultWrapper.Success<*> -> {
                     val message = (result.value as LikeResponse).message

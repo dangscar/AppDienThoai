@@ -1,5 +1,6 @@
 package com.nlhd.category
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.nlhd.core.R
+import com.nlhd.core.theme.AppTheme
+import com.nlhd.keystore.KeyStoreManager
+import org.koin.androidx.compose.koinViewModel
+
 data class Category(
     val id: Int,
     val name: String
@@ -26,22 +39,21 @@ data class Category(
 @Composable
 
 fun ManageCategoryScreen(
+    viewModel: ManageCategoryViewModel = koinViewModel(),
     onClickBack: () -> Unit
 ) {
-    var categories by remember {
-        mutableStateOf(
-            listOf(
-                Category(1, "Samsung"),
-                Category(2, "iPhone"),
-                Category(3, "Xiaomi"),
-                Category(4, "OPPO"),
-                Category(5, "Vivo")
-            )
-        )
-    }
-    var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val keyStore = KeyStoreManager.getKeyStore(context).collectAsStateWithLifecycle("")
+
+    var showDialogAdd by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
     var searchQuery by remember { mutableStateOf("") }
+
+    val manageCategoryState by viewModel.manageCategoryState.collectAsStateWithLifecycle()
+    val addCategoryState by viewModel.addCategoryState.collectAsStateWithLifecycle()
+    val name by viewModel.name.collectAsStateWithLifecycle()
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
+
 
     Scaffold(
         topBar = {
@@ -67,8 +79,7 @@ fun ManageCategoryScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    selectedCategory = null
-                    showDialog = true
+                    showDialogAdd = true
                 },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
@@ -101,39 +112,90 @@ fun ManageCategoryScreen(
                 )
             )
 
-            // Category List
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                val filteredCategories = categories.filter {
-                    it.name.contains(searchQuery, ignoreCase = true)
+            when (manageCategoryState) {
+                is ManageCategoryState.Error -> {
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding), contentAlignment = Alignment.Center) {
+                        Text((manageCategoryState as ManageCategoryState.Error).message, style = AppTheme.typography.titleMedium)
+                    }
                 }
+                ManageCategoryState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LottieAnimation(
+                            composition,
+                            iterations = LottieConstants.IterateForever,
+                            modifier = Modifier.size(AppTheme.dimens.large)
+                        )
+                    }
+                }
+                is ManageCategoryState.Success -> {
+                    val categories = (manageCategoryState as ManageCategoryState.Success).data.categories
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
 
-                items(filteredCategories) { category ->
-                    CategoryItem(
-                        category = category,
-                        onEdit = {
-                            selectedCategory = category
-                            showDialog = true
+                        items(categories.size) {
+                            val category = categories[it]
+                            CategoryItem(category.name) {
+
+                            }
                         }
-                    )
+                    }
                 }
             }
+
+            when (addCategoryState) {
+                is AddCategoryState.Error -> {
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding), contentAlignment = Alignment.Center) {
+                        Text((addCategoryState as AddCategoryState.Error).message, style = AppTheme.typography.titleMedium)
+                    }
+                }
+                AddCategoryState.Idle -> {}
+                AddCategoryState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LottieAnimation(
+                            composition,
+                            iterations = LottieConstants.IterateForever,
+                            modifier = Modifier.size(AppTheme.dimens.large)
+                        )
+                    }
+                }
+                is AddCategoryState.Success -> {
+                    viewModel.getCategory()
+                    viewModel.setName("")
+                    viewModel.updateAddCategoryState()
+                    showDialogAdd = false
+                    Toast.makeText(context, "Thành công", Toast.LENGTH_SHORT).show()
+                }
+            }
+
         }
     }
 
-    // Add/Edit Dialog
-    if (showDialog) {
+    // Add Dialog
+    if (showDialogAdd) {
         CategoryDialog(
-            category = selectedCategory,
-            onDismiss = { showDialog = false },
-            onSave = { name ->
+            name = name,
+            onDismiss = { showDialogAdd = false },
+            onValueChange = viewModel::setName,
+            onSave = {
+                viewModel.addCategory(keyStore.value)
 
             }
         )
     }
+
 }
 
 @Composable
@@ -155,7 +217,7 @@ fun StatItem(label: String, value: String, color: Color) {
 
 @Composable
 fun CategoryItem(
-    category: Category,
+    name: String,
     onEdit: () -> Unit
 ) {
 
@@ -174,7 +236,7 @@ fun CategoryItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = category.name,
+                    text = name,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -191,21 +253,20 @@ fun CategoryItem(
 
 @Composable
 fun CategoryDialog(
-    category: Category?,
+    name: String,
     onDismiss: () -> Unit,
-    onSave: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    onSave: () -> Unit
 ) {
-    var name by remember { mutableStateOf(category?.name ?: "") }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(if (category == null) "Thêm danh mục mới" else "Chỉnh sửa danh mục")
+            Text("Thêm danh mục mới")
         },
         text = {
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = onValueChange,
                 label = { Text("Tên danh mục") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -214,7 +275,7 @@ fun CategoryDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (name.isNotBlank()) onSave(name)
+                    if (name.isNotBlank()) onSave()
                 },
                 enabled = name.isNotBlank()
             ) {

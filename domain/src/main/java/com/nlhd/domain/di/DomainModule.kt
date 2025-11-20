@@ -23,8 +23,11 @@ import com.nlhd.domain.usecase.checkout.CheckoutOrder
 import com.nlhd.domain.usecase.checkout.CheckoutUseCase
 import com.nlhd.domain.usecase.dashboard.DashboardUseCase
 import com.nlhd.domain.usecase.dashboard.GetDashboard
+import com.nlhd.domain.usecase.manageCategory.AddCategory
 import com.nlhd.domain.usecase.manageCategory.GetCategory
 import com.nlhd.domain.usecase.manageCategory.ManageCategoryUseCase
+import com.nlhd.domain.usecase.manageOrder.GetOrdersAdmin
+import com.nlhd.domain.usecase.manageOrder.ManageOrderUseCase
 import com.nlhd.domain.usecase.manageProduct.AddColorProduct
 import com.nlhd.domain.usecase.manageProduct.AddProduct
 import com.nlhd.domain.usecase.manageProduct.AddVersionProduct
@@ -118,7 +121,8 @@ val domainModule = module {
 
     single {
         ManageCategoryUseCase(
-            getCategory = GetCategory(get())
+            getCategory = GetCategory(get()),
+            addCategory = AddCategory(get())
         )
     }
 
@@ -168,6 +172,12 @@ val domainModule = module {
             updateCaption = UpdateCaption(get()),
             getFollowingVideos = GetFollowingVideos(get()),
             getFollowUser = GetFollowUser(get())
+        )
+    }
+
+    single {
+        ManageOrderUseCase(
+            getOrdersAdmin = GetOrdersAdmin(get())
         )
     }
 

@@ -317,9 +317,9 @@ fun SearchShortSuccessScreen(
                                                 if (video!!.caption != "") {
                                                     Text(
                                                         text = video.caption,
-                                                        style = AppTheme.typography.headlineMedium.copy(
+                                                        style = AppTheme.typography.labelMedium.copy(
                                                             color = Color.Black,
-                                                            fontWeight = FontWeight.Normal
+                                                            fontWeight = FontWeight.SemiBold
                                                         ),
                                                         maxLines = 2,
                                                         overflow = TextOverflow.Ellipsis,
@@ -328,7 +328,7 @@ fun SearchShortSuccessScreen(
                                                 }
 
                                                 Row(
-                                                    modifier = Modifier.width(width).padding(vertical = AppTheme.dimens.small),
+                                                    modifier = Modifier.width(width).padding(vertical = AppTheme.dimens.small2),
                                                     horizontalArrangement = Arrangement.SpaceBetween,
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
@@ -372,13 +372,13 @@ fun SearchShortSuccessScreen(
                                                         )
                                                         Text(
                                                             text = video.likes,
-                                                            style = AppTheme.typography.titleSmall.copy(
+                                                            style = AppTheme.typography.headlineSmall.copy(
                                                                 color = Color.Black,
-                                                                fontWeight = FontWeight.Normal
+                                                                fontWeight = FontWeight.SemiBold
                                                             ),
                                                             maxLines = 1,
                                                             overflow = TextOverflow.Ellipsis,
-                                                            modifier = Modifier.padding(AppTheme.dimens.small)
+                                                            modifier = Modifier.padding(AppTheme.dimens.border)
                                                         )
                                                     }
                                                 }

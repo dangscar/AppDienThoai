@@ -92,12 +92,7 @@ fun SearchScreen(
 
             when (categories) {
                 is CategorySearchState.Error -> {
-                    item {
-                        Box(modifier = Modifier
-                            .fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            Text((categories as CategorySearchState.Error).message, style = AppTheme.typography.titleMedium)
-                        }
-                    }
+
                 }
                 CategorySearchState.Loading -> {
                     item {

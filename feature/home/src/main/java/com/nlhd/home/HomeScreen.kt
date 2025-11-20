@@ -1,5 +1,6 @@
 package com.nlhd.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -22,6 +23,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +50,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
+import com.nlhd.core.utils.containerButtonLightGray
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.domain.entity.product.Product
 import com.nlhd.home.component.CardProduct
@@ -183,24 +186,42 @@ fun HomeScreen(
 
             when (products.loadState.refresh) {
                 is LoadState.Error -> {
-                    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text((products.loadState.refresh as LoadState.Error).error.message ?: "Error", style = AppTheme.typography.headlineMedium.copy(
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.refresh),
+                            contentDescription = null,
+                            modifier = Modifier.size(AppTheme.dimens.large)
+                        )
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                        Text("Có lỗi gì đó đã xảy ra", style = AppTheme.typography.headlineMedium.copy(
                             color = Color.Black,
-                            fontWeight = FontWeight.Normal
+                            fontWeight = FontWeight.SemiBold
                         ))
                         Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                        Button(
+                        OutlinedButton(
                             onClick = {
                                 products.retry()
                             },
+                            modifier = Modifier.fillMaxWidth(fraction = 0.5f),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = contentPrice
-                            )
+                                containerColor = containerButtonLightGray,
+                                contentColor = Color.Black
+                            ),
+                            shape = RoundedCornerShape(AppTheme.dimens.small2),
+                            border = _root_ide_package_.androidx.compose.foundation.BorderStroke(AppTheme.dimens.extraSmall, Color.Transparent)
                         ) {
-                            Text("Retry", style = AppTheme.typography.headlineMedium.copy(
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            ))
+                            Text(
+                                "Thử lại",
+                                style = AppTheme.typography.headlineMedium.copy(
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.SemiBold
+                                ),
+                                modifier = Modifier.padding(AppTheme.dimens.small)
+                            )
                         }
                     }
                 }

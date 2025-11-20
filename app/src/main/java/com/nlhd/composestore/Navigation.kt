@@ -134,11 +134,11 @@ sealed class Navigation(
     val title: String,
     val icon: Int
 ) {
-    object Home : Navigation("home", "Trang chủ", R.drawable.ic_home)
+    object Home : Navigation("home", "Home", R.drawable.ic_home)
     object Shop: Navigation("shop", "Shop", R.drawable.ic_shop)
-    object AddVideo: Navigation("addVideo", "Thêm video", R.drawable.ic_addvideo)
-    object Order: Navigation("order", "Đơn hàng", R.drawable.ic_artical)
-    object User : Navigation("user", "Người dùng", R.drawable.ic_profile)
+    object AddVideo: Navigation("addVideo", "Add video", R.drawable.ic_addvideo)
+    object Order: Navigation("order", "Orders", R.drawable.ic_artical)
+    object User : Navigation("user", "Profile", R.drawable.ic_profile)
 }
 
 @Serializable
@@ -178,7 +178,6 @@ fun BottomBar(
     Column {
         Divider(
             thickness = AppTheme.dimens.extraSmall,
-            //color = Color(0xED484646)
             color = Color(0x4ACECBCB)
         )
         Row(
@@ -1178,11 +1177,14 @@ fun GeneralScreen(
                         onClickEditProfile = onClickEditProfile,
                         onClickAddVideo = onClickAddVideo,
                         onClickBack = {
-                            contentCommonViewModel.releaseAll()
-                            navController.navigate(Navigation.Home.route) {
-                                popUpTo(0) { inclusive = true }
-                                launchSingleTop = true
+                            if (contentCommonViewModel.releaseAll()) {
+                                navController.navigate(Navigation.Home.route) {
+                                    popUpTo(0) { inclusive = true }
+                                    launchSingleTop = true
+                                }
                             }
+
+
                         },
                         onClickAvatar = onClickAvatar,
                         onClickLikedVideo = onClickLikedVideo,

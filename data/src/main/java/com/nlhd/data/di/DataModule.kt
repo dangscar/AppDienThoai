@@ -6,6 +6,7 @@ import com.nlhd.data.repository.CartRepositoryImp
 import com.nlhd.data.repository.CheckoutRepositoryImp
 import com.nlhd.data.repository.DashboardRepositoryImp
 import com.nlhd.data.repository.ManageCategoryRepositoryImp
+import com.nlhd.data.repository.ManageOrderRepositoryImp
 import com.nlhd.data.repository.ManageProductRepositoryImp
 import com.nlhd.data.repository.OrderRepositoryImp
 import com.nlhd.data.repository.ProductRepositoryImp
@@ -16,6 +17,7 @@ import com.nlhd.domain.repository.CartRepository
 import com.nlhd.domain.repository.CheckoutRepository
 import com.nlhd.domain.repository.DashboardRepository
 import com.nlhd.domain.repository.ManageCategoryRepository
+import com.nlhd.domain.repository.ManageOrderRepository
 import com.nlhd.domain.repository.ManageProductRepository
 import com.nlhd.domain.repository.OrderRepository
 import com.nlhd.domain.repository.ProductRepository
@@ -53,5 +55,9 @@ val dataModule = module {
 
     single<ShortVideoRepository> {
         ShortVideoRepositoryImp(get())
+    }
+
+    single<ManageOrderRepository> {
+        ManageOrderRepositoryImp(get())
     }
 }

@@ -2,6 +2,7 @@ package com.nlhd.order
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,11 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -26,12 +30,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.nlhd.core.R
 import com.nlhd.core.theme.AppTheme
+import com.nlhd.core.utils.containerButtonLightGray
 import com.nlhd.core.utils.contentPrice
 import com.nlhd.keystore.KeyStoreManager
 import com.nlhd.order.components.CardOrder
@@ -66,23 +73,43 @@ fun OrderScreen(
         when (orders.loadState.refresh) {
             is LoadState.Error -> {
                 item {
-                    Text("Chưa có đơn hàng nào", style = AppTheme.typography.headlineMedium.copy(
-                        color = Color.Black,
-                        fontWeight = FontWeight.Normal
-                    ))
-                    Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
-                    Button(
-                        onClick = {
-                            orders.retry()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = contentPrice
-                        )
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Text("Retry", style = AppTheme.typography.headlineMedium.copy(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
+                        Image(
+                            painter = painterResource(R.drawable.refresh),
+                            contentDescription = null,
+                            modifier = Modifier.size(AppTheme.dimens.large)
+                        )
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                        Text("Có lỗi gì đó đã xảy ra", style = AppTheme.typography.headlineMedium.copy(
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold
                         ))
+                        Spacer(modifier = Modifier.height(AppTheme.dimens.small2))
+                        OutlinedButton(
+                            onClick = {
+                                orders.retry()
+                            },
+                            modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = containerButtonLightGray,
+                                contentColor = Color.Black
+                            ),
+                            shape = RoundedCornerShape(AppTheme.dimens.small2),
+                            border = _root_ide_package_.androidx.compose.foundation.BorderStroke(AppTheme.dimens.extraSmall, Color.Transparent)
+                        ) {
+                            Text(
+                                "Thử lại",
+                                style = AppTheme.typography.headlineMedium.copy(
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.SemiBold
+                                ),
+                                modifier = Modifier.padding(AppTheme.dimens.small)
+                            )
+                        }
                     }
                 }
             }

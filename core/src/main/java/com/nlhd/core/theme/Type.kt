@@ -159,7 +159,7 @@ val CompactMediumTypography = Typography(
         fontFamily = TikTokSans,
         fontWeight = FontWeight.Normal,
         fontSize = 13.sp,
-        lineHeight = 20.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.5.sp,
         color = Color.Black
     ),
@@ -185,7 +185,7 @@ val CompactMediumTypography = Typography(
         fontSize = 15.sp,
         letterSpacing = 0.5.sp,
         color = Color.Black,
-        lineHeight = 23.sp
+        lineHeight = 19.sp
     ),
     headlineLarge = TextStyle(
         fontFamily = TikTokSans,
